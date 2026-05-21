@@ -29,7 +29,7 @@ export default function Home() {
         </div>
       </header>
 
-      {/* Hero  */}
+      {/*   */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-6 flex flex-col items-center justify-center py-16 relative z-10">
         <div className="text-center max-w-3xl mb-16 space-y-6">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-xs text-indigo-300">
