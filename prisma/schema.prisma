@@ -1,0 +1,112 @@
+datasource db {
+  provider = "postgresql"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Admin {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String
+  role         String   @default("Admin")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@map("admins")
+}
+
+model Teacher {
+  id             String    @id @default(uuid())
+  userId         String    @unique // Employee ID, e.g. TCH001
+  userName       String
+  joiningDate    DateTime
+  branch         String
+  designation    String
+  subjects       String[]  @default([])
+  qualifications String    @default("")
+  gradesInCharge String[]  @default([])
+  experience     String    @default("")
+  mobileNo       String    @default("")
+  email          String    @default("")
+  status         String    @default("Active") // Active, Inactive, On Leave
+  password       String?   // Hashed password, null until activated
+  activated      Boolean   @default(false)
+  activatedAt    DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  assessments    Assessment[]
+
+  @@map("teachers")
+}
+
+model Otp {
+  id          String   @id @default(uuid())
+  identifier  String   // Email or User ID
+  otp         String
+  contactType String   @default("email")
+  createdAt   DateTime @default(now())
+  expiresAt   DateTime
+
+  @@map("otps")
+}
+
+model Assessment {
+  id                  String        @id @default(uuid())
+  title               String
+  duration            Int           @default(30) // in minutes
+  subject             String
+  lesson              String
+  isPublic            Boolean       @default(false)
+  questions           Json          // Array of question objects
+  createdById         String
+  createdByEmail      String
+  createdByTeacherName String
+  createdBy           Teacher       @relation(fields: [createdById], references: [id], onDelete: Cascade)
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+  liveSessions        LiveSession[]
+
+  @@map("assessments")
+}
+
+enum LiveSessionStatus {
+  WAITING
+  ACTIVE
+  COMPLETED
+}
+
+model LiveSession {
+  id           String                   @id @default(uuid())
+  token        String                   @unique
+  assessmentId String
+  teacherId    String
+  status       LiveSessionStatus        @default(WAITING)
+  startedAt    DateTime?
+  endedAt      DateTime?
+  createdAt    DateTime                 @default(now())
+  assessment   Assessment               @relation(fields: [assessmentId], references: [id])
+  participants LiveSessionParticipant[]
+
+  @@map("live_sessions")
+}
+
+model LiveSessionParticipant {
+  id               String      @id @default(uuid())
+  sessionId        String
+  name             String
+  grade            String
+  section          String
+  studentId        String
+  joinedAt         DateTime    @default(now())
+  completedAt      DateTime?
+  timeTakenSeconds Int?
+  score            Int?
+  totalQuestions   Int?
+  answers          Json?
+  tabSwitches      Int         @default(0)
+  session          LiveSession @relation(fields: [sessionId], references: [id])
+
+  @@map("live_session_participants")
+}
