@@ -73,7 +73,7 @@ export async function GET(
 
     // Calculate details and stats
     const scores = session.participants
-      .map((p) => p.score)
+      .map((p: { score: number | null }) => p.score)
       .filter((s): s is number => s !== null);
 
     const participantCount = session.participants.length;

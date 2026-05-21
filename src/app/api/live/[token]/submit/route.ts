@@ -147,7 +147,7 @@ export function buildLeaderboard(
     return (a.timeTakenSeconds ?? Infinity) - (b.timeTakenSeconds ?? Infinity);
   });
 
-  return sorted.map((p, i) => ({
+  return sorted.map((p: any, i: number) => ({
     rank: i + 1,
     id: p.id,
     name: p.name,

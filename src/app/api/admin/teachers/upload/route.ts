@@ -165,7 +165,7 @@ export async function POST(request: Request) {
           mobileNo: toSafeString(normalizedRow["mobile"] || normalizedRow["mobileno"] || normalizedRow["phone"]),
         };
       })
-      .filter((t) => t.userId && t.userName && t.branch && t.designation);
+      .filter((t: any) => t.userId && t.userName && t.branch && t.designation);
 
     if (mappedData.length === 0) {
       return NextResponse.json(
