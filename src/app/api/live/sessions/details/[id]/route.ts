@@ -71,13 +71,12 @@ export async function GET(
       designation: "Educator",
     };
 
-    // Calculate details and stats
     const scores = session.participants
       .map((p: { score: number | null }) => p.score)
-      .filter((s): s is number => s !== null);
+      .filter((s: number | null): s is number => s !== null);
 
     const participantCount = session.participants.length;
-    const avgScore = scores.length > 0 ? parseFloat((scores.reduce((a, b) => a + b, 0) / scores.length).toFixed(1)) : 0;
+    const avgScore = scores.length > 0 ? parseFloat((scores.reduce((a: number, b: number) => a + b, 0) / scores.length).toFixed(1)) : 0;
     const highScore = scores.length > 0 ? Math.max(...scores) : 0;
     const lowScore = scores.length > 0 ? Math.min(...scores) : 0;
 
