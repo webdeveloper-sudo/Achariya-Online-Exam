@@ -41,7 +41,7 @@ export async function POST(
       return NextResponse.json({ message: "Session is not active." }, { status: 409 });
     }
 
-    const participant = session.participants.find((p) => p.id === participantId);
+    const participant = session.participants.find((p: any) => p.id === participantId);
     if (!participant) {
       return NextResponse.json({ message: "Participant not found in this session." }, { status: 404 });
     }
@@ -50,10 +50,9 @@ export async function POST(
     }
 
     // Score calculation
-    const questions = (
-      Array.isArray(session.assessment.questions)
-        ? session.assessment.questions
-        : JSON.parse(session.assessment.questions as string)
+    const questions = (Array.isArray(session.assessment.questions)
+      ? session.assessment.questions
+      : JSON.parse(session.assessment.questions as string)
     ) as Array<{ id: string; correctAnswer: string }>;
 
     let score = 0;
@@ -85,7 +84,7 @@ export async function POST(
       where: { sessionId: session.id },
     });
 
-    const allDone = allParticipants.every((p) => p.completedAt !== null);
+    const allDone = allParticipants.every((p: any) => p.completedAt !== null);
 
     if (allDone) {
       await endSessionAndBroadcast(token, session.id, allParticipants);
