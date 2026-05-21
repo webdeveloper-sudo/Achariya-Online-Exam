@@ -55,7 +55,7 @@ export async function GET(request: Request) {
       },
     });
 
-    const teacherMap = new Map(teachers.map((t) => [t.id, t]));
+    const teacherMap = new Map(teachers.map((t: any) => [t.id, t]));
 
     // Map sessions to include computed stats and host details
     const formattedSessions = sessions.map((session) => {
