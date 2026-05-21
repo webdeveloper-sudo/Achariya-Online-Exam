@@ -60,13 +60,13 @@ export async function GET(
     });
 
     // Compute summary stats
-    const sessionsWithStats = sessions.map((s) => {
-      const completed = s.participants.filter((p) => p.completedAt !== null);
-      const scores = completed.map((p) => p.score ?? 0);
+    const sessionsWithStats = sessions.map((s: any) => {
+      const completed = s.participants.filter((p: any) => p.completedAt !== null);
+      const scores = completed.map((p: any) => p.score ?? 0);
       const topScore = scores.length > 0 ? Math.max(...scores) : null;
       const avgScore =
         scores.length > 0
-          ? Math.round((scores.reduce((a, b) => a + b, 0) / scores.length) * 10) / 10
+          ? Math.round((scores.reduce((a: number, b: number) => a + b, 0) / scores.length) * 10) / 10
           : null;
 
       return {
@@ -80,7 +80,7 @@ export async function GET(
         completedCount: completed.length,
         topScore,
         avgScore,
-        participants: s.participants.map((p, i) => ({
+        participants: s.participants.map((p: any, i: number) => ({
           rank: i + 1,
           ...p,
         })),
