@@ -274,8 +274,8 @@ export default function AssessmentDetailPage() {
 
   if (loading) return (
     <div className="p-8 flex items-center justify-center h-96">
-      <div className="flex flex-col items-center gap-3 text-slate-500">
-        <Loader size={32} className="animate-spin text-emerald-400" />
+      <div className="flex flex-col items-center gap-3 text-gray-500">
+        <Loader size={32} className="animate-spin text-blue-600" />
         <p className="text-sm">Loading assessment...</p>
       </div>
     </div>
@@ -283,10 +283,10 @@ export default function AssessmentDetailPage() {
 
   if (error || !assessment) return (
     <div className="p-8 space-y-4">
-      <Link href="/teacher/assessments" className="inline-flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-colors">
+      <Link href="/teacher/assessments" className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-gray-900 transition-colors">
         <ArrowLeft size={16} /> Back to Repository
       </Link>
-      <div className="bg-rose-500/10 border border-rose-500/20 rounded-2xl p-6 text-rose-400 flex items-center gap-3">
+      <div className="bg-red-50 border border-red-200 rounded-none p-6 text-red-600 flex items-center gap-3 shadow-sm">
         <AlertCircle size={20} />
         <p>{error || "Assessment not found."}</p>
       </div>
@@ -306,38 +306,38 @@ export default function AssessmentDetailPage() {
 
       <div className="p-8 space-y-6 animate-in fade-in slide-in-from-bottom duration-300 print-page">
         {/* Header */}
-        <div className="flex items-center justify-between gap-4 no-print">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 no-print border-b border-gray-200 pb-5">
           <div className="flex items-center gap-3">
             <Link
               href="/teacher/assessments"
-              className="p-2.5 bg-slate-900 border border-white/5 rounded-xl hover:bg-slate-800 text-slate-400 hover:text-white transition-colors"
+              className="p-2.5 bg-white border border-gray-300 rounded-none hover:bg-gray-50 text-gray-600 hover:text-gray-900 transition-colors cursor-pointer"
             >
               <ArrowLeft size={16} />
             </Link>
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="text-2xl font-black">{isEditMode ? editForm?.title : assessment.title}</h2>
-                <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
-                  assessment.isPublic ? "bg-indigo-500/10 text-indigo-400 border border-indigo-500/20" : "bg-slate-800 text-slate-400 border border-white/5"
+                <h2 className="text-2xl font-black text-gray-900">{isEditMode ? editForm?.title : assessment.title}</h2>
+                <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-none text-[10px] font-bold ${
+                  assessment.isPublic ? "bg-blue-50 text-blue-600 border border-blue-100" : "bg-gray-100 text-gray-600 border border-gray-200"
                 }`}>
                   {assessment.isPublic ? <Globe size={9} /> : <Lock size={9} />}
                   {assessment.isPublic ? "Public" : "Private"}
                 </span>
               </div>
-              <p className="text-xs text-slate-500 mt-0.5">
+              <p className="text-xs text-gray-500 mt-0.5">
                 By {assessment.createdByTeacherName} · {new Date(assessment.createdAt).toLocaleDateString()}
               </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             {!isEditMode && (
               <>
                 {(isOwner || assessment.isPublic) && (
                   <button
                     onClick={handleHostAssessment}
                     disabled={hosting}
-                    className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-xs font-bold text-white shadow-lg shadow-emerald-500/10 transition-all cursor-pointer"
+                    className="flex items-center gap-1.5 px-4 py-2 rounded-none bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-xs font-bold text-white shadow-sm transition-all cursor-pointer border border-blue-600"
                   >
                     {hosting ? <Loader size={13} className="animate-spin" /> : <Play size={13} />}
                     Host Live Exam
@@ -345,10 +345,10 @@ export default function AssessmentDetailPage() {
                 )}
                 {isOwner && (
                   <>
-                    <button onClick={startEdit} className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/5 text-xs font-bold text-slate-300 transition-all">
+                    <button onClick={startEdit} className="flex items-center gap-1.5 px-4 py-2 rounded-none bg-white hover:bg-gray-50 border border-gray-300 text-xs font-bold text-gray-700 transition-all cursor-pointer">
                       <Edit size={13} /> Edit
                     </button>
-                    <button onClick={handleDelete} className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/10 text-xs font-bold text-rose-400 transition-all">
+                    <button onClick={handleDelete} className="flex items-center gap-1.5 px-4 py-2 rounded-none bg-white hover:bg-red-50 border border-gray-300 hover:border-red-300 text-xs font-bold text-red-650 transition-all cursor-pointer">
                       <Trash2 size={13} /> Delete
                     </button>
                   </>
@@ -357,16 +357,16 @@ export default function AssessmentDetailPage() {
             )}
             {isEditMode && (
               <>
-                <button onClick={cancelEdit} className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white/5 border border-white/5 text-xs font-bold text-slate-400 transition-all">
+                <button onClick={cancelEdit} className="flex items-center gap-1.5 px-4 py-2 rounded-none bg-white hover:bg-gray-50 border border-gray-300 text-xs font-bold text-gray-700 transition-all cursor-pointer">
                   <X size={13} /> Cancel
                 </button>
-                <button onClick={handleSave} disabled={saving} className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-xs font-bold transition-all">
+                <button onClick={handleSave} disabled={saving} className="flex items-center gap-1.5 px-4 py-2 rounded-none bg-brand-red hover:bg-brand-red/90 disabled:opacity-50 text-xs font-bold text-white transition-all cursor-pointer shadow-sm border border-brand-red">
                   {saving ? <Loader size={13} className="animate-spin" /> : <Save size={13} />} {saving ? "Saving..." : "Save Changes"}
                 </button>
               </>
             )}
             {!isEditMode && (
-              <button onClick={() => setShowPrintModal(true)} className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-indigo-600/10 hover:bg-indigo-600/20 border border-indigo-500/20 text-xs font-bold text-indigo-400 transition-all">
+              <button onClick={() => setShowPrintModal(true)} className="flex items-center gap-1.5 px-4 py-2 rounded-none bg-white hover:bg-gray-50 border border-gray-300 text-xs font-bold text-gray-750 transition-all cursor-pointer">
                 <Printer size={13} /> Print / Export
               </button>
             )}
@@ -374,7 +374,7 @@ export default function AssessmentDetailPage() {
         </div>
 
         {saveError && (
-          <div className="flex items-center gap-2 p-3 bg-rose-500/10 border border-rose-500/20 rounded-xl text-xs text-rose-400 no-print">
+          <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-none text-xs text-red-600 no-print">
             <AlertCircle size={14} />{saveError}
           </div>
         )}
@@ -383,34 +383,34 @@ export default function AssessmentDetailPage() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 no-print">
           {isEditMode ? (
             <>
-              <div className="bg-slate-900/40 border border-white/5 rounded-2xl p-4 col-span-2 space-y-1.5">
-                <label className="text-[9px] font-black uppercase tracking-wider text-slate-500">Assessment Title</label>
+              <div className="bg-white/80 border border-gray-200 rounded-none p-4 col-span-2 space-y-1.5 shadow-sm backdrop-blur-sm">
+                <label className="text-[9px] font-black uppercase tracking-wider text-gray-500">Assessment Title</label>
                 <input value={editForm?.title || ""} onChange={(e) => setEditForm({ ...editForm!, title: e.target.value })}
-                  className="w-full bg-slate-950/60 border border-white/5 rounded-lg px-3 py-2 text-sm font-bold outline-none focus:border-emerald-500" />
+                  className="w-full bg-white border border-gray-300 rounded-none px-3 py-2 text-sm font-bold text-gray-900 outline-none focus:border-blue-600" />
               </div>
-              <div className="bg-slate-900/40 border border-white/5 rounded-2xl p-4 space-y-1.5">
-                <label className="text-[9px] font-black uppercase tracking-wider text-slate-500">Subject</label>
+              <div className="bg-white/80 border border-gray-200 rounded-none p-4 space-y-1.5 shadow-sm backdrop-blur-sm">
+                <label className="text-[9px] font-black uppercase tracking-wider text-gray-500">Subject</label>
                 <input value={editForm?.subject || ""} onChange={(e) => setEditForm({ ...editForm!, subject: e.target.value })}
-                  className="w-full bg-slate-950/60 border border-white/5 rounded-lg px-3 py-2 text-sm outline-none focus:border-emerald-500" />
+                  className="w-full bg-white border border-gray-300 rounded-none px-3 py-2 text-sm text-gray-900 outline-none focus:border-blue-600" />
               </div>
-              <div className="bg-slate-900/40 border border-white/5 rounded-2xl p-4 space-y-1.5">
-                <label className="text-[9px] font-black uppercase tracking-wider text-slate-500">Duration (mins)</label>
+              <div className="bg-white/80 border border-gray-200 rounded-none p-4 space-y-1.5 shadow-sm backdrop-blur-sm">
+                <label className="text-[9px] font-black uppercase tracking-wider text-gray-500">Duration (mins)</label>
                 <input type="number" value={editForm?.duration || 30} onChange={(e) => setEditForm({ ...editForm!, duration: parseInt(e.target.value) })}
-                  className="w-full bg-slate-950/60 border border-white/5 rounded-lg px-3 py-2 text-sm outline-none focus:border-emerald-500" />
+                  className="w-full bg-white border border-gray-300 rounded-none px-3 py-2 text-sm text-gray-900 outline-none focus:border-blue-600" />
               </div>
             </>
           ) : (
             <>
-              <div className="bg-slate-900/40 border border-white/5 rounded-2xl p-4 flex items-center gap-3">
-                <BookOpen className="text-indigo-400 shrink-0" size={20} />
-                <div><label className="text-[9px] uppercase tracking-wider font-bold text-slate-500">Subject</label><p className="text-sm font-bold mt-0.5">{assessment.subject}</p></div>
+              <div className="bg-white/80 border border-gray-200 rounded-none p-4 flex items-center gap-3 shadow-sm backdrop-blur-sm">
+                <BookOpen className="text-blue-600 shrink-0" size={20} />
+                <div><label className="text-[9px] uppercase tracking-wider font-bold text-gray-500">Subject</label><p className="text-sm font-bold text-gray-900 mt-0.5">{assessment.subject}</p></div>
               </div>
-              <div className="bg-slate-900/40 border border-white/5 rounded-2xl p-4 flex items-center gap-3">
-                <Clock className="text-indigo-400 shrink-0" size={20} />
-                <div><label className="text-[9px] uppercase tracking-wider font-bold text-slate-500">Duration</label><p className="text-sm font-bold mt-0.5">{assessment.duration} mins</p></div>
+              <div className="bg-white/80 border border-gray-200 rounded-none p-4 flex items-center gap-3 shadow-sm backdrop-blur-sm">
+                <Clock className="text-blue-600 shrink-0" size={20} />
+                <div><label className="text-[9px] uppercase tracking-wider font-bold text-gray-500">Duration</label><p className="text-sm font-bold text-gray-900 mt-0.5">{assessment.duration} mins</p></div>
               </div>
-              <div className="bg-slate-900/40 border border-white/5 rounded-2xl p-4 col-span-2 flex items-center gap-3">
-                <div><label className="text-[9px] uppercase tracking-wider font-bold text-slate-500">Chapter / Lesson</label><p className="text-sm font-bold mt-0.5">{assessment.lesson}</p></div>
+              <div className="bg-white/80 border border-gray-200 rounded-none p-4 col-span-2 flex items-center gap-3 shadow-sm backdrop-blur-sm">
+                <div><label className="text-[9px] uppercase tracking-wider font-bold text-gray-500">Chapter / Lesson</label><p className="text-sm font-bold text-gray-900 mt-0.5">{assessment.lesson}</p></div>
               </div>
             </>
           )}
@@ -425,10 +425,10 @@ export default function AssessmentDetailPage() {
 
         {/* Questions */}
         <div className="space-y-4">
-          <div className="flex items-center justify-between no-print">
-            <h3 className="text-base font-bold">{questions.length} Questions</h3>
+          <div className="flex items-center justify-between no-print border-b border-gray-200 pb-3">
+            <h3 className="text-base font-bold text-gray-900">{questions.length} Questions</h3>
             {isEditMode && (
-              <button onClick={addEditQuestion} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-xs font-bold text-slate-300 border border-white/5 transition-all">
+              <button onClick={addEditQuestion} className="flex items-center gap-1.5 px-3 py-1.5 rounded-none bg-white hover:bg-gray-50 text-xs font-bold text-gray-700 border border-gray-300 transition-all cursor-pointer">
                 <Plus size={12} /> Add Question
               </button>
             )}
@@ -436,17 +436,17 @@ export default function AssessmentDetailPage() {
 
           {/* New Question Draft Form at the top */}
           {isEditMode && newQuestionForm && (
-            <div className="bg-slate-900 border border-emerald-500/30 rounded-2xl p-6 space-y-4 shadow-xl shadow-emerald-500/5">
-              <div className="flex items-center justify-between border-b border-white/5 pb-3">
-                <span className="text-xs font-black uppercase tracking-widest text-emerald-400">Draft New Question</span>
-                <button onClick={() => { setNewQuestionForm(null); setNewQuestionError(null); }} className="p-1 text-slate-500 hover:text-white transition-colors">
+            <div className="bg-white border border-blue-300 rounded-none p-6 space-y-4 shadow-sm">
+              <div className="flex items-center justify-between border-b border-gray-200 pb-3">
+                <span className="text-xs font-black uppercase tracking-widest text-blue-600">Draft New Question</span>
+                <button onClick={() => { setNewQuestionForm(null); setNewQuestionError(null); }} className="p-1 text-gray-400 hover:text-gray-900 transition-colors cursor-pointer">
                   <X size={14} />
                 </button>
               </div>
 
               {/* Question Type Options */}
               <div className="space-y-1.5">
-                <label className="text-[10px] font-black uppercase tracking-wider text-slate-400">Question Type</label>
+                <label className="text-[10px] font-black uppercase tracking-wider text-gray-500">Question Type</label>
                 <div className="flex flex-wrap gap-2">
                   {[
                     { val: "multiple_choice", label: "Multiple Choice" },
@@ -465,10 +465,10 @@ export default function AssessmentDetailPage() {
                         });
                         setNewQuestionError(null);
                       }}
-                      className={`px-3 py-1.5 rounded-lg text-xs font-bold border transition-all ${
+                      className={`px-3 py-1.5 rounded-none text-xs font-bold border transition-all cursor-pointer ${
                         newQuestionForm.type === t.val
-                          ? "bg-indigo-600 border-indigo-600 text-white"
-                          : "bg-slate-950/60 border-white/5 text-slate-400 hover:text-slate-200"
+                          ? "bg-blue-600 border-blue-600 text-white"
+                          : "bg-white border-gray-300 text-gray-600 hover:text-gray-900 hover:border-gray-400"
                       }`}
                     >
                       {t.label}
@@ -479,24 +479,24 @@ export default function AssessmentDetailPage() {
 
               {/* Question Text */}
               <div className="space-y-1.5">
-                <label className="text-[10px] font-black uppercase tracking-wider text-slate-400">Question Text</label>
+                <label className="text-[10px] font-black uppercase tracking-wider text-gray-500">Question Text</label>
                 <textarea
                   value={newQuestionForm.question}
                   onChange={(e) => setNewQuestionForm({ ...newQuestionForm, question: e.target.value })}
                   placeholder="Type the question..."
                   rows={2}
-                  className="w-full bg-slate-950/60 border border-white/5 rounded-xl px-3 py-2 text-sm font-bold text-white outline-none focus:border-indigo-500 resize-none"
+                  className="w-full bg-white border border-gray-300 rounded-none px-3 py-2 text-sm font-bold text-gray-900 outline-none focus:border-blue-600 resize-none"
                 />
               </div>
 
               {/* Options & Correct Answer fields based on type */}
               {newQuestionForm.type === "multiple_choice" && (
                 <div className="space-y-3">
-                  <label className="text-[10px] font-black uppercase tracking-wider text-slate-400">Options</label>
+                  <label className="text-[10px] font-black uppercase tracking-wider text-gray-500">Options</label>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     {newQuestionForm.options.map((opt: string, optIdx: number) => (
                       <div key={optIdx} className="flex items-center gap-2">
-                        <span className="text-xs font-bold text-indigo-400">{String.fromCharCode(65 + optIdx)}.</span>
+                        <span className="text-xs font-bold text-blue-600">{String.fromCharCode(65 + optIdx)}.</span>
                         <input
                           value={opt}
                           onChange={(e) => {
@@ -505,18 +505,18 @@ export default function AssessmentDetailPage() {
                             setNewQuestionForm({ ...newQuestionForm, options: newOpts });
                           }}
                           placeholder={`Option ${String.fromCharCode(65 + optIdx)}`}
-                          className="w-full bg-slate-950/60 border border-white/5 rounded-lg px-3 py-2 text-xs text-slate-300 outline-none focus:border-indigo-500"
+                          className="w-full bg-white border border-gray-300 rounded-none px-3 py-2 text-xs text-gray-900 outline-none focus:border-blue-600"
                         />
                       </div>
                     ))}
                   </div>
 
                   <div className="space-y-1.5 mt-2">
-                    <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 font-bold">Correct Answer</label>
+                    <label className="text-[10px] font-black uppercase tracking-wider text-gray-500 font-bold">Correct Answer</label>
                     <select
                       value={newQuestionForm.correctAnswer}
                       onChange={(e) => setNewQuestionForm({ ...newQuestionForm, correctAnswer: e.target.value })}
-                      className="w-full bg-slate-950/80 border border-white/5 rounded-xl px-3 py-2 text-xs text-slate-300 outline-none focus:border-indigo-500"
+                      className="w-full bg-white border border-gray-300 rounded-none px-3 py-2 text-xs text-gray-900 outline-none focus:border-blue-600"
                     >
                       <option value="">Select Correct Option</option>
                       {newQuestionForm.options.map((opt: string, optIdx: number) => {
@@ -534,17 +534,17 @@ export default function AssessmentDetailPage() {
 
               {newQuestionForm.type === "true_false" && (
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-black uppercase tracking-wider text-slate-400">Correct Answer</label>
+                  <label className="text-[10px] font-black uppercase tracking-wider text-gray-500">Correct Answer</label>
                   <div className="flex gap-4">
                     {["True", "False"].map((val) => (
-                      <label key={val} className="flex items-center gap-2 cursor-pointer text-xs text-slate-300">
+                      <label key={val} className="flex items-center gap-2 cursor-pointer text-xs text-gray-700">
                         <input
                           type="radio"
                           name="new_tf_answer"
                           value={val}
                           checked={newQuestionForm.correctAnswer === val}
                           onChange={() => setNewQuestionForm({ ...newQuestionForm, correctAnswer: val })}
-                          className="accent-indigo-500"
+                          className="accent-blue-600"
                         />
                         {val}
                       </label>
@@ -555,46 +555,46 @@ export default function AssessmentDetailPage() {
 
               {newQuestionForm.type === "short_answer" && (
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-black uppercase tracking-wider text-slate-400">Correct Answer Solution</label>
+                  <label className="text-[10px] font-black uppercase tracking-wider text-gray-500">Correct Answer Solution</label>
                   <input
                     value={newQuestionForm.correctAnswer}
                     onChange={(e) => setNewQuestionForm({ ...newQuestionForm, correctAnswer: e.target.value })}
                     placeholder="Enter the expected correct answer..."
-                    className="w-full bg-slate-950/60 border border-white/5 rounded-lg px-3 py-2 text-xs text-slate-300 outline-none focus:border-indigo-500"
+                    className="w-full bg-white border border-gray-300 rounded-none px-3 py-2 text-xs text-gray-900 outline-none focus:border-blue-600"
                   />
                 </div>
               )}
 
               {/* Explanation */}
               <div className="space-y-1.5">
-                <label className="text-[10px] font-black uppercase tracking-wider text-slate-500">Explanation / Reasoning (Optional)</label>
+                <label className="text-[10px] font-black uppercase tracking-wider text-gray-500">Explanation / Reasoning (Optional)</label>
                 <textarea
                   value={newQuestionForm.explanation || ""}
                   onChange={(e) => setNewQuestionForm({ ...newQuestionForm, explanation: e.target.value })}
                   placeholder="Explain why this answer is correct..."
                   rows={2}
-                  className="w-full bg-slate-950/40 border border-white/5 rounded-lg px-3 py-2 text-xs text-slate-400 outline-none resize-none italic focus:border-indigo-500"
+                  className="w-full bg-white border border-gray-300 rounded-none px-3 py-2 text-xs text-gray-800 outline-none resize-none italic focus:border-blue-600"
                 />
               </div>
 
               {newQuestionError && (
-                <div className="p-2.5 bg-rose-500/10 border border-rose-500/20 text-rose-400 rounded-xl text-xs">
+                <div className="p-2.5 bg-red-50 border border-red-200 text-red-600 rounded-none text-xs">
                   {newQuestionError}
                 </div>
               )}
 
-              <div className="flex justify-end gap-2 pt-2 border-t border-white/5">
+              <div className="flex justify-end gap-2 pt-2 border-t border-gray-250">
                 <button
                   type="button"
                   onClick={() => { setNewQuestionForm(null); setNewQuestionError(null); }}
-                  className="px-3 py-1.5 bg-white/5 hover:bg-white/10 rounded-lg text-xs font-bold text-slate-400"
+                  className="px-3 py-1.5 bg-white hover:bg-gray-50 rounded-none text-xs font-bold text-gray-700 border border-gray-300 transition-all cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="button"
                   onClick={saveNewQuestion}
-                  className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 rounded-lg text-xs font-bold text-white shadow-lg shadow-emerald-500/15"
+                  className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 rounded-none text-xs font-bold text-white shadow-sm border border-blue-600 cursor-pointer"
                 >
                   Save Question
                 </button>
@@ -623,41 +623,41 @@ export default function AssessmentDetailPage() {
                 setEditForm({ ...editForm!, questions: updated });
                 setDraggedIndex(null);
               }}
-              className={`bg-slate-900/40 border border-white/5 rounded-2xl p-6 print:bg-white print:border-gray-200 print:border print:mb-4 print:rounded transition-all ${
-                isEditMode ? "hover:border-indigo-500/20 active:opacity-50" : ""
+              className={`bg-white/80 border border-gray-200 rounded-none p-6 print:bg-white print:border-gray-200 print:border print:mb-4 print:rounded-none transition-all ${
+                isEditMode ? "hover:border-blue-550/30 active:opacity-50 shadow-sm" : "shadow-sm backdrop-blur-sm"
               }`}
             >
               <div className="flex items-center gap-2 mb-3 no-print">
                 {isEditMode && (
-                  <div className="cursor-move p-1 text-slate-500 hover:text-white" title="Drag to reorder">
+                  <div className="cursor-move p-1 text-gray-400 hover:text-gray-900" title="Drag to reorder">
                     <GripVertical size={14} />
                   </div>
                 )}
-                <span className="h-6 w-6 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 flex items-center justify-center font-bold text-[10px] shrink-0">{idx + 1}</span>
-                <span className="text-[9px] font-black uppercase tracking-widest text-slate-500">{q.type.replace("_", " ")}</span>
+                <span className="h-6 w-6 rounded-none bg-blue-50 border border-blue-100 text-blue-600 flex items-center justify-center font-bold text-[10px] shrink-0">{idx + 1}</span>
+                <span className="text-[9px] font-black uppercase tracking-widest text-gray-500">{q.type.replace("_", " ")}</span>
                 {isEditMode && (
-                  <button onClick={() => removeEditQuestion(idx)} className="ml-auto p-1 text-slate-600 hover:text-rose-400 transition-colors"><Trash2 size={12} /></button>
+                  <button onClick={() => removeEditQuestion(idx)} className="ml-auto p-1 text-gray-400 hover:text-red-650 transition-colors cursor-pointer"><Trash2 size={12} /></button>
                 )}
               </div>
-              <p className="text-sm font-bold mb-1 print:hidden">{idx + 1}.</p>
+              <p className="text-sm font-bold mb-1 print:hidden text-gray-900">{idx + 1}.</p>
 
               {isEditMode ? (
                 <textarea value={q.question} onChange={(e) => updateEditQuestion(idx, "question", e.target.value)} rows={2}
-                  className="w-full bg-slate-950/60 border border-white/5 rounded-xl px-3 py-2 text-sm font-bold text-white outline-none focus:border-emerald-500 resize-none mb-3" />
+                  className="w-full bg-white border border-gray-300 rounded-none px-3 py-2 text-sm font-bold text-gray-900 outline-none focus:border-blue-600 resize-none mb-3" />
               ) : (
-                <p className="text-sm font-bold text-slate-100 mb-4">{q.question}</p>
+                <p className="text-sm font-bold text-gray-900 mb-4">{q.question}</p>
               )}
 
               {q.type === "multiple_choice" && q.options?.length > 0 && (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-4">
                   {q.options.map((opt: string, optIdx: number) => (
                     <div key={optIdx} className="flex items-center gap-2">
-                      <span className="text-[10px] font-black text-indigo-400 shrink-0">{String.fromCharCode(65 + optIdx)}.</span>
+                      <span className="text-[10px] font-black text-blue-600 shrink-0">{String.fromCharCode(65 + optIdx)}.</span>
                       {isEditMode ? (
                         <input value={opt} onChange={(e) => updateEditOption(idx, optIdx, e.target.value)}
-                          className="w-full bg-slate-950/60 border border-white/5 rounded-lg px-2 py-1.5 text-xs text-slate-300 outline-none focus:border-indigo-500" />
+                          className="w-full bg-white border border-gray-300 rounded-none px-2 py-1.5 text-xs text-gray-900 outline-none focus:border-blue-600" />
                       ) : (
-                        <span className="w-full bg-slate-950/50 border border-white/5 rounded-xl px-3 py-2 text-xs text-slate-300 print:border-gray-200">{opt}</span>
+                        <span className="w-full bg-gray-50 border border-gray-200 rounded-none px-3 py-2 text-xs text-gray-700 print:border-gray-200">{opt}</span>
                       )}
                     </div>
                   ))}
@@ -665,50 +665,48 @@ export default function AssessmentDetailPage() {
               )}
 
               {/* Answer — hidden on print if !printIncludeAnswers */}
-              <div className={`mt-3 p-3 bg-emerald-500/5 border border-emerald-500/10 rounded-xl ${!printIncludeAnswers ? "print:hidden" : ""}`}>
-                {isEditMode ? (
+              <div className={`mt-3 p-3 bg-emerald-50 border border-emerald-100 rounded-none ${!printIncludeAnswers ? "print:hidden" : ""}`}>
+                {isEditMode && editForm ? (
                   <div className="space-y-1">
-                    <label className="text-[9px] font-black uppercase tracking-wider text-emerald-500">Correct Answer</label>
+                    <label className="text-[9px] font-black uppercase tracking-wider text-emerald-800">Correct Answer</label>
                     <input value={q.correctAnswer} onChange={(e) => updateEditQuestion(idx, "correctAnswer", e.target.value)}
-                      className="w-full bg-emerald-500/5 border border-emerald-500/20 rounded-lg px-3 py-1.5 text-xs text-emerald-300 outline-none" />
+                      className="w-full bg-white border border-emerald-250 rounded-none px-3 py-1.5 text-xs text-emerald-850 outline-none" />
                   </div>
                 ) : (
-                  <p className="text-[11px] font-bold text-emerald-400">
-                    ✔ Answer: <span className="text-white font-extrabold">{q.correctAnswer}</span>
+                  <p className="text-[11px] font-bold text-emerald-700">
+                    ✔ Answer: <span className="text-emerald-950 font-black">{q.correctAnswer}</span>
                   </p>
                 )}
                 {q.explanation && !isEditMode && (
-                  <p className="text-[10px] text-slate-500 italic mt-1 leading-relaxed">{q.explanation}</p>
+                  <p className="text-[10px] text-gray-500 italic mt-1 leading-relaxed">{q.explanation}</p>
                 )}
                 {isEditMode && (
                   <div className="space-y-1 mt-2">
-                    <label className="text-[9px] font-black uppercase tracking-wider text-slate-500">Explanation</label>
+                    <label className="text-[9px] font-black uppercase tracking-wider text-gray-500">Explanation</label>
                     <textarea value={q.explanation || ""} onChange={(e) => updateEditQuestion(idx, "explanation", e.target.value)} rows={2}
-                      className="w-full bg-slate-950/40 border border-white/5 rounded-lg px-2 py-1.5 text-xs text-slate-400 outline-none resize-none italic" />
+                      className="w-full bg-white border border-gray-300 rounded-none px-2 py-1.5 text-xs text-gray-700 outline-none resize-none italic focus:border-blue-600" />
                   </div>
                 )}
               </div>
-            </div>
-          ))}
         </div>
 
         {/* Conducted Sessions Section */}
         <div className="mt-12 space-y-6 no-print">
-          <div className="flex items-center gap-3 border-b border-white/5 pb-4">
-            <div className="h-10 w-10 bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 rounded-xl flex items-center justify-center">
+          <div className="flex items-center gap-3 border-b border-gray-200 pb-4">
+            <div className="h-10 w-10 bg-blue-50 border border-blue-100 text-blue-600 rounded-none flex items-center justify-center">
               <Calendar size={18} />
             </div>
             <div>
-              <h3 className="text-lg font-black text-white">Conducted Live Sessions</h3>
-              <p className="text-xs text-slate-500 mt-0.5">Historical list of live assessment rooms conducted for this exam</p>
+              <h3 className="text-lg font-black text-gray-900">Conducted Live Sessions</h3>
+              <p className="text-xs text-gray-500 mt-0.5">Historical list of live assessment rooms conducted for this exam</p>
             </div>
           </div>
 
           {conductedSessions.length === 0 ? (
-            <div className="bg-slate-900/20 border border-white/5 rounded-3xl p-8 text-center text-slate-400 text-xs">
-              <p className="font-bold">No Conducted Sessions Yet</p>
-              <p className="text-slate-500 mt-1 max-w-sm mx-auto leading-relaxed">
-                Click on <span className="text-emerald-400 font-bold">"Host Live Exam"</span> in the header to start a live session and invite students in real-time.
+            <div className="bg-white/80 border border-gray-200 rounded-none p-8 text-center text-gray-500 text-xs shadow-sm backdrop-blur-sm">
+              <p className="font-bold text-gray-900">No Conducted Sessions Yet</p>
+              <p className="text-gray-500 mt-1 max-w-sm mx-auto leading-relaxed">
+                Click on <span className="text-blue-600 font-bold">"Host Live Exam"</span> in the header to start a live session and invite students in real-time.
               </p>
             </div>
           ) : (
@@ -719,72 +717,72 @@ export default function AssessmentDetailPage() {
                 const totalQ = Array.isArray(assessment?.questions) ? assessment?.questions.length : 0;
 
                 return (
-                  <div key={session.id} className="bg-slate-900/40 border border-white/5 rounded-3xl overflow-hidden transition-all">
+                  <div key={session.id} className="bg-white/80 border border-gray-200 rounded-none overflow-hidden transition-all shadow-sm backdrop-blur-sm">
                     {/* Accordion Header */}
                     <button
                       onClick={() => setExpandedSessionId(isExpanded ? null : session.id)}
-                      className="w-full text-left p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:bg-slate-900/20 transition-all"
+                      className="w-full text-left p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:bg-gray-50 transition-all cursor-pointer"
                     >
                       <div className="flex items-center gap-4">
-                        <div className={`h-8 w-8 rounded-xl flex items-center justify-center text-xs font-bold shrink-0 ${
-                          session.status === "COMPLETED" ? "bg-emerald-500/10 text-emerald-400" :
-                          session.status === "ACTIVE" ? "bg-indigo-500/10 text-indigo-400 animate-pulse" :
-                          "bg-slate-800 text-slate-400"
+                        <div className={`h-8 w-8 rounded-none flex items-center justify-center text-xs font-bold shrink-0 ${
+                          session.status === "COMPLETED" ? "bg-emerald-50 text-emerald-600 border border-emerald-100" :
+                          session.status === "ACTIVE" ? "bg-blue-50 text-blue-600 border border-blue-100 animate-pulse" :
+                          "bg-gray-100 text-gray-500 border border-gray-200"
                         }`}>
                           {session.status === "COMPLETED" ? "C" : session.status === "ACTIVE" ? "A" : "W"}
                         </div>
                         <div>
-                          <p className="text-sm font-bold text-slate-200">{formattedTime}</p>
-                          <p className="text-[10px] text-slate-500 mt-0.5">Token ID: {session.token}</p>
+                          <p className="text-sm font-bold text-gray-900">{formattedTime}</p>
+                          <p className="text-[10px] text-gray-500 mt-0.5">Token ID: {session.token}</p>
                         </div>
                       </div>
 
                       <div className="flex items-center gap-6 text-xs shrink-0">
                         <div className="text-right">
-                          <p className="text-[9px] text-slate-500 uppercase font-bold tracking-wider">Students</p>
-                          <p className="font-bold text-slate-300 mt-0.5">{session.participantCount} Joined</p>
+                          <p className="text-[9px] text-gray-500 uppercase font-bold tracking-wider">Students</p>
+                          <p className="font-bold text-gray-800 mt-0.5">{session.participantCount} Joined</p>
                         </div>
 
                         {session.status === "COMPLETED" && (
                           <>
                             <div className="text-right">
-                              <p className="text-[9px] text-slate-500 uppercase font-bold tracking-wider">Top Score</p>
-                              <p className="font-bold text-indigo-400 mt-0.5">{session.topScore ?? "-"} / {totalQ}</p>
+                              <p className="text-[9px] text-gray-500 uppercase font-bold tracking-wider">Top Score</p>
+                              <p className="font-bold text-blue-600 mt-0.5">{session.topScore ?? "-"} / {totalQ}</p>
                             </div>
                             <div className="text-right">
-                              <p className="text-[9px] text-slate-500 uppercase font-bold tracking-wider">Average</p>
-                              <p className="font-bold text-emerald-400 mt-0.5">{session.avgScore ?? "-"} / {totalQ}</p>
+                              <p className="text-[9px] text-gray-500 uppercase font-bold tracking-wider">Average</p>
+                              <p className="font-bold text-emerald-600 mt-0.5">{session.avgScore ?? "-"} / {totalQ}</p>
                             </div>
                           </>
                         )}
 
-                        <span className={`text-[9px] font-black uppercase px-2.5 py-0.5 rounded-full ${
-                          session.status === "COMPLETED" ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20" :
-                          session.status === "ACTIVE" ? "bg-indigo-500/10 text-indigo-400 border border-indigo-500/20" :
-                          "bg-slate-800 text-slate-400 border border-white/5"
+                        <span className={`text-[9px] font-black uppercase px-2.5 py-0.5 rounded-none ${
+                          session.status === "COMPLETED" ? "bg-emerald-50 text-emerald-600 border border-emerald-100" :
+                          session.status === "ACTIVE" ? "bg-blue-50 text-blue-600 border border-blue-100" :
+                          "bg-gray-100 text-gray-655 border border-gray-200"
                         }`}>
                           {session.status}
                         </span>
 
-                        {isExpanded ? <ChevronUp size={16} className="text-slate-500" /> : <ChevronDown size={16} className="text-slate-500" />}
+                        {isExpanded ? <ChevronUp size={16} className="text-gray-400" /> : <ChevronDown size={16} className="text-gray-400" />}
                       </div>
                     </button>
 
                     {/* Accordion Body */}
                     {isExpanded && (
-                      <div className="border-t border-white/5 bg-slate-950/40 p-6 space-y-6">
+                      <div className="border-t border-gray-200 bg-gray-50/50 p-6 space-y-6">
                         {/* Session details status CTA */}
                         {(session.status === "WAITING" || session.status === "ACTIVE") && (
-                          <div className="bg-slate-900/60 border border-indigo-500/20 rounded-2xl p-4 flex flex-col sm:flex-row justify-between sm:items-center gap-4">
+                          <div className="bg-white border border-blue-200 rounded-none p-4 flex flex-col sm:flex-row justify-between sm:items-center gap-4 shadow-sm">
                             <div>
-                              <p className="text-xs font-bold text-indigo-400">Live Control Room Active</p>
-                              <p className="text-[11px] text-slate-400 mt-0.5">
+                              <p className="text-xs font-bold text-blue-600">Live Control Room Active</p>
+                              <p className="text-[11px] text-gray-650 mt-0.5">
                                 This live classroom room is currently {session.status.toLowerCase()}. You can connect and manage the room as the educator.
                               </p>
                             </div>
                             <Link
                               href={`/live/${session.token}/host`}
-                              className="bg-indigo-600 hover:bg-indigo-500 px-4 py-2 rounded-xl text-xs font-bold text-white text-center transition-all shrink-0"
+                              className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-none text-xs font-bold text-white text-center transition-all shrink-0 cursor-pointer shadow-sm border border-blue-600"
                             >
                               Open Educator Dashboard
                             </Link>
@@ -793,15 +791,15 @@ export default function AssessmentDetailPage() {
 
                         {/* Leaderboard */}
                         <div className="space-y-4">
-                          <h4 className="text-xs font-black uppercase tracking-wider text-slate-400 flex items-center gap-2">
-                            <Trophy size={14} className="text-indigo-400" />
+                          <h4 className="text-xs font-black uppercase tracking-wider text-gray-500 flex items-center gap-2">
+                            <Trophy size={14} className="text-blue-600" />
                             Final Leaderboard & Roster Results
                           </h4>
 
-                          <div className="overflow-x-auto border border-white/5 rounded-2xl">
-                            <table className="w-full border-collapse text-left text-[11px]">
+                          <div className="overflow-x-auto border border-gray-200 rounded-none bg-white">
+                            <table className="w-full border-collapse text-left text-[11px] text-gray-700">
                               <thead>
-                                <tr className="border-b border-white/5 text-[9px] font-black uppercase text-slate-500 bg-slate-950/20">
+                                <tr className="border-b border-gray-200 text-[9px] font-black uppercase text-gray-500 bg-gray-50">
                                   <th className="py-2.5 px-3">Rank</th>
                                   <th className="py-2.5 px-4">Student</th>
                                   <th className="py-2.5 px-4">Score</th>
@@ -810,48 +808,48 @@ export default function AssessmentDetailPage() {
                                   <th className="py-2.5 px-4">Status</th>
                                 </tr>
                               </thead>
-                              <tbody className="divide-y divide-white/5">
+                              <tbody className="divide-y divide-gray-150">
                                 {session.participants.map((participant: any, rankIdx: number) => {
                                   const formattedTime = participant.timeTakenSeconds !== null
                                     ? `${Math.floor(participant.timeTakenSeconds / 60)}:${(participant.timeTakenSeconds % 60).toString().padStart(2, "0")}`
                                     : "-";
 
                                   return (
-                                    <tr key={participant.id} className="hover:bg-slate-900/10">
+                                    <tr key={participant.id} className="hover:bg-gray-50/50">
                                       <td className="py-3 px-3">
-                                        <span className={`h-5 w-5 rounded-md flex items-center justify-center text-[10px] font-black ${
-                                          rankIdx === 0 ? "bg-amber-500 text-slate-950" :
-                                          rankIdx === 1 ? "bg-slate-300 text-slate-950" :
-                                          rankIdx === 2 ? "bg-amber-750 text-white" :
-                                          "bg-slate-900 text-slate-500"
+                                        <span className={`h-5 w-5 rounded-none flex items-center justify-center text-[10px] font-black ${
+                                          rankIdx === 0 ? "bg-amber-100 text-amber-800 border border-amber-250" :
+                                          rankIdx === 1 ? "bg-gray-100 text-gray-700 border border-gray-200" :
+                                          rankIdx === 2 ? "bg-orange-100 text-orange-850 border border-orange-200" :
+                                          "bg-gray-50 text-gray-500 border border-gray-200"
                                         }`}>
                                           {rankIdx + 1}
                                         </span>
                                       </td>
                                       <td className="py-3 px-4">
-                                        <p className="font-bold text-slate-200">{participant.name}</p>
-                                        <p className="text-[9px] text-slate-500 mt-0.5">ID: {participant.studentId} · Grade {participant.grade}-{participant.section}</p>
+                                        <p className="font-bold text-gray-900">{participant.name}</p>
+                                        <p className="text-[9px] text-gray-500 mt-0.5">ID: {participant.studentId} · Grade {participant.grade}-{participant.section}</p>
                                       </td>
-                                      <td className="py-3 px-4 font-black text-emerald-400">
+                                      <td className="py-3 px-4 font-black text-emerald-600">
                                         {participant.score !== null ? `${participant.score} / ${totalQ}` : "-"}
                                       </td>
-                                      <td className="py-3 px-4 font-mono text-slate-300">
+                                      <td className="py-3 px-4 font-mono text-gray-650">
                                         {formattedTime}
                                       </td>
                                       <td className="py-3 px-4">
                                         {participant.tabSwitches > 0 ? (
-                                          <span className="text-[9px] font-black uppercase text-amber-500 bg-amber-500/10 border border-amber-500/20 px-1.5 py-0.5 rounded">
+                                          <span className="text-[9px] font-black uppercase text-amber-700 bg-amber-50 border border-amber-200 px-1.5 py-0.5 rounded-none">
                                             {participant.tabSwitches} Switch{participant.tabSwitches > 1 ? "es" : ""}
                                           </span>
                                         ) : (
-                                          <span className="text-[9px] font-black uppercase text-slate-500">
+                                          <span className="text-[9px] font-black uppercase text-gray-400">
                                             0
                                           </span>
                                         )}
                                       </td>
                                       <td className="py-3 px-4">
                                         <span className={`text-[9px] font-black uppercase ${
-                                          participant.completedAt ? "text-emerald-400" : "text-slate-500"
+                                          participant.completedAt ? "text-emerald-600" : "text-gray-400"
                                         }`}>
                                           {participant.completedAt ? "Finished" : "No Submission"}
                                         </span>
@@ -862,7 +860,7 @@ export default function AssessmentDetailPage() {
                               </tbody>
                             </table>
                             {session.participants.length === 0 && (
-                              <div className="text-center py-6 text-slate-500">
+                              <div className="text-center py-6 text-gray-400">
                                 No participants joined this session.
                               </div>
                             )}
@@ -880,29 +878,29 @@ export default function AssessmentDetailPage() {
 
       {/* Print Modal */}
       {showPrintModal && (
-        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 no-print">
-          <div className="bg-slate-900 border border-white/10 w-full max-w-md rounded-3xl p-8 space-y-6 shadow-2xl">
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 no-print">
+          <div className="bg-white border border-gray-250 w-full max-w-md rounded-none p-8 space-y-6 shadow-2xl">
             <div className="flex items-center justify-between">
-              <h3 className="text-xl font-bold">Print / Export</h3>
-              <button onClick={() => setShowPrintModal(false)} className="p-2 hover:bg-white/5 rounded-xl text-slate-400"><X size={16} /></button>
+              <h3 className="text-xl font-black text-gray-900">Print / Export</h3>
+              <button onClick={() => setShowPrintModal(false)} className="p-2 hover:bg-gray-50 border border-transparent hover:border-gray-200 rounded-none text-gray-400 hover:text-gray-900 transition-colors cursor-pointer"><X size={16} /></button>
             </div>
             <div className="space-y-3">
-              <p className="text-xs text-slate-400">Choose the print format:</p>
+              <p className="text-xs text-gray-500">Choose the print format:</p>
               {[
                 { value: true, label: "📋 Educator Answer Key", desc: "Includes all answers and explanations" },
                 { value: false, label: "📄 Student Exam Paper", desc: "Questions only — no answers shown" },
               ].map(({ value, label, desc }) => (
                 <button key={label} onClick={() => setPrintIncludeAnswers(value)}
-                  className={`w-full text-left p-4 rounded-2xl border transition-all ${
-                    printIncludeAnswers === value ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400" : "bg-white/5 border-white/5 text-slate-400 hover:border-white/10"
+                  className={`w-full text-left p-4 rounded-none border transition-all cursor-pointer ${
+                    printIncludeAnswers === value ? "bg-blue-50 border-blue-500/30 text-blue-700" : "bg-white border-gray-200 text-gray-500 hover:border-gray-350 hover:bg-gray-50"
                   }`}
                 >
-                  <p className="font-bold text-sm">{label}</p>
+                  <p className="font-bold text-sm text-gray-850">{label}</p>
                   <p className="text-[10px] mt-0.5 opacity-70">{desc}</p>
                 </button>
               ))}
             </div>
-            <button onClick={handlePrint} className="w-full bg-indigo-600 hover:bg-indigo-500 py-3.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all">
+            <button onClick={handlePrint} className="w-full bg-brand-red hover:bg-brand-red/90 border border-brand-red py-3.5 rounded-none font-bold text-sm text-white flex items-center justify-center gap-2 transition-all cursor-pointer shadow-sm">
               <FileDown size={14} /> Print Now
             </button>
           </div>

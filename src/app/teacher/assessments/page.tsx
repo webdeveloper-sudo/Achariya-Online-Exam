@@ -102,14 +102,14 @@ export default function AssessmentsPage() {
       {/* Header */}
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div>
-          <h2 className="text-3xl font-black">Assessments Repository</h2>
-          <p className="text-sm text-slate-400 mt-1">
+          <h2 className="text-3xl font-black text-gray-900">Assessments Repository</h2>
+          <p className="text-sm text-gray-500 mt-1">
             Browse your saved question banks or discover public assessments from the school network.
           </p>
         </div>
         <Link
           href="/teacher/generate"
-          className="bg-emerald-600 hover:bg-emerald-500 px-5 py-3 rounded-2xl font-bold text-xs flex items-center gap-2 transition-all shadow-lg shadow-emerald-600/20 shrink-0"
+          className="bg-brand-red hover:bg-brand-red/90 px-5 py-3 rounded-none font-bold text-xs flex items-center gap-2 transition-all shadow-md shadow-red-600/10 shrink-0 text-white cursor-pointer"
         >
           <Plus size={14} /> New Assessment
         </Link>
@@ -117,19 +117,19 @@ export default function AssessmentsPage() {
 
       {/* Tabs + Search */}
       <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
-        <div className="flex bg-slate-900/60 border border-white/5 rounded-2xl p-1 gap-1">
+        <div className="flex bg-gray-100 border border-gray-200 rounded-none p-1 gap-1">
           <button
             onClick={() => setActiveTab("mine")}
-            className={`px-5 py-2 rounded-xl text-xs font-bold transition-all ${
-              activeTab === "mine" ? "bg-emerald-500 text-slate-950" : "text-slate-400 hover:text-white"
+            className={`px-5 py-2 rounded-none text-xs font-bold transition-all cursor-pointer ${
+              activeTab === "mine" ? "bg-blue-600 text-white shadow-sm" : "text-gray-600 hover:text-gray-900"
             }`}
           >
             My Assessments ({myAssessments.length})
           </button>
           <button
             onClick={() => setActiveTab("public")}
-            className={`px-5 py-2 rounded-xl text-xs font-bold transition-all ${
-              activeTab === "public" ? "bg-indigo-500 text-white" : "text-slate-400 hover:text-white"
+            className={`px-5 py-2 rounded-none text-xs font-bold transition-all cursor-pointer ${
+              activeTab === "public" ? "bg-blue-600 text-white shadow-sm" : "text-gray-600 hover:text-gray-900"
             }`}
           >
             Public Pool ({publicAssessments.length})
@@ -138,15 +138,15 @@ export default function AssessmentsPage() {
 
         <div className="flex items-center gap-3 flex-1 max-w-sm">
           <div className="flex-1 relative">
-            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
+            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
             <input
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search by title or subject..."
-              className="w-full bg-slate-900/60 border border-white/5 rounded-xl pl-9 pr-4 py-2.5 text-xs focus:border-emerald-500 outline-none"
+              className="w-full bg-white border border-gray-300 rounded-none pl-9 pr-4 py-2.5 text-xs text-gray-900 focus:border-blue-600 outline-none"
             />
           </div>
-          <button onClick={fetchAssessments} className="p-2.5 bg-slate-900/60 border border-white/5 rounded-xl text-slate-400 hover:text-white transition-colors">
+          <button onClick={fetchAssessments} className="p-2.5 bg-white border border-gray-300 rounded-none text-gray-500 hover:text-gray-900 transition-colors cursor-pointer">
             <RefreshCw size={14} className={loading ? "animate-spin" : ""} />
           </button>
         </div>
@@ -156,17 +156,17 @@ export default function AssessmentsPage() {
       {loading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
           {[1, 2, 3].map((n) => (
-            <div key={n} className="bg-slate-900/30 border border-white/5 rounded-3xl h-52 animate-pulse" />
+            <div key={n} className="bg-white border border-gray-200 rounded-none h-52 animate-pulse shadow-sm" />
           ))}
         </div>
       ) : displayList.length === 0 ? (
-        <div className="bg-slate-900/20 border border-dashed border-white/5 rounded-3xl h-64 flex flex-col items-center justify-center gap-3 text-slate-600">
-          <FolderOpen size={40} className="text-slate-700" />
+        <div className="bg-white border border-dashed border-gray-305 rounded-none h-64 flex flex-col items-center justify-center gap-3 text-gray-500 shadow-sm">
+          <FolderOpen size={40} className="text-gray-450" />
           <p className="font-bold">
             {searchQuery ? "No results match your search" : activeTab === "mine" ? "No assessments created yet" : "No public assessments available"}
           </p>
           {activeTab === "mine" && !searchQuery && (
-            <Link href="/teacher/generate" className="text-xs font-bold text-emerald-400 hover:underline">
+            <Link href="/teacher/generate" className="text-xs font-bold text-blue-600 hover:underline">
               Generate your first assessment →
             </Link>
           )}
@@ -176,26 +176,26 @@ export default function AssessmentsPage() {
           {displayList.map((a) => {
             const qs = Array.isArray(a.questions) ? a.questions : JSON.parse(a.questions || "[]");
             return (
-              <div key={a.id} className="bg-slate-900/40 border border-white/5 rounded-3xl p-6 relative overflow-hidden hover:border-white/10 transition-all shadow-xl group flex flex-col">
-                <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/3 rounded-full blur-2xl" />
+              <div key={a.id} className="bg-white/80 border border-gray-200 rounded-none p-6 relative overflow-hidden hover:border-blue-500/40 transition-all shadow-sm backdrop-blur-sm group flex flex-col">
+                <div className="absolute top-0 right-0 w-24 h-24 bg-blue-500/2 blur-2xl animate-pulse" />
 
                 {/* Badge */}
                 <div className="flex items-center justify-between mb-4">
-                  <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
-                    a.isPublic ? "bg-indigo-500/10 text-indigo-400 border border-indigo-500/20" : "bg-slate-800 text-slate-400 border border-white/5"
+                  <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-none text-[10px] font-bold ${
+                    a.isPublic ? "bg-blue-50 text-blue-600 border border-blue-100" : "bg-gray-100 text-gray-600 border border-gray-200"
                   }`}>
                     {a.isPublic ? <Globe size={9} /> : <Lock size={9} />}
                     {a.isPublic ? "Public" : "Private"}
                   </span>
-                  <span className="text-[10px] text-slate-600">{new Date(a.createdAt).toLocaleDateString()}</span>
+                  <span className="text-[10px] text-gray-500">{new Date(a.createdAt).toLocaleDateString()}</span>
                 </div>
 
                 {/* Title */}
-                <h4 className="font-black text-base text-white leading-tight mb-1 line-clamp-2">{a.title}</h4>
-                <p className="text-xs text-slate-400 mb-4">{a.subject} · {a.lesson}</p>
+                <h4 className="font-black text-base text-gray-900 leading-tight mb-1 line-clamp-2">{a.title}</h4>
+                <p className="text-xs text-gray-500 mb-4">{a.subject} · {a.lesson}</p>
 
                 {/* Meta */}
-                <div className="flex items-center gap-4 text-[10px] text-slate-500 mt-auto mb-5">
+                <div className="flex items-center gap-4 text-[10px] text-gray-500 mt-auto mb-5">
                   <span className="flex items-center gap-1"><BookOpen size={10} />{qs.length} Questions</span>
                   <span className="flex items-center gap-1"><Clock size={10} />{a.duration} mins</span>
                 </div>
@@ -204,7 +204,7 @@ export default function AssessmentsPage() {
                 <div className="flex gap-2">
                   <Link
                     href={`/teacher/assessments/${a.id}`}
-                    className="flex-1 bg-emerald-600/10 hover:bg-emerald-600 border border-emerald-600/20 hover:border-emerald-600 text-emerald-400 hover:text-white px-3 py-2 rounded-xl text-[11px] font-bold text-center transition-all flex items-center justify-center"
+                    className="flex-1 bg-white hover:bg-gray-50 border border-gray-300 text-gray-700 px-3 py-2 rounded-none text-[11px] font-bold text-center transition-all flex items-center justify-center cursor-pointer"
                   >
                     {activeTab === "mine" ? "View & Edit" : "View Questions"}
                   </Link>
@@ -212,7 +212,7 @@ export default function AssessmentsPage() {
                   <button
                     onClick={() => handleHostAssessment(a.id)}
                     disabled={hosting !== null}
-                    className="flex-1 bg-indigo-650/10 hover:bg-indigo-600 border border-indigo-550/20 hover:border-indigo-600 text-indigo-400 hover:text-white px-3 py-2 rounded-xl text-[11px] font-bold text-center transition-all flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50"
+                    className="flex-1 bg-blue-600 hover:bg-blue-700 border border-blue-600 text-white px-3 py-2 rounded-none text-[11px] font-bold text-center transition-all flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50 shadow-sm"
                   >
                     {hosting === a.id ? (
                       <RefreshCw size={11} className="animate-spin" />
@@ -226,7 +226,7 @@ export default function AssessmentsPage() {
                     <button
                       onClick={() => handleDelete(a.id)}
                       disabled={deleting === a.id}
-                      className="p-2 bg-rose-500/5 hover:bg-rose-500/15 border border-rose-500/10 hover:border-rose-500/30 text-rose-500 rounded-xl transition-all disabled:opacity-50"
+                      className="p-2 bg-white hover:bg-red-50 border border-gray-300 hover:border-red-250 text-red-600 rounded-none transition-all disabled:opacity-50 cursor-pointer"
                     >
                       <Trash2 size={13} />
                     </button>

@@ -469,8 +469,8 @@ export default function GeneratePage() {
   return (
     <div className="p-8 space-y-8 animate-in fade-in slide-in-from-bottom duration-300">
       <div className="no-print">
-        <h2 className="text-3xl font-black">AI Question Bank Generator</h2>
-        <p className="text-sm text-slate-400 mt-1">
+        <h2 className="text-3xl font-black text-gray-900">AI Question Bank Generator</h2>
+        <p className="text-sm text-gray-600 mt-1">
           Upload course syllabi, textbooks, or notes. Gemini AI parses the document and builds a custom exam.
         </p>
       </div>
@@ -480,11 +480,11 @@ export default function GeneratePage() {
         <div className="lg:col-span-2 space-y-6 no-print">
           <form onSubmit={handleGenerate} className="space-y-6">
             {/* Generation Mode Selector */}
-            <div className="bg-slate-900/40 border border-white/5 rounded-3xl p-5 space-y-3">
-              <label className="text-[11px] font-bold uppercase tracking-wider text-slate-400 block">
+            <div className="bg-white/80 border border-gray-200 shadow-sm backdrop-blur-sm p-5 space-y-3">
+              <label className="text-[11px] font-bold uppercase tracking-wider text-gray-500 block">
                 Generation Mode
               </label>
-              <div className="grid grid-cols-3 gap-2 bg-slate-950/65 p-1 rounded-2xl border border-white/5">
+              <div className="grid grid-cols-3 gap-2 bg-gray-50 p-1 border border-gray-200">
                 {[
                   { id: "pdf_only", label: "PDF Only", icon: FileText },
                   { id: "pdf_context", label: "PDF + Context", icon: Zap },
@@ -499,10 +499,10 @@ export default function GeneratePage() {
                         setGenerationMode(mode.id as any);
                         setGeneratorError(null);
                       }}
-                      className={`flex flex-col items-center gap-1.5 py-2.5 px-1 rounded-xl text-[10px] font-extrabold transition-all ${
+                      className={`flex flex-col items-center gap-1.5 py-2.5 px-1 text-[10px] font-extrabold transition-all ${
                         generationMode === mode.id
-                          ? "bg-emerald-600 text-white shadow-lg shadow-emerald-600/25"
-                          : "text-slate-400 hover:text-slate-200 hover:bg-white/5"
+                          ? "bg-blue-600 text-white shadow-sm"
+                          : "text-gray-500 hover:text-gray-800 hover:bg-gray-100"
                       }`}
                     >
                       <Icon size={14} />
@@ -515,16 +515,16 @@ export default function GeneratePage() {
 
             {/* File Upload - shown for Document-based modes */}
             {generationMode !== "text_only" && (
-              <div className="bg-slate-900/40 border border-white/5 rounded-3xl p-6 space-y-4">
+              <div className="bg-white/80 border border-gray-200 shadow-sm backdrop-blur-sm p-6 space-y-4">
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
-                    <FileText size={16} className="text-emerald-400" />
-                    <h3 className="text-sm font-bold">Source Documents</h3>
+                    <FileText size={16} className="text-blue-600" />
+                    <h3 className="text-sm font-bold text-gray-900">Source Documents</h3>
                   </div>
-                  <span className="text-[10px] text-slate-500 font-bold">{files.length} uploaded</span>
+                  <span className="text-[10px] text-gray-500 font-bold">{files.length} uploaded</span>
                 </div>
                 
-                <label className="border-2 border-dashed border-white/10 hover:border-emerald-500/40 rounded-2xl p-6 flex flex-col items-center gap-3 bg-slate-950/30 transition-colors cursor-pointer group relative">
+                <label className="border-2 border-dashed border-gray-300 hover:border-blue-500 p-6 flex flex-col items-center gap-3 bg-gray-50/50 transition-colors cursor-pointer group relative">
                   <input
                     type="file"
                     multiple
@@ -532,12 +532,12 @@ export default function GeneratePage() {
                     onChange={handleFileChange}
                     className="absolute inset-0 opacity-0 cursor-pointer"
                   />
-                  <div className="h-12 w-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 group-hover:scale-110 transition-transform">
+                  <div className="h-12 w-12 bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600 group-hover:scale-110 transition-transform">
                     <UploadCloud size={24} />
                   </div>
                   <div className="text-center">
-                    <p className="font-bold text-slate-300 text-sm">Click or drag files here</p>
-                    <p className="text-[10px] text-slate-500 mt-1">PDF, DOCX, or TXT (Supports multiple)</p>
+                    <p className="font-bold text-gray-700 text-sm">Click or drag files here</p>
+                    <p className="text-[10px] text-gray-500 mt-1">PDF, DOCX, or TXT (Supports multiple)</p>
                   </div>
                 </label>
 
@@ -546,17 +546,17 @@ export default function GeneratePage() {
                     {files.map((f, idx) => (
                       <div
                         key={idx}
-                        className="flex items-center justify-between bg-slate-950/50 border border-white/5 rounded-xl px-3 py-2 text-xs"
+                        className="flex items-center justify-between bg-white border border-gray-200 px-3 py-2 text-xs"
                       >
                         <div className="flex items-center gap-2 truncate max-w-[200px]">
-                          <FileText size={13} className="text-emerald-400 shrink-0" />
-                          <span className="font-bold text-emerald-300 truncate">{f.name}</span>
-                          <span className="text-[9px] text-slate-500 shrink-0">({(f.size / 1024).toFixed(1)} KB)</span>
+                          <FileText size={13} className="text-blue-600 shrink-0" />
+                          <span className="font-bold text-blue-600 truncate">{f.name}</span>
+                          <span className="text-[9px] text-gray-400 shrink-0">({(f.size / 1024).toFixed(1)} KB)</span>
                         </div>
                         <button
                           type="button"
                           onClick={() => removeFile(idx)}
-                          className="text-slate-500 hover:text-rose-400 transition-colors p-1"
+                          className="text-gray-400 hover:text-red-500 transition-colors p-1"
                         >
                           <X size={12} />
                         </button>
@@ -569,14 +569,14 @@ export default function GeneratePage() {
 
             {/* Custom Context / Text Instructions */}
             {generationMode !== "pdf_only" && (
-              <div className="bg-slate-900/40 border border-white/5 rounded-3xl p-6 space-y-4">
+              <div className="bg-white/80 border border-gray-200 shadow-sm backdrop-blur-sm p-6 space-y-4">
                 <div className="flex items-center gap-2">
-                  <Sliders size={16} className="text-indigo-400" />
-                  <h3 className="text-sm font-bold">Contextual Instructions</h3>
+                  <Sliders size={16} className="text-blue-600" />
+                  <h3 className="text-sm font-bold text-gray-900">Contextual Instructions</h3>
                 </div>
                 
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-black uppercase tracking-wider text-slate-400">
+                  <label className="text-[10px] font-black uppercase tracking-wider text-gray-500">
                     What should the AI focus on?
                   </label>
                   <textarea
@@ -589,9 +589,9 @@ export default function GeneratePage() {
                         : "e.g., 'Generate 50 assessment questions under the topic of vocabulary for 5th grade students aligned with the Puducherry CBSE syllabus.'"
                     }
                     rows={4}
-                    className="w-full bg-slate-950/60 border border-white/5 rounded-2xl px-4 py-3 text-sm text-slate-200 outline-none focus:border-indigo-500 transition-all placeholder:text-slate-600 resize-none font-bold"
+                    className="w-full bg-white border border-gray-300 px-4 py-3 text-sm text-gray-800 outline-none focus:border-blue-600 transition-all placeholder:text-gray-400 resize-none font-bold"
                   />
-                  <p className="text-[9px] text-slate-500 italic">
+                  <p className="text-[9px] text-gray-500 italic">
                     {generationMode === "pdf_context"
                       ? "💡 Tip: You can reference specific pages (e.g. 'pages 2-4') or key subtopics within the uploaded document."
                       : "💡 Tip: Mention specific syllabus, level, and concepts to achieve accurate, high-quality standalone questions."}
@@ -602,31 +602,31 @@ export default function GeneratePage() {
 
             {/* Target Alignment Options Accordion */}
             {generationMode !== "pdf_only" && (
-              <div className="bg-slate-900/40 border border-white/5 rounded-3xl p-6 space-y-4">
+              <div className="bg-white/80 border border-gray-200 shadow-sm backdrop-blur-sm p-6 space-y-4">
                 <button
                   type="button"
                   onClick={() => setShowAdvanced(!showAdvanced)}
                   className="flex items-center justify-between w-full text-left outline-none"
                 >
                   <div className="flex items-center gap-2">
-                    <Sliders size={16} className="text-indigo-400" />
-                    <h3 className="text-sm font-bold">Target Alignment Options</h3>
+                    <Sliders size={16} className="text-blue-600" />
+                    <h3 className="text-sm font-bold text-gray-900">Target Alignment Options</h3>
                   </div>
-                  <span className="text-[10px] text-indigo-400 font-bold hover:underline">
+                  <span className="text-[10px] text-blue-600 font-bold hover:underline">
                     {showAdvanced ? "Hide Options" : "Show Options"}
                   </span>
                 </button>
 
                 {showAdvanced && (
-                  <div className="space-y-4 pt-2 border-t border-white/5 animate-in fade-in duration-200">
+                  <div className="space-y-4 pt-2 border-t border-gray-200 animate-in fade-in duration-200">
                     <div className="grid grid-cols-2 gap-3">
                       {/* Difficulty */}
                       <div className="space-y-1">
-                        <label className="text-[9px] font-black uppercase tracking-wider text-slate-400">Difficulty</label>
+                        <label className="text-[9px] font-black uppercase tracking-wider text-gray-500">Difficulty</label>
                         <select
-                          value={difficulty}
-                          onChange={(e) => setDifficulty(e.target.value)}
-                          className="w-full bg-slate-950/80 border border-white/5 rounded-xl px-3 py-2 text-xs text-slate-300 outline-none focus:border-indigo-500 font-bold"
+                           value={difficulty}
+                           onChange={(e) => setDifficulty(e.target.value)}
+                           className="w-full bg-white border border-gray-300 px-3 py-2 text-xs text-gray-800 outline-none focus:border-blue-600 font-bold"
                         >
                           <option value="mixed">Mixed Difficulty</option>
                           <option value="easy">Easy / Recall</option>
@@ -637,11 +637,11 @@ export default function GeneratePage() {
 
                       {/* Grade */}
                       <div className="space-y-1">
-                        <label className="text-[9px] font-black uppercase tracking-wider text-slate-400">Grade Level</label>
+                        <label className="text-[9px] font-black uppercase tracking-wider text-gray-500">Grade Level</label>
                         <select
                           value={grade}
                           onChange={(e) => setGrade(e.target.value)}
-                          className="w-full bg-slate-950/80 border border-white/5 rounded-xl px-3 py-2 text-xs text-slate-300 outline-none focus:border-indigo-500 font-bold"
+                          className="w-full bg-white border border-gray-300 px-3 py-2 text-xs text-gray-800 outline-none focus:border-blue-600 font-bold"
                         >
                           {["1st Grade", "2nd Grade", "3rd Grade", "4th Grade", "5th Grade", "6th Grade", "7th Grade", "8th Grade", "9th Grade", "10th Grade", "11th Grade", "12th Grade"].map((g) => (
                             <option key={g} value={g}>{g}</option>
@@ -653,23 +653,23 @@ export default function GeneratePage() {
                     <div className="grid grid-cols-2 gap-3">
                       {/* Syllabus */}
                       <div className="space-y-1">
-                        <label className="text-[9px] font-black uppercase tracking-wider text-slate-400">Syllabus / Board</label>
+                        <label className="text-[9px] font-black uppercase tracking-wider text-gray-500">Syllabus / Board</label>
                         <input
                           type="text"
                           value={syllabus}
                           onChange={(e) => setSyllabus(e.target.value)}
                           placeholder="e.g. CBSE / State Board"
-                          className="w-full bg-slate-950/80 border border-white/5 rounded-xl px-3 py-2 text-xs text-slate-300 outline-none focus:border-indigo-500 font-bold"
+                          className="w-full bg-white border border-gray-300 px-3 py-2 text-xs text-gray-800 outline-none focus:border-blue-600 font-bold"
                         />
                       </div>
 
                       {/* Assessment Style */}
                       <div className="space-y-1">
-                        <label className="text-[9px] font-black uppercase tracking-wider text-slate-400">Style</label>
+                        <label className="text-[9px] font-black uppercase tracking-wider text-gray-500">Style</label>
                         <select
                           value={assessmentStyle}
                           onChange={(e) => setAssessmentStyle(e.target.value)}
-                          className="w-full bg-slate-950/80 border border-white/5 rounded-xl px-3 py-2 text-xs text-slate-300 outline-none focus:border-indigo-500 font-bold"
+                          className="w-full bg-white border border-gray-300 px-3 py-2 text-xs text-gray-800 outline-none focus:border-blue-600 font-bold"
                         >
                           <option value="standard">Standard Exam</option>
                           <option value="concept_focused">Concept Focused</option>
@@ -681,13 +681,13 @@ export default function GeneratePage() {
 
                     {/* Topic */}
                     <div className="space-y-1">
-                      <label className="text-[9px] font-black uppercase tracking-wider text-slate-400">Topic / Subject Category</label>
+                      <label className="text-[9px] font-black uppercase tracking-wider text-gray-500">Topic / Subject Category</label>
                       <input
                         type="text"
                         value={topic}
                         onChange={(e) => setTopic(e.target.value)}
                         placeholder="e.g. Biology - Photosynthesis"
-                        className="w-full bg-slate-950/80 border border-white/5 rounded-xl px-3 py-2 text-xs text-slate-300 outline-none focus:border-indigo-500 font-bold"
+                        className="w-full bg-white border border-gray-300 px-3 py-2 text-xs text-gray-800 outline-none focus:border-blue-600 font-bold"
                       />
                     </div>
                   </div>
@@ -696,26 +696,26 @@ export default function GeneratePage() {
             )}
 
             {/* Config */}
-            <div className="bg-slate-900/40 border border-white/5 rounded-3xl p-6 space-y-5">
+            <div className="bg-white/80 border border-gray-200 shadow-sm backdrop-blur-sm p-6 space-y-5">
               <div className="flex items-center gap-2 mb-1">
-                <Sliders size={16} className="text-indigo-400" />
-                <h3 className="text-sm font-bold">Generator Configuration</h3>
+                <Sliders size={16} className="text-blue-600" />
+                <h3 className="text-sm font-bold text-gray-900">Generator Configuration</h3>
               </div>
 
               <div className="space-y-2">
-                <label className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
-                  Number of Questions: <span className="text-white">{numQuestions}</span>
+                <label className="text-[11px] font-bold uppercase tracking-wider text-gray-500">
+                  Number of Questions: <span className="text-gray-900 font-extrabold">{numQuestions}</span>
                 </label>
                 <input
                   type="range" min={5} max={30} value={numQuestions}
                   onChange={(e) => setNumQuestions(parseInt(e.target.value))}
-                  className="w-full accent-emerald-500"
+                  className="w-full accent-blue-600"
                 />
-                <div className="flex justify-between text-[10px] text-slate-600"><span>5</span><span>30</span></div>
+                <div className="flex justify-between text-[10px] text-gray-400"><span>5</span><span>30</span></div>
               </div>
 
               <div className="space-y-2">
-                <label className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Question Types</label>
+                <label className="text-[11px] font-bold uppercase tracking-wider text-gray-500">Question Types</label>
                 {[
                   { key: "multiple_choice", label: "Multiple Choice (MCQ)" },
                   { key: "true_false", label: "True / False" },
@@ -724,20 +724,20 @@ export default function GeneratePage() {
                   <label key={key} className="flex items-center gap-3 cursor-pointer group">
                     <div
                       onClick={() => setQuestionTypes({ ...questionTypes, [key]: !(questionTypes as any)[key] })}
-                      className={`h-5 w-5 rounded-md border-2 flex items-center justify-center transition-all cursor-pointer ${
-                        (questionTypes as any)[key] ? "bg-emerald-500 border-emerald-500" : "border-slate-600 bg-transparent"
+                      className={`h-5 w-5 border-2 flex items-center justify-center transition-all cursor-pointer ${
+                        (questionTypes as any)[key] ? "bg-blue-600 border-blue-600 text-white" : "border-gray-300 bg-transparent"
                       }`}
                     >
-                      {(questionTypes as any)[key] && <CheckCircle size={12} className="text-slate-950" />}
+                      {(questionTypes as any)[key] && <CheckCircle size={12} className="text-white" />}
                     </div>
-                    <span className="text-xs text-slate-300 group-hover:text-white transition-colors">{label}</span>
+                    <span className="text-xs text-gray-700 group-hover:text-gray-900 transition-colors">{label}</span>
                   </label>
                 ))}
               </div>
             </div>
 
             {generatorError && (
-              <div className="flex items-start gap-2 p-3 bg-rose-500/10 border border-rose-500/20 rounded-xl text-xs text-rose-400">
+              <div className="flex items-start gap-2 p-3 bg-red-50 border border-red-200 text-xs text-red-600">
                 <AlertCircle size={14} className="shrink-0 mt-0.5" />
                 <span>{generatorError}</span>
               </div>
@@ -751,11 +751,11 @@ export default function GeneratePage() {
                 (generationMode === "pdf_context" && (files.length === 0 || !contextText.trim())) ||
                 (generationMode === "text_only" && !contextText.trim())
               }
-              className="w-full bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed py-4 rounded-2xl font-black text-sm flex items-center justify-center gap-2 transition-all shadow-lg shadow-emerald-600/20 text-white animate-in"
+              className="w-full bg-brand-red hover:bg-[#b01f1f] disabled:opacity-50 disabled:cursor-not-allowed py-4 font-black text-sm flex items-center justify-center gap-2 transition-all shadow-sm text-white animate-in"
             >
               {generatorLoading ? (
                 <>
-                  <Loader size={16} className="animate-spin" /> 
+                  <Loader size={16} className="animate-spin text-white" /> 
                   {generationMode === "text_only" ? "Generating Questions..." : "Processing Documents..."}
                 </>
               ) : (
@@ -914,10 +914,10 @@ export default function GeneratePage() {
             </div>
           )}
 
-          <div className="flex items-center justify-between no-print">
+          <div className="flex items-center justify-between no-print border-b border-gray-200 pb-3">
             <div>
-              <h3 className="text-base font-bold">Generated Questions Preview</h3>
-              <p className="text-xs text-slate-500 mt-0.5">
+              <h3 className="text-base font-bold text-gray-900">Generated Questions Preview</h3>
+              <p className="text-xs text-gray-500 mt-0.5">
                 {generatedQuestions.length > 0 ? `${generatedQuestions.length} questions ready — edit inline before saving` : "Ready for Intelligent Processing"}
               </p>
             </div>
@@ -926,7 +926,7 @@ export default function GeneratePage() {
                 <button
                   type="button"
                   onClick={addQuestion}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-xs font-bold text-slate-300 border border-white/5 transition-all"
+                  className="flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-gray-50 text-xs font-bold text-gray-700 border border-gray-300 transition-all"
                 >
                   <Plus size={12} /> Add Question
                 </button>
@@ -934,7 +934,7 @@ export default function GeneratePage() {
                 <button
                   type="button"
                   onClick={() => openPrintModal("print")}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-indigo-600/10 hover:bg-indigo-600/20 border border-indigo-500/20 text-xs font-bold text-indigo-400 transition-all"
+                  className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 hover:bg-blue-100 border border-blue-200 text-xs font-bold text-blue-600 transition-all"
                 >
                   <Printer size={12} /> Print Exam
                 </button>
@@ -942,7 +942,7 @@ export default function GeneratePage() {
                 <button
                   type="button"
                   onClick={() => openPrintModal("pdf")}
-                  className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-violet-600/10 hover:bg-violet-600/20 border border-violet-500/20 text-xs font-bold text-violet-400 transition-all"
+                  className="flex items-center gap-1.5 px-3.5 py-1.5 bg-purple-50 hover:bg-purple-100 border border-purple-200 text-xs font-bold text-purple-600 transition-all"
                 >
                   <FileDown size={12} /> Export PDF
                 </button>
@@ -950,7 +950,7 @@ export default function GeneratePage() {
                 <button
                   type="button"
                   onClick={() => openSaveModal()}
-                  className="flex items-center gap-1.5 px-4 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-xs font-bold transition-all shadow-lg shadow-emerald-600/20 text-white"
+                  className="flex items-center gap-1.5 px-4 py-1.5 bg-brand-red hover:bg-[#b01f1f] text-xs font-bold transition-all shadow-sm text-white"
                 >
                   <Save size={12} /> Save Assessment
                 </button>
@@ -959,17 +959,17 @@ export default function GeneratePage() {
           </div>
 
           {generatedQuestions.length === 0 ? (
-            <div className="bg-slate-900/20 border border-dashed border-white/5 rounded-3xl h-[600px] flex flex-col items-center justify-center p-8 text-center gap-4 text-slate-600">
-              <div className="h-16 w-16 rounded-2xl bg-slate-950/40 border border-white/5 flex items-center justify-center text-slate-500">
-                <Zap size={32} className="text-slate-500 animate-pulse" />
+            <div className="bg-white/65 border border-dashed border-gray-300 h-[600px] flex flex-col items-center justify-center p-8 text-center gap-4 text-gray-400 backdrop-blur-sm shadow-sm">
+              <div className="h-16 w-16 bg-gray-50 border border-gray-200 flex items-center justify-center text-gray-400">
+                <Zap size={32} className="text-gray-400 animate-pulse" />
               </div>
               <div>
-                <p className="font-black text-slate-300 text-base">
+                <p className="font-black text-gray-700 text-base">
                   {generationMode === "pdf_only" && "Upload documents to begin"}
                   {generationMode === "pdf_context" && "Upload documents & add instructions"}
                   {generationMode === "text_only" && "Provide text instructions to generate"}
                 </p>
-                <p className="text-xs text-slate-500 max-w-[280px] mx-auto mt-2">
+                <p className="text-xs text-gray-500 max-w-[280px] mx-auto mt-2">
                   {generationMode === "pdf_only" && "Gemini AI will extract key syllabus facts and build your comprehensive exam bank."}
                   {generationMode === "pdf_context" && "Combine reference literature with your specific focal points and page ranges."}
                   {generationMode === "text_only" && "Standalone AI generation tailored by syllabus, difficulty, grade, and topic."}
@@ -980,17 +980,17 @@ export default function GeneratePage() {
             <div className="space-y-4 max-h-[70vh] overflow-y-auto pr-1">
               {/* New Question Draft Form at the top */}
               {newQuestionForm && (
-                <div className="bg-slate-900 border border-emerald-500/30 rounded-2xl p-5 space-y-4 shadow-xl shadow-emerald-500/5">
-                  <div className="flex items-center justify-between border-b border-white/5 pb-3">
-                    <span className="text-xs font-black uppercase tracking-widest text-emerald-400">Draft New Question</span>
-                    <button onClick={() => { setNewQuestionForm(null); setNewQuestionError(null); }} className="p-1 text-slate-500 hover:text-white transition-colors">
+                <div className="bg-white border border-blue-200 p-5 space-y-4 shadow-md">
+                  <div className="flex items-center justify-between border-b border-gray-200 pb-3">
+                    <span className="text-xs font-black uppercase tracking-widest text-blue-600">Draft New Question</span>
+                    <button onClick={() => { setNewQuestionForm(null); setNewQuestionError(null); }} className="p-1 text-gray-400 hover:text-gray-600 transition-colors">
                       <X size={14} />
                     </button>
                   </div>
 
                   {/* Question Type Options */}
                   <div className="space-y-1.5">
-                    <label className="text-[10px] font-black uppercase tracking-wider text-slate-400">Question Type</label>
+                    <label className="text-[10px] font-black uppercase tracking-wider text-gray-500">Question Type</label>
                     <div className="flex flex-wrap gap-2">
                       {[
                         { val: "multiple_choice", label: "Multiple Choice" },
@@ -1009,10 +1009,10 @@ export default function GeneratePage() {
                             });
                             setNewQuestionError(null);
                           }}
-                          className={`px-3 py-1.5 rounded-lg text-xs font-bold border transition-all ${
+                          className={`px-3 py-1.5 text-xs font-bold border transition-all ${
                             newQuestionForm.type === t.val
-                              ? "bg-indigo-600 border-indigo-600 text-white"
-                              : "bg-slate-950/60 border-white/5 text-slate-400 hover:text-slate-200"
+                              ? "bg-blue-600 border-blue-600 text-white"
+                              : "bg-gray-50 border-gray-200 text-gray-600 hover:text-gray-900"
                           }`}
                         >
                           {t.label}
@@ -1023,24 +1023,24 @@ export default function GeneratePage() {
 
                   {/* Question Text */}
                   <div className="space-y-1.5">
-                    <label className="text-[10px] font-black uppercase tracking-wider text-slate-400">Question Text</label>
+                    <label className="text-[10px] font-black uppercase tracking-wider text-gray-500">Question Text</label>
                     <textarea
                       value={newQuestionForm.question}
                       onChange={(e) => setNewQuestionForm({ ...newQuestionForm, question: e.target.value })}
                       placeholder="Type the question..."
                       rows={2}
-                      className="w-full bg-slate-950/60 border border-white/5 rounded-xl px-3 py-2 text-sm font-bold text-white outline-none focus:border-indigo-500 resize-none"
+                      className="w-full bg-white border border-gray-300 px-3 py-2 text-sm font-bold text-gray-900 outline-none focus:border-blue-600 resize-none"
                     />
                   </div>
 
                   {/* Options & Correct Answer fields based on type */}
                   {newQuestionForm.type === "multiple_choice" && (
                     <div className="space-y-3">
-                      <label className="text-[10px] font-black uppercase tracking-wider text-slate-400">Options</label>
+                      <label className="text-[10px] font-black uppercase tracking-wider text-gray-500">Options</label>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                         {newQuestionForm.options.map((opt: string, optIdx: number) => (
                           <div key={optIdx} className="flex items-center gap-2">
-                            <span className="text-xs font-bold text-indigo-400">{String.fromCharCode(65 + optIdx)}.</span>
+                            <span className="text-xs font-bold text-blue-600">{String.fromCharCode(65 + optIdx)}.</span>
                             <input
                               value={opt}
                               onChange={(e) => {
@@ -1049,18 +1049,18 @@ export default function GeneratePage() {
                                 setNewQuestionForm({ ...newQuestionForm, options: newOpts });
                               }}
                               placeholder={`Option ${String.fromCharCode(65 + optIdx)}`}
-                              className="w-full bg-slate-950/60 border border-white/5 rounded-lg px-3 py-2 text-xs text-slate-300 outline-none focus:border-indigo-500"
+                              className="w-full bg-white border border-gray-300 px-3 py-2 text-xs text-gray-700 outline-none focus:border-blue-600"
                             />
                           </div>
                         ))}
                       </div>
 
                       <div className="space-y-1.5 mt-2">
-                        <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 font-bold">Correct Answer</label>
+                        <label className="text-[10px] font-black uppercase tracking-wider text-gray-500 font-bold">Correct Answer</label>
                         <select
                           value={newQuestionForm.correctAnswer}
                           onChange={(e) => setNewQuestionForm({ ...newQuestionForm, correctAnswer: e.target.value })}
-                          className="w-full bg-slate-950/80 border border-white/5 rounded-xl px-3 py-2 text-xs text-slate-300 outline-none focus:border-indigo-500"
+                          className="w-full bg-white border border-gray-300 px-3 py-2 text-xs text-gray-700 outline-none focus:border-blue-600"
                         >
                           <option value="">Select Correct Option</option>
                           {newQuestionForm.options.map((opt: string, optIdx: number) => {
@@ -1078,17 +1078,17 @@ export default function GeneratePage() {
 
                   {newQuestionForm.type === "true_false" && (
                     <div className="space-y-1.5">
-                      <label className="text-[10px] font-black uppercase tracking-wider text-slate-400">Correct Answer</label>
+                      <label className="text-[10px] font-black uppercase tracking-wider text-gray-500">Correct Answer</label>
                       <div className="flex gap-4">
                         {["True", "False"].map((val) => (
-                          <label key={val} className="flex items-center gap-2 cursor-pointer text-xs text-slate-300">
+                          <label key={val} className="flex items-center gap-2 cursor-pointer text-xs text-gray-700">
                             <input
                               type="radio"
                               name="gen_tf_answer"
                               value={val}
                               checked={newQuestionForm.correctAnswer === val}
                               onChange={() => setNewQuestionForm({ ...newQuestionForm, correctAnswer: val })}
-                              className="accent-indigo-500"
+                              className="accent-blue-600"
                             />
                             {val}
                           </label>
@@ -1099,46 +1099,46 @@ export default function GeneratePage() {
 
                   {newQuestionForm.type === "short_answer" && (
                     <div className="space-y-1.5">
-                      <label className="text-[10px] font-black uppercase tracking-wider text-slate-400">Correct Answer Solution</label>
+                      <label className="text-[10px] font-black uppercase tracking-wider text-gray-500">Correct Answer Solution</label>
                       <input
                         value={newQuestionForm.correctAnswer}
                         onChange={(e) => setNewQuestionForm({ ...newQuestionForm, correctAnswer: e.target.value })}
                         placeholder="Enter the expected correct answer..."
-                        className="w-full bg-slate-950/60 border border-white/5 rounded-lg px-3 py-2 text-xs text-slate-300 outline-none focus:border-indigo-500"
+                        className="w-full bg-white border border-gray-300 px-3 py-2 text-xs text-gray-700 outline-none focus:border-blue-600"
                       />
                     </div>
                   )}
 
                   {/* Explanation */}
                   <div className="space-y-1.5">
-                    <label className="text-[10px] font-black uppercase tracking-wider text-slate-500">Explanation / Reasoning (Optional)</label>
+                    <label className="text-[10px] font-black uppercase tracking-wider text-gray-400">Explanation / Reasoning (Optional)</label>
                     <textarea
                       value={newQuestionForm.explanation || ""}
                       onChange={(e) => setNewQuestionForm({ ...newQuestionForm, explanation: e.target.value })}
                       placeholder="Explain why this answer is correct..."
                       rows={2}
-                      className="w-full bg-slate-950/40 border border-white/5 rounded-lg px-3 py-2 text-xs text-slate-400 outline-none resize-none italic focus:border-indigo-500"
+                      className="w-full bg-gray-50 border border-gray-200 px-3 py-2 text-xs text-gray-600 outline-none resize-none italic focus:border-blue-600"
                     />
                   </div>
 
                   {newQuestionError && (
-                    <div className="p-2.5 bg-rose-500/10 border border-rose-500/20 text-rose-400 rounded-xl text-xs">
+                    <div className="p-2.5 bg-red-50 border border-red-200 text-red-600 text-xs">
                       {newQuestionError}
                     </div>
                   )}
 
-                  <div className="flex justify-end gap-2 pt-2 border-t border-white/5">
+                  <div className="flex justify-end gap-2 pt-2 border-t border-gray-200">
                     <button
                       type="button"
                       onClick={() => { setNewQuestionForm(null); setNewQuestionError(null); }}
-                      className="px-3 py-1.5 bg-white/5 hover:bg-white/10 rounded-lg text-xs font-bold text-slate-400"
+                      className="px-3 py-1.5 bg-gray-50 hover:bg-gray-100 text-xs font-bold text-gray-600"
                     >
                       Cancel
                     </button>
                     <button
                       type="button"
                       onClick={saveNewQuestion}
-                      className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 rounded-lg text-xs font-bold text-white shadow-lg shadow-emerald-500/15"
+                      className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-xs font-bold text-white shadow-sm"
                     >
                       Save Question
                     </button>
@@ -1165,19 +1165,19 @@ export default function GeneratePage() {
                     setGeneratedQuestions(updated);
                     setDraggedIndex(null);
                   }}
-                  className="bg-slate-900/40 border border-white/5 rounded-2xl p-5 space-y-3 relative transition-all hover:border-indigo-500/20 active:opacity-50 print:bg-white print:border-slate-200 print:text-black print:shadow-none print:p-4 print:mb-4 print:page-break-inside-avoid print:rounded-xl"
+                  className="bg-white/80 border border-gray-200 p-5 space-y-3 relative transition-all hover:border-blue-500/40 shadow-sm print:bg-white print:border-gray-300 print:text-black print:shadow-none print:p-4 print:mb-4 print:page-break-inside-avoid"
                 >
                   <div className="flex items-center justify-between gap-2 no-print">
                     <div className="flex items-center gap-2">
-                      <div className="cursor-move p-1 text-slate-500 hover:text-white" title="Drag to reorder">
+                      <div className="cursor-move p-1 text-gray-400 hover:text-gray-700" title="Drag to reorder">
                         <GripVertical size={14} />
                       </div>
-                      <span className="h-6 w-6 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 flex items-center justify-center font-bold text-[10px] shrink-0">
+                      <span className="h-6 w-6 bg-blue-50 border border-blue-100 text-blue-600 flex items-center justify-center font-bold text-[10px] shrink-0">
                         {idx + 1}
                       </span>
                     </div>
-                    <span className="text-[9px] font-black uppercase tracking-widest text-slate-500 flex-1">{q.type.replace("_", " ")}</span>
-                    <button onClick={() => removeQuestion(idx)} className="p-1 text-slate-600 hover:text-rose-400 transition-colors">
+                    <span className="text-[9px] font-black uppercase tracking-widest text-gray-500 flex-1">{q.type.replace("_", " ")}</span>
+                    <button onClick={() => removeQuestion(idx)} className="p-1 text-gray-400 hover:text-red-500 transition-colors">
                       <Trash2 size={13} />
                     </button>
                   </div>
@@ -1193,7 +1193,7 @@ export default function GeneratePage() {
                     value={q.question}
                     onChange={(e) => updateQuestion(idx, "question", e.target.value)}
                     rows={2}
-                    className="w-full bg-slate-950/60 border border-white/5 rounded-xl px-3 py-2 text-sm font-bold text-white outline-none focus:border-emerald-500 resize-none print:hidden"
+                    className="w-full bg-white border border-gray-200 px-3 py-2 text-sm font-bold text-gray-900 outline-none focus:border-blue-600 resize-none print:hidden"
                   />
                   <p className="hidden print:block text-sm font-bold text-slate-900 leading-relaxed">
                     {q.question}
@@ -1204,11 +1204,11 @@ export default function GeneratePage() {
                       <div className="grid grid-cols-2 gap-2 print:hidden">
                         {q.options.map((opt, optIdx) => (
                           <div key={optIdx} className="flex items-center gap-2">
-                            <span className="text-[10px] font-black text-indigo-400 shrink-0">{String.fromCharCode(65 + optIdx)}.</span>
+                            <span className="text-[10px] font-black text-blue-600 shrink-0">{String.fromCharCode(65 + optIdx)}.</span>
                             <input
                               value={opt}
                               onChange={(e) => updateOption(idx, optIdx, e.target.value)}
-                              className="w-full bg-slate-950/60 border border-white/5 rounded-lg px-2 py-1.5 text-xs text-slate-300 outline-none focus:border-indigo-500"
+                              className="w-full bg-white border border-gray-200 px-2 py-1.5 text-xs text-gray-700 outline-none focus:border-blue-600"
                             />
                           </div>
                         ))}
@@ -1229,28 +1229,28 @@ export default function GeneratePage() {
                   <div className={`space-y-2 mt-3 ${!printConfig.includeAnswers ? "print:hidden" : ""}`}>
                     {/* Screen edit controls (hidden on print) */}
                     <div className="space-y-1.5 print:hidden">
-                      <label className="text-[9px] font-black uppercase tracking-wider text-emerald-500">Correct Answer</label>
+                      <label className="text-[9px] font-black uppercase tracking-wider text-blue-600">Correct Answer</label>
                       <input
                         value={q.correctAnswer}
                         onChange={(e) => updateQuestion(idx, "correctAnswer", e.target.value)}
-                        className="w-full bg-emerald-500/5 border border-emerald-500/20 rounded-lg px-3 py-1.5 text-xs text-emerald-300 outline-none focus:border-emerald-400"
+                        className="w-full bg-blue-50/50 border border-blue-200 px-3 py-1.5 text-xs text-blue-800 outline-none focus:border-blue-600"
                       />
                     </div>
 
                     {q.explanation !== undefined && (
                       <div className="space-y-1.5 print:hidden">
-                        <label className="text-[9px] font-black uppercase tracking-wider text-slate-500">Explanation</label>
+                        <label className="text-[9px] font-black uppercase tracking-wider text-gray-400">Explanation</label>
                         <textarea
                           value={q.explanation}
                           onChange={(e) => updateQuestion(idx, "explanation", e.target.value)}
                           rows={2}
-                          className="w-full bg-slate-950/40 border border-white/5 rounded-lg px-3 py-1.5 text-xs text-slate-400 outline-none focus:border-slate-400 resize-none italic"
+                          className="w-full bg-gray-50 border border-gray-200 px-3 py-1.5 text-xs text-gray-600 outline-none focus:border-blue-600 resize-none italic"
                         />
                       </div>
                     )}
 
                     {/* Print-only Answers & Explanations */}
-                    <div className="hidden print:block p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-1.5 text-xs text-black">
+                    <div className="hidden print:block p-3 bg-slate-50 border border-slate-200 rounded-none space-y-1.5 text-xs text-black">
                       <p className="font-extrabold text-emerald-700">
                         ✔ Correct Answer: <span className="text-slate-950 font-black">{q.correctAnswer}</span>
                       </p>
@@ -1278,37 +1278,37 @@ export default function GeneratePage() {
 
       {/* Save Modal */}
       {showSaveModal && (
-        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-white/10 w-full max-w-lg rounded-3xl p-8 space-y-6 shadow-2xl overflow-y-auto max-h-[90vh]">
-            <div className="flex items-center justify-between border-b border-white/5 pb-3">
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white border border-gray-200 w-full max-w-lg rounded-none p-8 space-y-6 shadow-2xl overflow-y-auto max-h-[90vh]">
+            <div className="flex items-center justify-between border-b border-gray-100 pb-3">
               <div>
-                <h3 className="text-xl font-bold text-white">Save Assessment</h3>
-                <p className="text-[10px] text-slate-400 mt-0.5">Commit assessment details to database</p>
+                <h3 className="text-xl font-bold text-gray-900">Save Assessment</h3>
+                <p className="text-[10px] text-gray-500 mt-0.5">Commit assessment details to database</p>
               </div>
-              <button onClick={() => setShowSaveModal(false)} className="p-2 hover:bg-white/5 rounded-xl text-slate-400"><X size={16} /></button>
+              <button onClick={() => setShowSaveModal(false)} className="p-2 hover:bg-gray-100 rounded-none text-gray-500 cursor-pointer"><X size={16} /></button>
             </div>
 
             <form onSubmit={handleSaveAssessment} className="space-y-4">
               {/* Assessment Name */}
               <div className="space-y-1.5">
-                <label className="text-[11px] font-bold uppercase tracking-wider text-slate-400 block">Assessment Name</label>
+                <label className="text-[11px] font-extrabold uppercase tracking-wider text-gray-600 block">Assessment Name</label>
                 <input
                   type="text"
                   required
                   value={printConfig.assessmentName}
                   onChange={(e) => setPrintConfig({ ...printConfig, assessmentName: e.target.value })}
                   placeholder="e.g. Chapter 3 Biology Quiz"
-                  className="w-full bg-slate-950/60 border border-white/5 rounded-xl px-3.5 py-2.5 text-xs text-white outline-none focus:border-emerald-500 font-bold"
+                  className="w-full bg-white border border-gray-300 rounded-none px-3.5 py-2.5 text-xs text-gray-900 outline-none focus:border-blue-600 font-bold"
                 />
               </div>
 
               {/* School Name select dropdown */}
               <div className="space-y-1.5">
-                <label className="text-[11px] font-bold uppercase tracking-wider text-slate-400 block">School Name</label>
+                <label className="text-[11px] font-extrabold uppercase tracking-wider text-gray-600 block">School Name</label>
                 <select
                   value={printConfig.schoolName}
                   onChange={(e) => setPrintConfig({ ...printConfig, schoolName: e.target.value })}
-                  className="w-full bg-slate-950/60 border border-white/5 rounded-xl px-3.5 py-2.5 text-xs text-white outline-none focus:border-emerald-500 font-bold"
+                  className="w-full bg-white border border-gray-300 rounded-none px-3.5 py-2.5 text-xs text-gray-900 outline-none focus:border-blue-600 font-bold"
                 >
                   <option value="ACHARIYA WORLD CLASS EDUCATION">ACHARIYA WORLD CLASS EDUCATION</option>
                   {allschoolsdata.map((school) => (
@@ -1322,27 +1322,27 @@ export default function GeneratePage() {
               {/* Subject & Lesson */}
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
-                  <label className="text-[11px] font-bold uppercase tracking-wider text-slate-400 block">Subject</label>
+                  <label className="text-[11px] font-extrabold uppercase tracking-wider text-gray-600 block">Subject</label>
                   <input
                     type="text"
                     required
                     value={printConfig.subject}
                     onChange={(e) => setPrintConfig({ ...printConfig, subject: e.target.value })}
                     placeholder="e.g. Biology"
-                    className="w-full bg-slate-950/60 border border-white/5 rounded-xl px-3.5 py-2.5 text-xs text-white outline-none focus:border-emerald-500 font-bold"
+                    className="w-full bg-white border border-gray-300 rounded-none px-3.5 py-2.5 text-xs text-gray-900 outline-none focus:border-blue-600 font-bold"
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-[11px] font-bold uppercase tracking-wider text-slate-400 block flex justify-between">
+                  <label className="text-[11px] font-extrabold uppercase tracking-wider text-gray-600 block flex justify-between">
                     <span>Lesson</span>
-                    <span className="text-[8px] text-slate-500 font-normal">Optional</span>
+                    <span className="text-[8px] text-gray-400 font-normal">Optional</span>
                   </label>
                   <input
                     type="text"
                     value={printConfig.lesson}
                     onChange={(e) => setPrintConfig({ ...printConfig, lesson: e.target.value })}
                     placeholder="e.g. Cell Division"
-                    className="w-full bg-slate-950/60 border border-white/5 rounded-xl px-3.5 py-2.5 text-xs text-white outline-none focus:border-emerald-500 font-bold"
+                    className="w-full bg-white border border-gray-300 rounded-none px-3.5 py-2.5 text-xs text-gray-900 outline-none focus:border-blue-600 font-bold"
                   />
                 </div>
               </div>
@@ -1352,25 +1352,25 @@ export default function GeneratePage() {
                 {/* Left Column: Date & Day Stack */}
                 <div className="space-y-3">
                   <div className="space-y-1.5">
-                    <label className="text-[11px] font-bold uppercase tracking-wider text-slate-400 block">Date</label>
+                    <label className="text-[11px] font-extrabold uppercase tracking-wider text-gray-600 block">Date</label>
                     <input
                       type="text"
                       required
                       value={printConfig.date}
                       onChange={(e) => setPrintConfig({ ...printConfig, date: e.target.value })}
                       placeholder="e.g. 21/05/2026"
-                      className="w-full bg-slate-950/60 border border-white/5 rounded-xl px-3.5 py-2.5 text-xs text-white outline-none focus:border-emerald-500 font-bold"
+                      className="w-full bg-white border border-gray-300 rounded-none px-3.5 py-2.5 text-xs text-gray-900 outline-none focus:border-blue-600 font-bold"
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <label className="text-[11px] font-bold uppercase tracking-wider text-slate-400 block">Day</label>
+                    <label className="text-[11px] font-extrabold uppercase tracking-wider text-gray-600 block">Day</label>
                     <input
                       type="text"
                       required
                       value={printConfig.day}
                       onChange={(e) => setPrintConfig({ ...printConfig, day: e.target.value })}
                       placeholder="e.g. Thursday"
-                      className="w-full bg-slate-950/60 border border-white/5 rounded-xl px-3.5 py-2.5 text-xs text-white outline-none focus:border-emerald-500 font-bold"
+                      className="w-full bg-white border border-gray-300 rounded-none px-3.5 py-2.5 text-xs text-gray-900 outline-none focus:border-blue-600 font-bold"
                     />
                   </div>
                 </div>
@@ -1378,25 +1378,25 @@ export default function GeneratePage() {
                 {/* Right Column: Grade & Duration Stack */}
                 <div className="space-y-3">
                   <div className="space-y-1.5">
-                    <label className="text-[11px] font-bold uppercase tracking-wider text-slate-400 block">Grade</label>
+                    <label className="text-[11px] font-extrabold uppercase tracking-wider text-gray-600 block">Grade</label>
                     <input
                       type="text"
                       required
                       value={printConfig.grade}
                       onChange={(e) => setPrintConfig({ ...printConfig, grade: e.target.value })}
                       placeholder="e.g. 5th Grade"
-                      className="w-full bg-slate-950/60 border border-white/5 rounded-xl px-3.5 py-2.5 text-xs text-white outline-none focus:border-emerald-500 font-bold"
+                      className="w-full bg-white border border-gray-300 rounded-none px-3.5 py-2.5 text-xs text-gray-900 outline-none focus:border-blue-600 font-bold"
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <label className="text-[11px] font-bold uppercase tracking-wider text-slate-400 block">Duration</label>
+                    <label className="text-[11px] font-extrabold uppercase tracking-wider text-gray-600 block">Duration</label>
                     <input
                       type="text"
                       required
                       value={printConfig.duration}
                       onChange={(e) => setPrintConfig({ ...printConfig, duration: e.target.value })}
                       placeholder="e.g. 30 Minutes"
-                      className="w-full bg-slate-950/60 border border-white/5 rounded-xl px-3.5 py-2.5 text-xs text-white outline-none focus:border-emerald-500 font-bold"
+                      className="w-full bg-white border border-gray-300 rounded-none px-3.5 py-2.5 text-xs text-gray-900 outline-none focus:border-blue-600 font-bold"
                     />
                   </div>
                 </div>
@@ -1404,30 +1404,30 @@ export default function GeneratePage() {
 
               {/* Generated By */}
               <div className="space-y-1.5">
-                <label className="text-[11px] font-bold uppercase tracking-wider text-slate-400 block flex justify-between">
+                <label className="text-[11px] font-extrabold uppercase tracking-wider text-gray-600 block flex justify-between">
                   <span>Generated By</span>
-                  <span className="text-[8px] text-slate-500 font-normal">Optional</span>
+                  <span className="text-[8px] text-gray-400 font-normal">Optional</span>
                 </label>
                 <input
                   type="text"
                   value={printConfig.generatedBy}
                   onChange={(e) => setPrintConfig({ ...printConfig, generatedBy: e.target.value })}
                   placeholder="e.g. Mr. Rajesh Kumar"
-                  className="w-full bg-slate-950/60 border border-white/5 rounded-xl px-3.5 py-2.5 text-xs text-white outline-none focus:border-emerald-500 font-bold"
+                  className="w-full bg-white border border-gray-300 rounded-none px-3.5 py-2.5 text-xs text-gray-900 outline-none focus:border-blue-600 font-bold"
                 />
               </div>
 
               {/* Visibility Scope */}
-              <div className="flex items-center justify-between p-4 bg-slate-950/60 border border-white/5 rounded-xl">
+              <div className="flex items-center justify-between p-4 bg-gray-50 border border-gray-200 rounded-none">
                 <div>
-                  <p className="text-xs font-bold text-slate-200">Visibility Scope</p>
-                  <p className="text-[10px] text-slate-500 mt-0.5">Public = visible to all activated teachers</p>
+                  <p className="text-xs font-bold text-gray-800">Visibility Scope</p>
+                  <p className="text-[10px] text-gray-500 mt-0.5">Public = visible to all activated teachers</p>
                 </div>
                 <div className="flex gap-3">
                   {[{ val: false, label: "Private" }, { val: true, label: "Public" }].map(({ val, label }) => (
                     <button key={label} type="button" onClick={() => setSaveForm({ ...saveForm, isPublic: val })}
-                      className={`px-3 py-1.5 rounded-lg text-[11px] font-bold border transition-all ${
-                        saveForm.isPublic === val ? "bg-emerald-600 border-emerald-600 text-white" : "bg-transparent border-white/10 text-slate-400"
+                      className={`px-3 py-1.5 rounded-none text-[11px] font-bold border transition-all ${
+                        saveForm.isPublic === val ? "bg-blue-600 border-blue-600 text-white cursor-pointer" : "bg-white border-gray-300 text-gray-700 cursor-pointer"
                       }`}
                     >
                       {label}
@@ -1436,10 +1436,10 @@ export default function GeneratePage() {
                 </div>
               </div>
 
-              {saveError && <p className="text-xs text-rose-400 flex items-center gap-1"><AlertCircle size={12} />{saveError}</p>}
+              {saveError && <p className="text-xs text-red-600 flex items-center gap-1"><AlertCircle size={12} />{saveError}</p>}
 
               <button type="submit" disabled={saveLoading}
-                className="w-full bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 py-3.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all text-white"
+                className="w-full bg-brand-red hover:bg-brand-red/90 disabled:opacity-50 py-3.5 rounded-none font-bold text-sm flex items-center justify-center gap-2 transition-all text-white cursor-pointer"
               >
                 {saveLoading ? <><Loader size={14} className="animate-spin" /> Saving...</> : <><Save size={14} /> Save to Database</>}
               </button>
@@ -1450,19 +1450,19 @@ export default function GeneratePage() {
 
       {/* Print / Export Config Modal */}
       {showPrintConfigModal && (
-        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 no-print animate-in fade-in duration-200">
-          <div className="bg-slate-900 border border-white/10 w-full max-w-lg rounded-3xl p-8 space-y-6 shadow-2xl overflow-y-auto max-h-[90vh]">
-            <div className="flex items-center justify-between border-b border-white/5 pb-3">
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 no-print animate-in fade-in duration-200">
+          <div className="bg-white border border-gray-200 w-full max-w-lg rounded-none p-8 space-y-6 shadow-2xl overflow-y-auto max-h-[90vh]">
+            <div className="flex items-center justify-between border-b border-gray-100 pb-3">
               <div>
-                <h3 className="text-lg font-black text-white">
+                <h3 className="text-lg font-black text-gray-900">
                   {activePrintMode === "pdf" ? "Export Assessment as PDF" : "Print Assessment Exam"}
                 </h3>
-                <p className="text-[10px] text-slate-400 mt-0.5">Configure exam print layout fields</p>
+                <p className="text-[10px] text-gray-500 mt-0.5">Configure exam print layout fields</p>
               </div>
               <button
                 onClick={() => setShowPrintConfigModal(false)}
                 type="button"
-                className="p-2 hover:bg-white/5 rounded-xl text-slate-400 transition-colors"
+                className="p-2 hover:bg-gray-100 rounded-none text-gray-500 transition-colors cursor-pointer"
               >
                 <X size={16} />
               </button>
@@ -1470,7 +1470,7 @@ export default function GeneratePage() {
             
             {/* Format Choice: Questions Only vs With Answer Key */}
             <div className="space-y-2">
-              <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 block">
+              <label className="text-[10px] font-extrabold uppercase tracking-wider text-gray-600 block">
                 Answer Key Option
               </label>
               <div className="grid grid-cols-2 gap-2">
@@ -1482,10 +1482,10 @@ export default function GeneratePage() {
                     key={label}
                     onClick={() => setPrintConfig({ ...printConfig, includeAnswers: value })}
                     type="button"
-                    className={`py-2.5 px-4 rounded-xl border text-center font-bold transition-all text-xs flex items-center justify-center gap-1.5 ${
+                    className={`py-2.5 px-4 rounded-none border text-center font-bold transition-all text-xs flex items-center justify-center gap-1.5 cursor-pointer ${
                       printConfig.includeAnswers === value
-                        ? "bg-emerald-600/10 border-emerald-500/30 text-emerald-400 shadow-md"
-                        : "bg-slate-950/60 border-white/5 text-slate-400 hover:border-white/10"
+                        ? "bg-blue-50 border-blue-600 text-blue-600 shadow-sm"
+                        : "bg-white border-gray-300 text-gray-600 hover:bg-gray-50"
                     }`}
                   >
                     <CheckCircle size={12} className={printConfig.includeAnswers === value ? "opacity-100" : "opacity-0"} />
@@ -1499,23 +1499,23 @@ export default function GeneratePage() {
             <div className="space-y-4">
               {/* Assessment Name */}
               <div className="space-y-1.5">
-                <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 block">Assessment Name</label>
+                <label className="text-[10px] font-extrabold uppercase tracking-wider text-gray-600 block">Assessment Name</label>
                 <input
                   type="text"
                   value={printConfig.assessmentName}
                   onChange={(e) => setPrintConfig({ ...printConfig, assessmentName: e.target.value })}
                   placeholder="e.g. Chapter 3 Biology Quiz"
-                  className="w-full bg-slate-950/60 border border-white/5 rounded-xl px-3.5 py-2.5 text-xs text-white outline-none focus:border-indigo-500 font-bold"
+                  className="w-full bg-white border border-gray-300 rounded-none px-3.5 py-2.5 text-xs text-gray-900 outline-none focus:border-blue-600 font-bold"
                 />
               </div>
 
               {/* School Name select dropdown */}
               <div className="space-y-1.5">
-                <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 block">School Name</label>
+                <label className="text-[10px] font-extrabold uppercase tracking-wider text-gray-600 block">School Name</label>
                 <select
                   value={printConfig.schoolName}
                   onChange={(e) => setPrintConfig({ ...printConfig, schoolName: e.target.value })}
-                  className="w-full bg-slate-950/60 border border-white/5 rounded-xl px-3.5 py-2.5 text-xs text-white outline-none focus:border-indigo-500 font-bold"
+                  className="w-full bg-white border border-gray-300 rounded-none px-3.5 py-2.5 text-xs text-gray-900 outline-none focus:border-blue-600 font-bold"
                 >
                   <option value="ACHARIYA WORLD CLASS EDUCATION">ACHARIYA WORLD CLASS EDUCATION</option>
                   {allschoolsdata.map((school) => (
@@ -1529,27 +1529,27 @@ export default function GeneratePage() {
               {/* Subject & Lesson */}
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 block">Subject</label>
+                  <label className="text-[10px] font-extrabold uppercase tracking-wider text-gray-600 block">Subject</label>
                   <input
                     type="text"
                     value={printConfig.subject}
                     onChange={(e) => setPrintConfig({ ...printConfig, subject: e.target.value })}
                     placeholder="e.g. Biology"
-                    className="w-full bg-slate-950/60 border border-white/5 rounded-xl px-3.5 py-2.5 text-xs text-white outline-none focus:border-indigo-500 font-bold"
+                    className="w-full bg-white border border-gray-300 rounded-none px-3.5 py-2.5 text-xs text-gray-900 outline-none focus:border-blue-600 font-bold"
                   />
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 block flex justify-between">
+                  <label className="text-[10px] font-extrabold uppercase tracking-wider text-gray-600 block flex justify-between">
                     <span>Lesson</span>
-                    <span className="text-[8px] text-slate-500 font-normal">Optional</span>
+                    <span className="text-[8px] text-gray-400 font-normal">Optional</span>
                   </label>
                   <input
                     type="text"
                     value={printConfig.lesson}
                     onChange={(e) => setPrintConfig({ ...printConfig, lesson: e.target.value })}
                     placeholder="e.g. Cell Division"
-                    className="w-full bg-slate-950/60 border border-white/5 rounded-xl px-3.5 py-2.5 text-xs text-white outline-none focus:border-indigo-500 font-bold"
+                    className="w-full bg-white border border-gray-300 rounded-none px-3.5 py-2.5 text-xs text-gray-900 outline-none focus:border-blue-600 font-bold"
                   />
                 </div>
               </div>
@@ -1559,23 +1559,23 @@ export default function GeneratePage() {
                 {/* Left Column: Date & Day Stack */}
                 <div className="space-y-3">
                   <div className="space-y-1.5">
-                    <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 block">Date</label>
+                    <label className="text-[10px] font-extrabold uppercase tracking-wider text-gray-600 block">Date</label>
                     <input
                       type="text"
                       value={printConfig.date}
                       onChange={(e) => setPrintConfig({ ...printConfig, date: e.target.value })}
                       placeholder="e.g. 21/05/2026"
-                      className="w-full bg-slate-950/60 border border-white/5 rounded-xl px-3.5 py-2.5 text-xs text-white outline-none focus:border-indigo-500 font-bold"
+                      className="w-full bg-white border border-gray-300 rounded-none px-3.5 py-2.5 text-xs text-gray-900 outline-none focus:border-blue-600 font-bold"
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 block">Day</label>
+                    <label className="text-[10px] font-extrabold uppercase tracking-wider text-gray-600 block">Day</label>
                     <input
                       type="text"
                       value={printConfig.day}
                       onChange={(e) => setPrintConfig({ ...printConfig, day: e.target.value })}
                       placeholder="e.g. Thursday"
-                      className="w-full bg-slate-950/60 border border-white/5 rounded-xl px-3.5 py-2.5 text-xs text-white outline-none focus:border-indigo-500 font-bold"
+                      className="w-full bg-white border border-gray-300 rounded-none px-3.5 py-2.5 text-xs text-gray-900 outline-none focus:border-blue-600 font-bold"
                     />
                   </div>
                 </div>
@@ -1583,23 +1583,23 @@ export default function GeneratePage() {
                 {/* Right Column: Grade & Duration Stack */}
                 <div className="space-y-3">
                   <div className="space-y-1.5">
-                    <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 block">Grade</label>
+                    <label className="text-[10px] font-extrabold uppercase tracking-wider text-gray-600 block">Grade</label>
                     <input
                       type="text"
                       value={printConfig.grade}
                       onChange={(e) => setPrintConfig({ ...printConfig, grade: e.target.value })}
                       placeholder="e.g. 5th Grade"
-                      className="w-full bg-slate-950/60 border border-white/5 rounded-xl px-3.5 py-2.5 text-xs text-white outline-none focus:border-indigo-500 font-bold"
+                      className="w-full bg-white border border-gray-300 rounded-none px-3.5 py-2.5 text-xs text-gray-900 outline-none focus:border-blue-600 font-bold"
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 block">Duration</label>
+                    <label className="text-[10px] font-extrabold uppercase tracking-wider text-gray-600 block">Duration</label>
                     <input
                       type="text"
                       value={printConfig.duration}
                       onChange={(e) => setPrintConfig({ ...printConfig, duration: e.target.value })}
                       placeholder="e.g. 30 Minutes"
-                      className="w-full bg-slate-950/60 border border-white/5 rounded-xl px-3.5 py-2.5 text-xs text-white outline-none focus:border-indigo-500 font-bold"
+                      className="w-full bg-white border border-gray-300 rounded-none px-3.5 py-2.5 text-xs text-gray-900 outline-none focus:border-blue-600 font-bold"
                     />
                   </div>
                 </div>
@@ -1607,26 +1607,26 @@ export default function GeneratePage() {
 
               {/* Generated By (Optional) */}
               <div className="space-y-1.5 animate-in fade-in duration-200">
-                <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 block flex justify-between">
+                <label className="text-[10px] font-extrabold uppercase tracking-wider text-gray-600 block flex justify-between">
                   <span>Generated By</span>
-                  <span className="text-[8px] text-slate-500 font-normal">Optional</span>
+                  <span className="text-[8px] text-gray-400 font-normal">Optional</span>
                 </label>
                 <input
                   type="text"
                   value={printConfig.generatedBy}
                   onChange={(e) => setPrintConfig({ ...printConfig, generatedBy: e.target.value })}
                   placeholder="e.g. Mr. Rajesh Kumar"
-                  className="w-full bg-slate-950/60 border border-white/5 rounded-xl px-3.5 py-2.5 text-xs text-white outline-none focus:border-indigo-500 font-bold"
+                  className="w-full bg-white border border-gray-300 rounded-none px-3.5 py-2.5 text-xs text-gray-900 outline-none focus:border-blue-600 font-bold"
                 />
               </div>
             </div>
 
             {/* Action Buttons */}
-            <div className="flex gap-3 pt-3 border-t border-white/5">
+            <div className="flex gap-3 pt-3 border-t border-gray-100">
               <button
                 type="button"
                 onClick={() => setShowPrintConfigModal(false)}
-                className="flex-1 bg-white/5 hover:bg-white/10 py-3 rounded-xl font-bold text-xs text-slate-400 hover:text-white transition-colors"
+                className="flex-1 bg-gray-100 hover:bg-gray-200 py-3 rounded-none font-bold text-xs text-gray-700 hover:text-gray-900 transition-colors cursor-pointer"
               >
                 Cancel
               </button>
@@ -1639,7 +1639,7 @@ export default function GeneratePage() {
                   onClick={() => {
                     setTimeout(() => setShowPrintConfigModal(false), 500);
                   }}
-                  className="flex-1 bg-emerald-600 hover:bg-emerald-500 shadow-lg shadow-emerald-600/15 py-3 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition-all text-white no-underline text-center cursor-pointer"
+                  className="flex-1 bg-brand-red hover:bg-brand-red/90 py-3 rounded-none font-bold text-xs flex items-center justify-center gap-1.5 transition-all text-white no-underline text-center cursor-pointer shadow-md shadow-red-600/10"
                 >
                   {({ loading, error }) => (
                     loading ? (
@@ -1661,7 +1661,7 @@ export default function GeneratePage() {
                 <button
                   onClick={handlePrint}
                   type="button"
-                  className="flex-1 py-3 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition-all text-white bg-indigo-600 hover:bg-indigo-500 shadow-lg shadow-indigo-600/15"
+                  className="flex-1 py-3 rounded-none font-bold text-xs flex items-center justify-center gap-1.5 transition-all text-white bg-blue-600 hover:bg-blue-700 shadow-md shadow-blue-600/10 cursor-pointer"
                 >
                   <Printer size={13} />
                   Print Exam

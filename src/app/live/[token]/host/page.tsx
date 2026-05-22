@@ -233,23 +233,23 @@ export default function TeacherHostPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-white">
-        <Loader className="animate-spin text-emerald-400 mb-4" size={40} />
-        <p className="text-sm text-slate-400">Loading educator hosting panel...</p>
+      <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center text-gray-700">
+        <Loader className="animate-spin text-blue-600 mb-4" size={40} />
+        <p className="text-sm text-gray-500">Loading educator hosting panel...</p>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-white p-6">
-        <div className="max-w-md w-full bg-slate-900 border border-white/5 rounded-3xl p-8 text-center space-y-4 shadow-2xl">
-          <div className="mx-auto h-12 w-12 rounded-2xl bg-rose-500/10 border border-rose-500/20 text-rose-400 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center text-gray-900 p-6">
+        <div className="max-w-md w-full bg-white border border-gray-200 rounded-none p-8 text-center space-y-4 shadow-sm">
+          <div className="mx-auto h-12 w-12 rounded-none bg-red-50 border border-red-200 text-red-500 flex items-center justify-center">
             <AlertTriangle size={24} />
           </div>
-          <h2 className="text-xl font-black text-white">Hosting Inaccessible</h2>
-          <p className="text-sm text-slate-400 leading-relaxed">{error}</p>
-          <button onClick={() => router.push("/teacher/assessments")} className="w-full bg-indigo-600 hover:bg-indigo-500 py-3 rounded-xl font-bold text-sm transition-all">
+          <h2 className="text-xl font-black text-gray-900">Hosting Inaccessible</h2>
+          <p className="text-sm text-gray-500 leading-relaxed">{error}</p>
+          <button onClick={() => router.push("/teacher/assessments")} className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-none font-bold text-sm transition-all">
             Return to Repository
           </button>
         </div>
@@ -260,11 +260,7 @@ export default function TeacherHostPage() {
   const joinUrl = `${typeof window !== "undefined" ? window.location.origin : ""}/live/${token}`;
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white font-sans flex flex-col relative overflow-hidden">
-      {/* Background gradients */}
-      <div className="absolute top-0 left-[-10%] w-[50%] h-[40%] rounded-full bg-emerald-900/10 blur-[130px] pointer-events-none" />
-      <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-indigo-900/10 blur-[130px] pointer-events-none" />
-
+    <div className="min-h-screen bg-gray-50 font-sans flex flex-col relative overflow-hidden">
       {/* Main Container */}
       <div className="flex-1 max-w-6xl w-full mx-auto p-6 md:p-8 flex flex-col gap-6 relative z-10 overflow-y-auto">
         
@@ -273,16 +269,16 @@ export default function TeacherHostPage() {
           <div className="flex items-center gap-3">
             <button
               onClick={() => router.push(`/teacher/assessments/${assessment?.id}`)}
-              className="p-2.5 bg-slate-900 border border-white/5 rounded-xl hover:bg-slate-800 text-slate-400 hover:text-white transition-colors"
+              className="p-2.5 bg-white border border-gray-200 rounded-none hover:bg-gray-50 text-gray-500 hover:text-gray-900 transition-colors shadow-sm"
             >
               <ArrowLeft size={16} />
             </button>
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-[10px] font-black uppercase tracking-widest text-emerald-400 bg-emerald-500/10 px-2 py-0.5 border border-emerald-500/20 rounded-md">Live Control</span>
-                <span className="text-xs font-bold text-slate-500">· Room Status: {sessionStatus}</span>
+                <span className="text-[10px] font-black uppercase tracking-widest text-emerald-600 bg-emerald-50 px-2 py-0.5 border border-emerald-200 rounded-none">Live Control</span>
+                <span className="text-xs font-bold text-gray-400">· Room Status: {sessionStatus}</span>
               </div>
-              <h1 className="text-xl md:text-2xl font-black mt-1">{assessment?.title}</h1>
+              <h1 className="text-xl md:text-2xl font-black mt-1 text-gray-900">{assessment?.title}</h1>
             </div>
           </div>
 
@@ -292,7 +288,7 @@ export default function TeacherHostPage() {
               <button
                 disabled={roster.length === 0 || actionLoading}
                 onClick={startAssessment}
-                className="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-500 disabled:opacity-40 disabled:cursor-not-allowed px-5 py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/10 transition-all"
+                className="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 disabled:opacity-40 disabled:cursor-not-allowed border border-emerald-600 px-5 py-3 rounded-none font-bold text-sm text-white flex items-center justify-center gap-2 shadow-sm transition-all"
               >
                 {actionLoading ? <Loader size={16} className="animate-spin" /> : <Play size={16} />}
                 Start Assessment
@@ -303,7 +299,7 @@ export default function TeacherHostPage() {
               <button
                 disabled={actionLoading}
                 onClick={endAssessment}
-                className="w-full sm:w-auto bg-rose-600 hover:bg-rose-500 disabled:opacity-50 px-5 py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 shadow-lg shadow-rose-500/10 transition-all"
+                className="w-full sm:w-auto bg-red-600 hover:bg-red-700 disabled:opacity-50 border border-red-600 px-5 py-3 rounded-none font-bold text-sm text-white flex items-center justify-center gap-2 shadow-sm transition-all"
               >
                 {actionLoading ? <Loader size={16} className="animate-spin" /> : <Square size={16} />}
                 End Assessment
@@ -313,7 +309,7 @@ export default function TeacherHostPage() {
             {sessionStatus === "COMPLETED" && (
               <button
                 disabled
-                className="w-full sm:w-auto bg-slate-900 border border-white/5 text-slate-500 px-5 py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2"
+                className="w-full sm:w-auto bg-white border border-gray-200 text-gray-400 px-5 py-3 rounded-none font-bold text-sm flex items-center justify-center gap-2 shadow-sm"
               >
                 Assessment Completed
               </button>
@@ -327,38 +323,38 @@ export default function TeacherHostPage() {
             
             {/* Share link and meta column */}
             <div className="md:col-span-1 space-y-6">
-              <div className="bg-slate-900/60 border border-white/5 rounded-3xl p-6 space-y-6">
+              <div className="bg-white/80 border border-gray-200 rounded-none p-6 space-y-6 shadow-sm backdrop-blur-sm">
                 <div>
-                  <h3 className="text-base font-bold">Invite Students</h3>
-                  <p className="text-xs text-slate-400 mt-1">Share the following live access connection URL with your roster class.</p>
+                  <h3 className="text-base font-bold text-gray-900">Invite Students</h3>
+                  <p className="text-xs text-gray-500 mt-1">Share the following live access connection URL with your roster class.</p>
                 </div>
 
-                <div className="bg-slate-950 border border-white/5 rounded-2xl p-4 space-y-3">
-                  <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Access Link</p>
+                <div className="bg-gray-50 border border-gray-200 rounded-none p-4 space-y-3">
+                  <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Access Link</p>
                   <div className="flex gap-2">
                     <input
                       readOnly
                       type="text"
                       value={joinUrl}
-                      className="bg-slate-900 border border-white/5 rounded-lg px-3 py-2 text-xs font-mono text-slate-400 flex-1 outline-none truncate"
+                      className="bg-white border border-gray-300 rounded-none px-3 py-2 text-xs font-mono text-gray-500 flex-1 outline-none truncate"
                     />
                     <button
                       onClick={handleCopyLink}
-                      className="p-2.5 bg-indigo-600 hover:bg-indigo-500 rounded-lg flex items-center justify-center text-white transition-all"
+                      className="p-2.5 bg-blue-600 hover:bg-blue-700 rounded-none flex items-center justify-center text-white transition-all"
                     >
                       {copied ? <Check size={14} /> : <Copy size={14} />}
                     </button>
                   </div>
                 </div>
 
-                <div className="border-t border-white/5 pt-4 space-y-3 text-xs">
+                <div className="border-t border-gray-100 pt-4 space-y-3 text-xs">
                   <div className="flex justify-between">
-                    <span className="text-slate-400">Duration Limit</span>
-                    <span className="font-bold">{assessment?.duration} minutes</span>
+                    <span className="text-gray-400">Duration Limit</span>
+                    <span className="font-bold text-gray-700">{assessment?.duration} minutes</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-slate-400">Total Questions</span>
-                    <span className="font-bold">
+                    <span className="text-gray-400">Total Questions</span>
+                    <span className="font-bold text-gray-700">
                       {Array.isArray(assessment?.questions)
                         ? assessment?.questions.length
                         : JSON.parse(assessment?.questions || "[]").length} Questions
@@ -369,41 +365,41 @@ export default function TeacherHostPage() {
             </div>
 
             {/* Live student roster column */}
-            <div className="md:col-span-2 bg-slate-900/60 border border-white/5 rounded-3xl p-6 md:p-8 space-y-6 flex flex-col">
+            <div className="md:col-span-2 bg-white/80 border border-gray-200 rounded-none p-6 md:p-8 space-y-6 flex flex-col shadow-sm backdrop-blur-sm">
               <div className="flex justify-between items-center">
                 <div className="flex items-center gap-3">
-                  <div className="h-10 w-10 bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 rounded-xl flex items-center justify-center">
+                  <div className="h-10 w-10 bg-blue-50 border border-blue-200 text-blue-600 rounded-none flex items-center justify-center">
                     <Users size={18} />
                   </div>
                   <div>
-                    <h3 className="font-black text-lg">Waiting Queue</h3>
-                    <p className="text-[10px] text-slate-400 mt-0.5">Students ready to initiate the assessment</p>
+                    <h3 className="font-black text-lg text-gray-900">Waiting Queue</h3>
+                    <p className="text-[10px] text-gray-400 mt-0.5">Students ready to initiate the assessment</p>
                   </div>
                 </div>
 
-                <span className="text-xs font-bold text-indigo-400 bg-indigo-500/10 px-3 py-1 border border-indigo-500/20 rounded-full">
+                <span className="text-xs font-bold text-blue-600 bg-blue-50 px-3 py-1 border border-blue-200 rounded-none">
                   {roster.length} Connected
                 </span>
               </div>
 
               {roster.length === 0 ? (
-                <div className="flex-1 border-2 border-dashed border-white/5 rounded-2xl p-12 flex flex-col items-center justify-center text-center space-y-3">
-                  <Users className="text-slate-700" size={32} />
-                  <p className="text-sm font-bold text-slate-400">Roster Queue Empty</p>
-                  <p className="text-xs text-slate-500 max-w-xs leading-relaxed">
+                <div className="flex-1 border-2 border-dashed border-gray-200 rounded-none p-12 flex flex-col items-center justify-center text-center space-y-3">
+                  <Users className="text-gray-300" size={32} />
+                  <p className="text-sm font-bold text-gray-400">Roster Queue Empty</p>
+                  <p className="text-xs text-gray-400 max-w-xs leading-relaxed">
                     Share the invitation link to wait for participants. Roster will update instantly in real time.
                   </p>
                 </div>
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 overflow-y-auto max-h-[400px] pr-2 custom-scrollbar">
                   {roster.map((student, idx) => (
-                    <div key={student.id || idx} className="bg-slate-950 border border-white/5 rounded-2xl p-4 flex items-center gap-3 hover:border-white/10 transition-all">
-                      <div className="h-9 w-9 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 rounded-xl flex items-center justify-center font-bold text-xs">
+                    <div key={student.id || idx} className="bg-gray-50 border border-gray-200 rounded-none p-4 flex items-center gap-3 hover:border-blue-200 transition-all">
+                      <div className="h-9 w-9 bg-emerald-50 border border-emerald-200 text-emerald-600 rounded-none flex items-center justify-center font-bold text-xs">
                         {student.name.slice(0, 2).toUpperCase()}
                       </div>
                       <div className="min-w-0 flex-1">
-                        <p className="text-xs font-bold truncate text-slate-200">{student.name}</p>
-                        <p className="text-[9px] text-slate-500 truncate mt-0.5">ID: {student.studentId} · Grade {student.grade}-{student.section}</p>
+                        <p className="text-xs font-bold truncate text-gray-700">{student.name}</p>
+                        <p className="text-[9px] text-gray-400 truncate mt-0.5">ID: {student.studentId} · Grade {student.grade}-{student.section}</p>
                       </div>
                     </div>
                   ))}
@@ -419,34 +415,34 @@ export default function TeacherHostPage() {
             
             {/* Live Stats */}
             <div className="md:col-span-1 space-y-6">
-              <div className="bg-slate-900/60 border border-white/5 rounded-3xl p-6 space-y-6">
+              <div className="bg-white/80 border border-gray-200 rounded-none p-6 space-y-6 shadow-sm backdrop-blur-sm">
                 <div>
-                  <h3 className="text-base font-bold">Assessment Terminal</h3>
-                  <p className="text-xs text-slate-400 mt-1">Real-time supervision of active exam submissions.</p>
+                  <h3 className="text-base font-bold text-gray-900">Assessment Terminal</h3>
+                  <p className="text-xs text-gray-500 mt-1">Real-time supervision of active exam submissions.</p>
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
-                  <div className="bg-slate-950 border border-white/5 rounded-2xl p-4 text-center">
-                    <p className="text-[9px] text-slate-500 uppercase tracking-wider font-bold">Active Roster</p>
-                    <p className="text-2xl font-black text-indigo-400 mt-1">{roster.length}</p>
+                  <div className="bg-gray-50 border border-gray-200 rounded-none p-4 text-center">
+                    <p className="text-[9px] text-gray-400 uppercase tracking-wider font-bold">Active Roster</p>
+                    <p className="text-2xl font-black text-blue-600 mt-1">{roster.length}</p>
                   </div>
-                  <div className="bg-slate-950 border border-white/5 rounded-2xl p-4 text-center">
-                    <p className="text-[9px] text-slate-500 uppercase tracking-wider font-bold">Submitted</p>
-                    <p className="text-2xl font-black text-emerald-400 mt-1">
+                  <div className="bg-gray-50 border border-gray-200 rounded-none p-4 text-center">
+                    <p className="text-[9px] text-gray-400 uppercase tracking-wider font-bold">Submitted</p>
+                    <p className="text-2xl font-black text-emerald-600 mt-1">
                       {roster.filter((r) => r.completedAt).length}
                     </p>
                   </div>
                 </div>
 
-                <div className="bg-slate-950 border border-white/5 rounded-2xl p-4 flex items-center justify-between">
+                <div className="bg-gray-50 border border-gray-200 rounded-none p-4 flex items-center justify-between">
                   <div>
-                    <p className="text-[10px] text-slate-500 uppercase tracking-wider font-bold">Elapsed Limit</p>
-                    <p className="text-sm font-bold text-slate-200 mt-0.5">Duration: {assessment?.duration} Mins</p>
+                    <p className="text-[10px] text-gray-400 uppercase tracking-wider font-bold">Elapsed Limit</p>
+                    <p className="text-sm font-bold text-gray-700 mt-0.5">Duration: {assessment?.duration} Mins</p>
                   </div>
-                  <div className={`px-4 py-2 border rounded-xl font-mono font-bold text-sm ${
+                  <div className={`px-4 py-2 border rounded-none font-mono font-bold text-sm ${
                     timeLeft !== null && timeLeft < 60
-                      ? "bg-rose-500/10 border-rose-500/20 text-rose-400 animate-pulse"
-                      : "bg-slate-900 border-white/5 text-emerald-400"
+                      ? "bg-red-50 border-red-200 text-red-600 animate-pulse font-black"
+                      : "bg-gray-50 border-gray-200 text-blue-600"
                   }`}>
                     {timeLeft !== null ? formatTime(timeLeft) : "00:00"}
                   </div>
@@ -455,15 +451,15 @@ export default function TeacherHostPage() {
             </div>
 
             {/* Interactive Student Supervisor */}
-            <div className="md:col-span-2 bg-slate-900/60 border border-white/5 rounded-3xl p-6 md:p-8 space-y-6">
+            <div className="md:col-span-2 bg-white/80 border border-gray-200 rounded-none p-6 md:p-8 space-y-6 shadow-sm backdrop-blur-sm">
               <div className="flex justify-between items-center">
                 <div className="flex items-center gap-3">
-                  <div className="h-10 w-10 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 rounded-xl flex items-center justify-center">
+                  <div className="h-10 w-10 bg-emerald-50 border border-emerald-200 text-emerald-600 rounded-none flex items-center justify-center">
                     <UserCheck size={18} />
                   </div>
                   <div>
-                    <h3 className="font-black text-lg">Active Roster Monitoring</h3>
-                    <p className="text-[10px] text-slate-400 mt-0.5">Live updates of exam activity & integrity logs</p>
+                    <h3 className="font-black text-lg text-gray-900">Active Roster Monitoring</h3>
+                    <p className="text-[10px] text-gray-400 mt-0.5">Live updates of exam activity &amp; integrity logs</p>
                   </div>
                 </div>
               </div>
@@ -473,36 +469,36 @@ export default function TeacherHostPage() {
                   const isSubmitted = !!student.completedAt;
 
                   return (
-                    <div key={student.id || idx} className="bg-slate-950 border border-white/5 rounded-2xl p-4 flex flex-col sm:flex-row justify-between sm:items-center gap-3">
+                    <div key={student.id || idx} className="bg-gray-50 border border-gray-200 rounded-none p-4 flex flex-col sm:flex-row justify-between sm:items-center gap-3 hover:border-blue-200 transition-all">
                       <div className="flex items-center gap-3">
-                        <div className={`h-8 w-8 rounded-lg flex items-center justify-center text-xs font-bold ${
-                          isSubmitted ? "bg-emerald-500/10 text-emerald-400" : "bg-indigo-500/10 text-indigo-400"
+                        <div className={`h-8 w-8 rounded-none flex items-center justify-center text-xs font-bold border ${
+                          isSubmitted ? "bg-emerald-50 text-emerald-600 border-emerald-200" : "bg-blue-50 text-blue-600 border-blue-200"
                         }`}>
                           {idx + 1}
                         </div>
                         <div>
-                          <p className="text-xs font-bold text-slate-200">{student.name}</p>
-                          <p className="text-[9px] text-slate-500 mt-0.5">ID: {student.studentId} · Class {student.grade}-{student.section}</p>
+                          <p className="text-xs font-bold text-gray-700">{student.name}</p>
+                          <p className="text-[9px] text-gray-400 mt-0.5">ID: {student.studentId} · Class {student.grade}-{student.section}</p>
                         </div>
                       </div>
 
                       <div className="flex items-center justify-between sm:justify-end gap-6 text-xs">
                         {student.tabSwitches && student.tabSwitches > 0 ? (
-                          <span className="flex items-center gap-1 text-[10px] font-black uppercase text-amber-500 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded-md">
+                          <span className="flex items-center gap-1 text-[10px] font-black uppercase text-amber-600 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-none">
                             <AlertTriangle size={10} />
                             {student.tabSwitches} Tab Out{student.tabSwitches > 1 ? "s" : ""}
                           </span>
                         ) : (
-                          <span className="flex items-center gap-1 text-[10px] font-black uppercase text-slate-500">
+                          <span className="flex items-center gap-1 text-[10px] font-black uppercase text-gray-400">
                             <ShieldCheck size={11} className="text-emerald-500" />
                             Secure Lock
                           </span>
                         )}
 
-                        <span className={`text-[10px] font-black uppercase px-2.5 py-1 rounded-full ${
+                        <span className={`text-[10px] font-black uppercase px-2.5 py-1 rounded-none border ${
                           isSubmitted
-                            ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
-                            : "bg-slate-900 text-slate-400 border border-white/5 animate-pulse"
+                            ? "bg-emerald-50 text-emerald-600 border-emerald-200"
+                            : "bg-gray-100 text-gray-400 border-gray-200 animate-pulse"
                         }`}>
                           {isSubmitted ? "Submitted" : "Answering"}
                         </span>
@@ -521,33 +517,33 @@ export default function TeacherHostPage() {
             
             {/* Summary statistics column */}
             <div className="lg:col-span-1 space-y-6">
-              <div className="bg-slate-900/60 border border-white/5 rounded-3xl p-6 space-y-6">
+              <div className="bg-white/80 border border-gray-200 rounded-none p-6 space-y-6 shadow-sm backdrop-blur-sm">
                 <div>
-                  <h3 className="text-base font-bold">Assessment Complete</h3>
-                  <p className="text-xs text-slate-400 mt-1">Conducted session metrics and aggregated analytics.</p>
+                  <h3 className="text-base font-bold text-gray-900">Assessment Complete</h3>
+                  <p className="text-xs text-gray-500 mt-1">Conducted session metrics and aggregated analytics.</p>
                 </div>
 
                 <div className="space-y-3">
-                  <div className="bg-slate-950 border border-white/5 rounded-2xl p-4">
-                    <p className="text-[9px] text-slate-500 uppercase tracking-wider font-bold">Conducted</p>
-                    <p className="text-sm font-bold text-slate-200 mt-1">
+                  <div className="bg-gray-50 border border-gray-200 rounded-none p-4">
+                    <p className="text-[9px] text-gray-400 uppercase tracking-wider font-bold">Conducted</p>
+                    <p className="text-sm font-bold text-gray-700 mt-1">
                       {startedAt ? new Date(startedAt).toLocaleDateString() : "N/A"}
                     </p>
-                    <p className="text-[10px] text-slate-500 mt-0.5">
+                    <p className="text-[10px] text-gray-400 mt-0.5">
                       {startedAt ? new Date(startedAt).toLocaleTimeString() : ""}
                     </p>
                   </div>
 
                   <div className="grid grid-cols-2 gap-3">
-                    <div className="bg-slate-950 border border-white/5 rounded-2xl p-4 text-center">
-                      <p className="text-[9px] text-slate-500 uppercase tracking-wider font-bold">Top Score</p>
-                      <p className="text-2xl font-black text-indigo-400 mt-1">
+                    <div className="bg-gray-50 border border-gray-200 rounded-none p-4 text-center">
+                      <p className="text-[9px] text-gray-400 uppercase tracking-wider font-bold">Top Score</p>
+                      <p className="text-2xl font-black text-blue-600 mt-1">
                         {leaderboard.length > 0 ? Math.max(...leaderboard.map((l) => l.score)) : 0}
                       </p>
                     </div>
-                    <div className="bg-slate-950 border border-white/5 rounded-2xl p-4 text-center">
-                      <p className="text-[9px] text-slate-500 uppercase tracking-wider font-bold">Average</p>
-                      <p className="text-2xl font-black text-emerald-400 mt-1">
+                    <div className="bg-gray-50 border border-gray-200 rounded-none p-4 text-center">
+                      <p className="text-[9px] text-gray-400 uppercase tracking-wider font-bold">Average</p>
+                      <p className="text-2xl font-black text-emerald-600 mt-1">
                         {leaderboard.length > 0
                           ? Math.round((leaderboard.reduce((acc, curr) => acc + curr.score, 0) / leaderboard.length) * 10) / 10
                           : 0}
@@ -559,21 +555,21 @@ export default function TeacherHostPage() {
             </div>
 
             {/* Leaderboard panel */}
-            <div className="lg:col-span-2 bg-slate-900/60 border border-white/5 rounded-3xl p-6 md:p-8 space-y-6">
+            <div className="lg:col-span-2 bg-white/80 border border-gray-200 rounded-none p-6 md:p-8 space-y-6 shadow-sm backdrop-blur-sm">
               <div className="flex items-center gap-3">
-                <div className="h-10 w-10 bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 rounded-xl flex items-center justify-center">
+                <div className="h-10 w-10 bg-blue-50 border border-blue-200 text-blue-600 rounded-none flex items-center justify-center">
                   <Trophy size={18} />
                 </div>
                 <div>
-                  <h3 className="font-black text-lg">Class Results Leaderboard</h3>
-                  <p className="text-[10px] text-slate-400 mt-0.5">Ranked by score (primary) and time taken (tie-breaker)</p>
+                  <h3 className="font-black text-lg text-gray-900">Class Results Leaderboard</h3>
+                  <p className="text-[10px] text-gray-400 mt-0.5">Ranked by score (primary) and time taken (tie-breaker)</p>
                 </div>
               </div>
 
               <div className="overflow-x-auto">
                 <table className="w-full border-collapse text-left text-xs">
                   <thead>
-                    <tr className="border-b border-white/5 text-[10px] font-black uppercase tracking-wider text-slate-500">
+                    <tr className="bg-gray-50 border-b border-gray-200 text-gray-500 font-bold uppercase tracking-wider text-[10px]">
                       <th className="py-3 px-2">Rank</th>
                       <th className="py-3 px-4">Student</th>
                       <th className="py-3 px-4">Score</th>
@@ -581,40 +577,40 @@ export default function TeacherHostPage() {
                       <th className="py-3 px-4">Integrity Logs</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-white/5">
+                  <tbody>
                     {leaderboard.map((student, idx) => {
                       const formattedTime = `${Math.floor(student.timeTakenSeconds / 60)}:${(student.timeTakenSeconds % 60).toString().padStart(2, "0")}`;
 
                       return (
-                        <tr key={student.id || idx} className="hover:bg-slate-900/30 transition-colors">
+                        <tr key={student.id || idx} className="hover:bg-gray-50/30 transition-all border-b border-gray-100">
                           <td className="py-4 px-2">
-                            <span className={`h-6 w-6 rounded-lg flex items-center justify-center text-xs font-black ${
-                              idx === 0 ? "bg-amber-500 text-slate-950" :
-                              idx === 1 ? "bg-slate-300 text-slate-950" :
-                              idx === 2 ? "bg-amber-700 text-white" :
-                              "bg-slate-900 text-slate-500"
+                            <span className={`h-6 w-6 rounded-none flex items-center justify-center text-xs font-black border ${
+                              idx === 0 ? "bg-amber-100 text-amber-700 border-amber-200" :
+                              idx === 1 ? "bg-gray-100 text-gray-600 border-gray-300" :
+                              idx === 2 ? "bg-orange-100 text-orange-700 border-orange-200" :
+                              "bg-gray-100 text-gray-400 border-gray-200"
                             }`}>
                               {idx + 1}
                             </span>
                           </td>
                           <td className="py-4 px-4">
-                            <p className="font-bold text-slate-200">{student.name}</p>
-                            <p className="text-[9px] text-slate-500 mt-0.5">ID: {student.studentId} · Class {student.grade}-{student.section}</p>
+                            <p className="font-bold text-gray-700">{student.name}</p>
+                            <p className="text-[9px] text-gray-400 mt-0.5">ID: {student.studentId} · Class {student.grade}-{student.section}</p>
                           </td>
-                          <td className="py-4 px-4 font-black text-emerald-400 text-sm">
+                          <td className="py-4 px-4 font-black text-emerald-600 text-sm">
                             {student.score} / {student.totalQuestions}
                           </td>
-                          <td className="py-4 px-4 font-mono font-medium text-slate-300">
+                          <td className="py-4 px-4 font-mono font-medium text-gray-600">
                             {formattedTime}
                           </td>
                           <td className="py-4 px-4">
                             {student.tabSwitches > 0 ? (
-                              <span className="inline-flex items-center gap-1 text-[9px] font-black uppercase text-amber-500 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded-md">
+                              <span className="inline-flex items-center gap-1 text-[9px] font-black uppercase text-amber-600 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-none">
                                 <AlertTriangle size={10} />
                                 {student.tabSwitches} Alert{student.tabSwitches > 1 ? "s" : ""}
                               </span>
                             ) : (
-                              <span className="inline-flex items-center gap-1 text-[9px] font-black uppercase text-slate-500">
+                              <span className="inline-flex items-center gap-1 text-[9px] font-black uppercase text-gray-400">
                                 <ShieldCheck size={11} className="text-emerald-500" />
                                 Locked
                               </span>
@@ -627,7 +623,7 @@ export default function TeacherHostPage() {
                 </table>
 
                 {leaderboard.length === 0 && (
-                  <div className="text-center py-12 text-slate-500">
+                  <div className="text-center py-12 text-gray-400">
                     No participants successfully finalized submission.
                   </div>
                 )}

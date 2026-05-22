@@ -30,7 +30,6 @@ export default function AdminLogin() {
         throw new Error(data.message || "Failed to log in");
       }
 
-      // Save token and user details to localStorage
       localStorage.setItem("adminToken", data.token);
       localStorage.setItem("adminUser", JSON.stringify(data.user));
 
@@ -43,36 +42,35 @@ export default function AdminLogin() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white flex flex-col items-center justify-center p-4 relative overflow-hidden">
-      {/* Background decoration */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] rounded-full bg-indigo-500/10 blur-[100px] pointer-events-none" />
-
+    <div className="min-h-screen text-gray-900 flex flex-col items-center justify-center p-4 relative overflow-hidden bg-transparent">
       <div className="w-full max-w-md relative z-10">
+        
         {/* Back Link */}
         <div className="mb-6">
           <Link
             href="/"
-            className="inline-flex items-center gap-2 text-xs text-slate-400 hover:text-white transition-colors"
+            className="inline-flex items-center gap-2 text-xs text-gray-600 hover:text-gray-900 transition-colors font-bold"
           >
-            <ArrowLeft size={14} /> Back to Gateway Selection
+            <ArrowLeft size={14} className="text-[#C72323]" /> Back to Gateway Selection
           </Link>
         </div>
 
         {/* Brand Header */}
         <div className="text-center mb-8">
-          <div className="h-14 w-14 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 mx-auto mb-4 shadow-lg shadow-indigo-500/5">
+          {/* Logo box: sharp flat edges (no rounded corners) */}
+          <div className="h-14 w-14 bg-[#C72323] flex items-center justify-center text-white mx-auto mb-4 shadow-md">
             <ShieldCheck size={32} />
           </div>
-          <h2 className="text-3xl font-extrabold tracking-tight">Super Admin Gateway</h2>
-          <p className="text-sm text-slate-400 mt-2">
+          <h2 className="text-3xl font-extrabold tracking-tight text-gray-900">Super Admin Gateway</h2>
+          <p className="text-sm text-gray-600 mt-2">
             Sign in with authorized administrative credentials.
           </p>
         </div>
 
-        {/* Login Card */}
-        <div className="bg-slate-900/60 backdrop-blur-xl border border-white/5 rounded-3xl p-8 shadow-2xl">
+        {/* Login Card - flat no-radius style */}
+        <div className="bg-white/80 backdrop-blur-md border border-gray-300 p-8 shadow-xl">
           {error && (
-            <div className="mb-6 p-4 bg-rose-500/10 border border-rose-500/20 rounded-xl flex items-center gap-3 text-rose-400 text-sm">
+            <div className="mb-6 p-4 bg-red-50 border border-red-200 flex items-center gap-3 text-[#C72323] text-sm">
               <AlertCircle size={20} className="shrink-0" />
               <span>{error}</span>
             </div>
@@ -81,17 +79,17 @@ export default function AdminLogin() {
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Email Field */}
             <div className="space-y-2">
-              <label className="text-xs font-bold uppercase tracking-wider text-slate-400">
+              <label className="text-xs font-bold uppercase tracking-wider text-gray-700">
                 Email Address
               </label>
               <div className="relative">
-                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" size={18} />
+                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" size={18} />
                 <input
                   type="email"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full bg-slate-950/80 border border-white/5 rounded-xl pl-12 pr-4 py-3 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all text-white placeholder-slate-600"
+                  className="input-field pl-12 pr-4 py-3 bg-white text-gray-900 placeholder-gray-400"
                   placeholder="admin@achariya.org"
                 />
               </div>
@@ -99,34 +97,34 @@ export default function AdminLogin() {
 
             {/* Password Field */}
             <div className="space-y-2">
-              <label className="text-xs font-bold uppercase tracking-wider text-slate-400">
+              <label className="text-xs font-bold uppercase tracking-wider text-gray-700">
                 Password
               </label>
               <div className="relative">
-                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" size={18} />
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" size={18} />
                 <input
                   type="password"
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full bg-slate-950/80 border border-white/5 rounded-xl pl-12 pr-4 py-3 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all text-white placeholder-slate-600"
+                  className="input-field pl-12 pr-4 py-3 bg-white text-gray-900 placeholder-gray-400"
                   placeholder="••••••••"
                 />
               </div>
             </div>
 
-            {/* Submit Button */}
+            {/* Submit Button - flat no-radius style */}
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-3.5 rounded-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-indigo-600/20 hover:shadow-indigo-600/35 flex items-center justify-center gap-2 text-sm"
+              className="w-full bg-[#20407D] hover:bg-blue-800 text-white font-bold py-3.5 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-sm cursor-pointer"
             >
               {loading ? "Authenticating Master Gateway..." : "Access Control Panel"}
             </button>
           </form>
 
           {/* Quick Info Box */}
-          <div className="mt-6 pt-6 border-t border-white/5 text-center text-xs text-slate-500">
+          <div className="mt-6 pt-6 border-t border-gray-200 text-center text-xs text-gray-500">
             <p>Authorized access only. Actions within this portal are logged.</p>
           </div>
         </div>

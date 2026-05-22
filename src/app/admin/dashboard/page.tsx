@@ -593,11 +593,7 @@ export default function AdminDashboard() {
   const pendingCount = totalCount - activatedCount;
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white font-sans flex relative overflow-hidden">
-      {/* Background atmospheric elements */}
-      <div className="absolute top-0 left-[-10%] w-[50%] h-[40%] rounded-full bg-indigo-900/10 blur-[130px] pointer-events-none" />
-      <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-emerald-900/10 blur-[130px] pointer-events-none" />
-
+    <div className="min-h-screen text-gray-900 font-sans flex relative overflow-hidden bg-transparent">
       {/* Shared Global Sidebar */}
       <Sidebar
         role="admin"
@@ -618,13 +614,13 @@ export default function AdminDashboard() {
           {/* Toast Alerts */}
           {message && (
             <div
-              className={`fixed bottom-6 right-6 z-50 p-4 rounded-2xl border backdrop-blur-xl shadow-2xl flex items-center gap-3 text-sm font-medium animate-in slide-in-from-bottom-5 duration-300 max-w-md ${
+              className={`fixed bottom-6 right-6 z-50 p-4 border backdrop-blur-xl shadow-2xl flex items-center gap-3 text-sm font-medium animate-in slide-in-from-bottom-5 duration-300 max-w-md ${
                 message.type === "success"
-                  ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400"
-                  : "bg-rose-500/10 border-rose-500/20 text-rose-400"
+                  ? "bg-emerald-50 border-emerald-200 text-emerald-800"
+                  : "bg-red-50 border-red-200 text-red-800"
               }`}
             >
-              <CheckCircle size={20} className="shrink-0" />
+              <CheckCircle size={20} className="shrink-0 text-emerald-600" />
               <span>{message.text}</span>
             </div>
           )}
@@ -633,67 +629,63 @@ export default function AdminDashboard() {
           {activeSidebarTab === "teachers" && (
             <div className="space-y-8 animate-in fade-in slide-in-from-bottom duration-300">
               <div>
-                <h2 className="text-3xl font-black">Super Admin Console</h2>
-                <p className="text-sm text-slate-400 mt-1">
+                <h2 className="text-3xl font-black text-gray-900">Super Admin Console</h2>
+                <p className="text-sm text-gray-600 mt-1">
                   Onboard academic educators, view active listings, and audit system-wide permissions.
                 </p>
               </div>
 
               {/* Overview Stats Grid */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-                <div className="bg-slate-900/50 border border-white/5 rounded-3xl p-6 relative overflow-hidden shadow-xl">
-                  <div className="absolute top-0 right-0 w-16 h-16 bg-indigo-500/5 rounded-full blur-xl" />
+                <div className="bg-white/80 border border-gray-300 p-6 relative overflow-hidden shadow-md">
                   <div className="flex items-center justify-between mb-4">
-                    <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
+                    <span className="text-xs font-bold uppercase tracking-wider text-gray-500">
                       Total Teachers
                     </span>
-                    <Users size={20} className="text-indigo-400" />
+                    <Users size={20} className="text-[#20407D]" />
                   </div>
-                  <p className="text-3xl font-black">{totalCount}</p>
+                  <p className="text-3xl font-black text-gray-900">{totalCount}</p>
                 </div>
 
-                <div className="bg-slate-900/50 border border-white/5 rounded-3xl p-6 relative overflow-hidden shadow-xl">
-                  <div className="absolute top-0 right-0 w-16 h-16 bg-emerald-500/5 rounded-full blur-xl" />
+                <div className="bg-white/80 border border-gray-300 p-6 relative overflow-hidden shadow-md">
                   <div className="flex items-center justify-between mb-4">
-                    <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
+                    <span className="text-xs font-bold uppercase tracking-wider text-gray-500">
                       Active Staff
                     </span>
-                    <CheckCircle size={20} className="text-emerald-400" />
+                    <CheckCircle size={20} className="text-emerald-600" />
                   </div>
-                  <p className="text-3xl font-black text-emerald-400">{activeCount}</p>
+                  <p className="text-3xl font-black text-emerald-600">{activeCount}</p>
                 </div>
 
-                <div className="bg-slate-900/50 border border-white/5 rounded-3xl p-6 relative overflow-hidden shadow-xl">
-                  <div className="absolute top-0 right-0 w-16 h-16 bg-violet-500/5 rounded-full blur-xl" />
+                <div className="bg-white/80 border border-gray-300 p-6 relative overflow-hidden shadow-md">
                   <div className="flex items-center justify-between mb-4">
-                    <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
+                    <span className="text-xs font-bold uppercase tracking-wider text-gray-500">
                       Activated
                     </span>
-                    <Users size={20} className="text-violet-400" />
+                    <Users size={20} className="text-blue-600" />
                   </div>
-                  <p className="text-3xl font-black text-violet-400">{activatedCount}</p>
+                  <p className="text-3xl font-black text-blue-600">{activatedCount}</p>
                 </div>
 
-                <div className="bg-slate-900/50 border border-white/5 rounded-3xl p-6 relative overflow-hidden shadow-xl">
-                  <div className="absolute top-0 right-0 w-16 h-16 bg-amber-500/5 rounded-full blur-xl" />
+                <div className="bg-white/80 border border-gray-300 p-6 relative overflow-hidden shadow-md">
                   <div className="flex items-center justify-between mb-4">
-                    <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
+                    <span className="text-xs font-bold uppercase tracking-wider text-gray-500">
                       Pending Activation
                     </span>
-                    <AlertTriangle size={20} className="text-amber-400" />
+                    <AlertTriangle size={20} className="text-amber-600" />
                   </div>
-                  <p className="text-3xl font-black text-amber-400">{pendingCount}</p>
+                  <p className="text-3xl font-black text-amber-600">{pendingCount}</p>
                 </div>
               </div>
 
         {/* Tabs Control */}
-        <div className="flex border-b border-white/5 gap-6">
+        <div className="flex border-b border-gray-300 gap-6">
           <button
             onClick={() => setActiveTab("list")}
             className={`pb-4 text-sm font-bold tracking-wide transition-all border-b-2 ${
               activeTab === "list"
-                ? "border-indigo-500 text-indigo-400"
-                : "border-transparent text-slate-400 hover:text-white"
+                ? "border-[#20407D] text-[#20407D]"
+                : "border-transparent text-gray-500 hover:text-gray-900"
             }`}
           >
             Teacher Registry
@@ -702,8 +694,8 @@ export default function AdminDashboard() {
             onClick={() => setActiveTab("create")}
             className={`pb-4 text-sm font-bold tracking-wide transition-all border-b-2 ${
               activeTab === "create"
-                ? "border-indigo-500 text-indigo-400"
-                : "border-transparent text-slate-400 hover:text-white"
+                ? "border-[#20407D] text-[#20407D]"
+                : "border-transparent text-gray-500 hover:text-gray-900"
             }`}
           >
             Manually Onboard Teacher
@@ -712,8 +704,8 @@ export default function AdminDashboard() {
             onClick={() => setActiveTab("upload")}
             className={`pb-4 text-sm font-bold tracking-wide transition-all border-b-2 ${
               activeTab === "upload"
-                ? "border-indigo-500 text-indigo-400"
-                : "border-transparent text-slate-400 hover:text-white"
+                ? "border-[#20407D] text-[#20407D]"
+                : "border-transparent text-gray-500 hover:text-gray-900"
             }`}
           >
             Bulk Onboard (Excel)
@@ -728,12 +720,12 @@ export default function AdminDashboard() {
             {/* Filter and search bar */}
             <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
               <div className="relative w-full sm:max-w-md">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" size={16} />
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full bg-slate-900 border border-white/5 rounded-2xl pl-12 pr-4 py-2.5 text-sm focus:border-indigo-500 outline-none transition-all placeholder-slate-500"
+                  className="w-full bg-white border border-gray-300 pl-12 pr-4 py-2.5 text-sm focus:border-[#20407D] outline-none transition-all placeholder-gray-400 text-gray-900"
                   placeholder="Search by ID, Name, Branch, or Designation..."
                 />
               </div>
@@ -742,7 +734,7 @@ export default function AdminDashboard() {
                 <select
                   value={statusFilter}
                   onChange={(e) => setStatusFilter(e.target.value)}
-                  className="bg-slate-900 border border-white/5 rounded-2xl px-4 py-2.5 text-sm focus:border-indigo-500 outline-none w-full sm:w-auto"
+                  className="bg-white border border-gray-300 text-gray-900 px-4 py-2.5 text-sm focus:border-[#20407D] outline-none w-full sm:w-auto"
                 >
                   <option value="all">All States</option>
                   <option value="active">Active Status</option>
@@ -754,7 +746,7 @@ export default function AdminDashboard() {
 
                 <button
                   onClick={() => fetchTeachers()}
-                  className="p-2.5 bg-slate-900 border border-white/5 hover:bg-slate-800 rounded-2xl transition-colors shrink-0"
+                  className="p-2.5 bg-white border border-gray-300 hover:bg-gray-100 text-gray-700 transition-colors shrink-0 cursor-pointer"
                   title="Reload Registry"
                 >
                   <RefreshCw size={16} className={loading ? "animate-spin" : ""} />
@@ -764,22 +756,22 @@ export default function AdminDashboard() {
 
             {/* List Loader / Table */}
             {loading ? (
-              <div className="h-64 flex flex-col items-center justify-center gap-3 text-slate-500">
-                <RefreshCw size={36} className="animate-spin text-indigo-400" />
+              <div className="h-64 flex flex-col items-center justify-center gap-3 text-gray-500">
+                <RefreshCw size={36} className="animate-spin text-[#20407D]" />
                 <span>Loading educator registry...</span>
               </div>
             ) : filteredTeachers.length === 0 ? (
-              <div className="h-64 border border-dashed border-white/5 rounded-3xl flex flex-col items-center justify-center gap-2 text-slate-500 bg-slate-900/10">
-                <Users size={40} className="text-slate-600" />
+              <div className="h-64 border border-dashed border-gray-300 flex flex-col items-center justify-center gap-2 text-gray-500 bg-white/50">
+                <Users size={40} className="text-gray-400" />
                 <p className="font-bold">No teachers found</p>
                 <p className="text-xs">Onboard some teachers using the onboard tabs.</p>
               </div>
             ) : (
-              <div className="bg-slate-900/40 border border-white/5 rounded-3xl overflow-hidden shadow-2xl">
+              <div className="bg-white/80 border border-gray-300 overflow-hidden shadow-md">
                 <div className="overflow-x-auto">
                   <table className="w-full text-left text-sm">
                     <thead>
-                      <tr className="bg-slate-900/80 border-b border-white/5 text-xs text-slate-400 font-bold uppercase tracking-wider">
+                      <tr className="bg-gray-100 border-b border-gray-300 text-xs text-gray-700 font-bold uppercase tracking-wider">
                         <th className="px-6 py-4">Employee ID</th>
                         <th className="px-6 py-4">Name / Designation</th>
                         <th className="px-6 py-4">Branch Hub</th>
@@ -788,16 +780,16 @@ export default function AdminDashboard() {
                         <th className="px-6 py-4">Actions</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-white/5">
+                    <tbody className="divide-y divide-gray-200">
                       {filteredTeachers.map((t) => (
-                        <tr key={t.id} className="hover:bg-white/[0.02] transition-colors">
-                          <td className="px-6 py-4 font-mono font-bold text-indigo-400">
+                        <tr key={t.id} className="hover:bg-gray-50/50 transition-colors border-b border-gray-200 text-gray-900">
+                          <td className="px-6 py-4 font-mono font-bold text-[#20407D]">
                             {t.userId}
                           </td>
                           <td className="px-6 py-4">
                             <div>
-                              <p className="font-bold text-white">{t.userName}</p>
-                              <p className="text-xs text-slate-400">{t.designation}</p>
+                              <p className="font-bold text-gray-900">{t.userName}</p>
+                              <p className="text-xs text-gray-600">{t.designation}</p>
                             </div>
                           </td>
                           <td className="px-6 py-4 text-slate-300 font-medium">

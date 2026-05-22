@@ -110,3 +110,75 @@ model LiveSessionParticipant {
 
   @@map("live_session_participants")
 }
+
+model Recruiter {
+  id           String                  @id @default(uuid())
+  email        String                  @unique
+  passwordHash String
+  name         String
+  role         String                  @default("Recruiter")
+  createdAt    DateTime                @default(now())
+  updatedAt    DateTime                @updatedAt
+  assessments  RecruitmentAssessment[]
+
+  @@map("recruiters")
+}
+
+model RecruitmentAssessment {
+  id                  String                   @id @default(uuid())
+  title               String
+  isPublic            Boolean                  @default(false)
+  teaching            String                   // teaching or non teaching
+  department          String
+  duration            Int                      @default(30) // in minutes
+  date                String                   // Date of assessment, e.g. "2026-05-22"
+  day                 String                   // Day of week, e.g. "Friday"
+  generatedBy         String                   // Recruiter name
+  position            String                   // Assessment to hire which position
+  recruitmentFor      String                   // School name(s)
+  questions           Json                     // Array of question objects
+  createdById         String
+  createdBy           Recruiter                @relation(fields: [createdById], references: [id], onDelete: Cascade)
+  createdAt           DateTime                 @default(now())
+  updatedAt           DateTime                 @updatedAt
+  liveSessions        RecruitmentLiveSession[]
+
+  @@map("recruitment_assessments")
+}
+
+model RecruitmentLiveSession {
+  id           String                               @id @default(uuid())
+  token        String                               @unique
+  assessmentId String
+  recruiterId  String
+  status       LiveSessionStatus                    @default(WAITING)
+  startedAt    DateTime?
+  endedAt      DateTime?
+  createdAt    DateTime                             @default(now())
+  assessment   RecruitmentAssessment                @relation(fields: [assessmentId], references: [id])
+  participants RecruitmentLiveSessionParticipant[]
+
+  @@map("recruitment_live_sessions")
+}
+
+model RecruitmentLiveSessionParticipant {
+  id               String                 @id @default(uuid())
+  sessionId        String
+  name             String
+  email            String
+  phone            String
+  experience       String
+  qualification    String
+  joinedAt         DateTime               @default(now())
+  completedAt      DateTime?
+  timeTakenSeconds Int?
+  score            Int?
+  totalQuestions   Int?
+  answers          Json?
+  tabSwitches      Int                    @default(0)
+  terminated       Boolean                @default(false)
+  session          RecruitmentLiveSession @relation(fields: [sessionId], references: [id])
+
+  @@map("recruitment_live_session_participants")
+}
+
