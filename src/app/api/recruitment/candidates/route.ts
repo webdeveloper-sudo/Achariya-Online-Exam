@@ -95,7 +95,7 @@ export async function GET(request: Request) {
         totalQuestions: p.session?.assessment?.questions
           ? (typeof p.session.assessment.questions === "string"
               ? JSON.parse(p.session.assessment.questions).length
-              : p.session.assessment.questions.length)
+              : (Array.isArray(p.session.assessment.questions) ? p.session.assessment.questions.length : 0))
           : null,
         terminated: p.terminated,
         tabSwitches: p.tabSwitches,
@@ -116,7 +116,7 @@ export async function GET(request: Request) {
         candidate.latestTotalQuestions = p.session?.assessment?.questions
           ? (typeof p.session.assessment.questions === "string"
               ? JSON.parse(p.session.assessment.questions).length
-              : p.session.assessment.questions.length)
+              : (Array.isArray(p.session.assessment.questions) ? p.session.assessment.questions.length : 0))
           : null;
 
         // Latest attempt name/phone may have been updated

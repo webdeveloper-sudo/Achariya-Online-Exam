@@ -686,10 +686,11 @@ export default function AssessmentDetailPage() {
                     <textarea value={q.explanation || ""} onChange={(e) => updateEditQuestion(idx, "explanation", e.target.value)} rows={2}
                       className="w-full bg-white border border-gray-300 rounded-none px-2 py-1.5 text-xs text-gray-700 outline-none resize-none italic focus:border-blue-600" />
                   </div>
-
+                )}
               </div>
-
-        )}
+            </div>
+          ))}
+        </div>
         {/* Conducted Sessions Section */}
         <div className="mt-12 space-y-6 no-print">
           <div className="flex items-center gap-3 border-b border-gray-200 pb-4">
