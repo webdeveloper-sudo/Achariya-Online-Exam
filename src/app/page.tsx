@@ -30,7 +30,9 @@ import x from "@/assets/images/sm/3dicons-x-front-color.png";
 import insta from "@/assets/images/sm/3dicons-instagram-front-color.png";
 import fb from "@/assets/images/sm/3dicons-facebook-front-color.png";
 import linkedin from "@/assets/images/sm/3dicons-linkedin-front-color.png";
-
+import youtube from "@/assets/images/sm/3dicons-youtube-front-color.png"
+import hero from "@/assets/images/achariyanew1-scaled.avif"
+import mobileHero from "@/assets/images/Artboard-1.avif"
 // Background images for the Hero carousel slider
 const carouselSlides = [
   {
@@ -197,9 +199,8 @@ export default function Home() {
       <main className="flex-1 w-full">
 
         {/* HERO SECTION WITH PREMIUM GLASS UI */}
-        <section className="relative h-full py-20 flex items-center overflow-hidden border-b border-white/10 bg-black">
+        {/* <section className="relative h-full py-20 flex items-center overflow-hidden border-b border-white/10 bg-black">
 
-          {/* Background Carousel */}
           <div className="absolute inset-0 z-0">
             <AnimatePresence mode="wait">
               <motion.div
@@ -215,16 +216,14 @@ export default function Home() {
               />
             </AnimatePresence>
 
-            {/* Premium layered overlays */}
             <div className="absolute inset-0 bg-black/70" />
             <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/55 to-black/85" />
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.08),transparent_45%)]" />
           </div>
 
-          {/* Soft Ambient Glow */}
+         
           <div className="absolute top-24 left-1/2 -translate-x-1/2 w-[650px] h-[650px] bg-[#C72323]/10 blur-[160px] rounded-full z-10 pointer-events-none" />
 
-          {/* Grid Texture */}
           <div
             className="absolute inset-0 opacity-[0.04] z-10"
             style={{
@@ -236,7 +235,6 @@ export default function Home() {
             }}
           />
 
-          {/* Navigation Arrows */}
           <button
             onClick={handlePrevSlide}
             className="absolute left-8 top-1/2 -translate-y-1/2 z-30 hidden lg:flex items-center justify-center w-14 h-14 border border-white/10 bg-white/5 backdrop-blur-xl text-white/70 hover:text-white hover:bg-white/10 transition-all duration-300 cursor-pointer"
@@ -252,7 +250,6 @@ export default function Home() {
           >
             <ChevronRight size={20} />
           </button>
-          {/* Main Hero Content */}
           <div className="relative z-20 w-full max-w-7xl mx-auto px-6 pt-12 pb-12">
             <motion.div
               key={`content-${currentSlide}`}
@@ -261,14 +258,10 @@ export default function Home() {
               exit={{ opacity: 0, y: -30 }}
               transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
             >
-
-              {/* 2 COLUMN LAYOUT */}
               <div className="grid lg:grid-cols-12 gap-14 items-center">
 
-                {/* LEFT CONTENT */}
                 <div className="lg:col-span-7">
 
-                  {/* Top Badge */}
                   <div className="inline-flex items-center gap-3 px-5 py-2 border border-white/10 bg-white/5 backdrop-blur-xl mb-8">
                     <span className="w-2 h-2 bg-[#C72323] animate-pulse rounded-full" />
 
@@ -277,7 +270,6 @@ export default function Home() {
                     </span>
                   </div>
 
-                  {/* Main Heading */}
                   <h1 className="text-3xl sm:text-4xl md:text-5xl max-w-2xl lg:text-6xl leading-[0.95] font-black tracking-[-0.05em] text-white">
                     {carouselSlides[currentSlide].title
                       .split(" ")
@@ -303,15 +295,12 @@ export default function Home() {
                       })}
                   </h1>
 
-                  {/* Divider */}
                   <div className="w-28 h-[2px] bg-gradient-to-r from-[#C72323] to-transparent mt-10 mb-8" />
 
-                  {/* Description */}
                   <p className="text-base sm:text-lg md:text-xl text-gray-300 leading-relaxed max-w-2xl font-medium">
                     {carouselSlides[currentSlide].description}
                   </p>
 
-                  {/* CTA Buttons */}
                   <div className="flex flex-wrap items-center gap-4 pt-10">
 
                     <button
@@ -345,7 +334,6 @@ export default function Home() {
                   </div>
                 </div>
 
-                {/* RIGHT STATS */}
                 <div className="lg:col-span-5">
 
                   <div className="grid grid-cols-2 gap-5">
@@ -376,10 +364,8 @@ export default function Home() {
                         }}
                       >
 
-                        {/* Glow */}
                         <div className="absolute inset-0 bg-gradient-to-br from-white/[0.04] to-transparent pointer-events-none" />
 
-                        {/* Accent Line */}
                         <div className="relative z-10 w-12 h-[2px] bg-[#C72323]" />
 
                         <div className="relative z-10 space-y-4">
@@ -401,11 +387,16 @@ export default function Home() {
             </motion.div>
           </div>
 
-          {/* Bottom Fade */}
           <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-black to-transparent z-10" />
+        </section> */}
+
+
+
+
+        <section>
+          <img src={hero.src} alt="" className="w-full md:block hidden border-b border-gray-200 object-fit" />
+          <img src={mobileHero.src} alt="" className="w-full md:hidden block border-b border-gray-200 object-fit" />
         </section>
-
-
 
 
 
@@ -422,7 +413,7 @@ export default function Home() {
                 variants={fadeInUp}
                 className="md:col-span-6 space-y-6"
               >
-                <div className="space-y-2">
+                <div className="space-y-2 text-center md:text-left">
                   <span className="text-xs font-bold uppercase tracking-widest text-[#C72323] block">
                     WHO WE ARE
                   </span>
@@ -430,25 +421,25 @@ export default function Home() {
                     Pioneering Digital Evaluation for Academic Excellence
                   </h3>
                 </div>
-                <p className="text-sm sm:text-base text-gray-600 leading-relaxed">
+                <p className="text-sm sm:text-base text-gray-600 leading-relaxed text-center md:text-left">
                   The ACHARIYA Online Assessment Portal is a modern, high-integrity assessment infrastructure designed to handle complex academic grading, practice tests, and recruitment screenings. We align advanced educational analytics with a flexible, user-friendly portal.
                 </p>
-                <p className="text-sm text-gray-600 leading-relaxed">
+                <p className="text-sm sm:text-base text-gray-600 leading-relaxed text-center md:text-left">
                   By digitizing evaluations across our cluster of schools and universities, we minimize evaluation latency, streamline reporting, and provide instant insights to students and faculty, ensuring academic advancement is both secure and measurable.
                 </p>
 
                 <div className="grid grid-cols-3 gap-6 pt-4">
-                  <div className="border-l-2 border-[#C72323] pl-4 space-y-1">
+                  <div className="md:border-l-2 border-[#C72323] md:pl-4 space-y-1 text-center md:text-left">
                     <h4 className="text-2xl font-bold text-gray-900">100%</h4>
-                    <p className="text-xs font-bold text-gray-500 uppercase tracking-wider">Secure Infrastructure</p>
+                    <p className="md:text-xs text-[10px] font-bold text-gray-500 uppercase tracking-wider">Secure Infrastructure</p>
                   </div>
-                  <div className="border-l-2 border-[#DE2589] pl-4 space-y-1">
+                  <div className="md:border-l-2 border-[#DE2589] md:pl-4 space-y-1 text-center md:text-left">
                     <h4 className="text-2xl font-bold text-gray-900">10K+</h4>
-                    <p className="text-xs font-bold text-gray-500 uppercase tracking-wider">Students Registered</p>
+                    <p className="md:text-xs text-[10px] font-bold text-gray-500 uppercase tracking-wider">Students Registered</p>
                   </div>
-                  <div className="border-l-2 border-[#20407D] pl-4 space-y-1">
+                  <div className="md:border-l-2 border-[#20407D] md:pl-4 space-y-1 text-center md:text-left">
                     <h4 className="text-2xl font-bold text-gray-900">Instant</h4>
-                    <p className="text-xs font-bold text-gray-500 uppercase tracking-wider">Grading & Analytics</p>
+                    <p className="md:text-xs text-[10px] font-bold text-gray-500 uppercase tracking-wider">Grading & Analytics</p>
                   </div>
                 </div>
               </motion.div>
@@ -467,39 +458,39 @@ export default function Home() {
                     title: "Advanced Remote Proctoring",
                     desc: "Rigorous anti-cheating framework that monitors navigation and environment to ensure genuine scores.",
                     icon: Shield,
-                    color: "border-l-[#C72323]"
+                    color: "[#C72323]"
                   },
                   {
                     title: "AI-Powered Evaluation Engine",
                     desc: "Automated grading workflows with intelligent analytics for faster and more accurate assessment processing.",
                     icon: Brain,
-                    color: "border-l-[#20407D]"
+                    color: "[#20407D]"
                   },
                   {
                     title: "Seamless Scaling Capabilities",
                     desc: "Built to host thousands of students concurrently without server dropouts or rendering delays.",
                     icon: Layers,
-                    color: "border-l-[#20407D]"
+                    color: "[#20407D]"
                   },
                   {
                     title: "Robust Performance Dashboards",
                     desc: "Insightful metrics showing progress, strengths, and weaknesses for students and course teachers.",
                     icon: Sparkles,
-                    color: "border-l-[#DE2589]"
+                    color: "[#DE2589]"
                   }
                 ].map((item, idx) => (
                   <motion.div
                     key={idx}
                     variants={fadeInUp}
-                    className={`bg-white border border-gray-200 border-l-4 p-5 ${item.color} shadow-sm hover:shadow-md transition-shadow rounded-none`}
+                    className={`bg-white border border-gray-200 md:border-l-4 border-t-4 p-5 md:border-l-${item.color} md:border-t-gray-200 border-t-${item.color} shadow-sm hover:shadow-md transition-shadow rounded-none`}
                   >
-                    <div className="flex gap-4 items-start">
+                    <div className="flex flex-col md:flex-row md:justify-start justify-center gap-4 md:items-start items-center">
                       <div className="p-2.5 bg-gray-50 text-gray-700 rounded-none shrink-0 border border-gray-150">
                         <item.icon size={20} className="text-[#20407D]" />
                       </div>
                       <div className="space-y-1">
-                        <h4 className="font-bold text-sm text-gray-900">{item.title}</h4>
-                        <p className="text-xs text-gray-500 leading-relaxed">{item.desc}</p>
+                        <h4 className="font-bold text-sm text-gray-900 text-center md:text-left">{item.title}</h4>
+                        <p className="text-xs text-gray-500 leading-relaxed text-center md:text-left">{item.desc}</p>
                       </div>
                     </div>
                   </motion.div>
@@ -590,21 +581,26 @@ export default function Home() {
         </section>
         {/* FAQ ACCORDION SECTION */}
         <section className="bg-transparent container mx-auto py-12">
-          <div className="grid  grid-cols-2  gap-12 items-center">
+          <div className="grid  md:grid-cols-2 grid-cols-1 gap-12 items-center">
             <div className="cols-span-6">
               <div className=" mx-auto px-6 space-y-12">
 
-                {/* Header */}
-                <div className="text-left space-y-3">
+                <div className="md:text-left text-center space-y-3">
                   <span className="text-xs font-bold uppercase tracking-widest text-[#C72323] block">
                     COMMON QUESTIONS
                   </span>
                   <h3 className="lg:text-5xl md:text-4xl text-3xl font-bold tracking-tight text-gray-900">
                     Frequently Asked Questions
                   </h3>
-                  <p className="text-sm text-gray-500 max-w-lg ">
+                  <p className="text-sm text-gray-500 max-w-lg mx-auto md:mx-0">
                     Need details about system functionality, reliability, or login rules? Find answers to our most popular questions below.
                   </p>
+                </div>
+
+                <div className="cols-span-6 md:hidden block">
+                  <div className="w-full h-full ">
+                    <img src="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?q=80&w=1600" alt="faq image" className="w-full h-full object-fit rounded-lg" />
+                  </div>
                 </div>
 
                 {/* Accordion list */}
@@ -647,7 +643,7 @@ export default function Home() {
                 </div>
               </div>
             </div>
-            <div className="cols-span-6">
+            <div className="cols-span-6 md:block hidden">
               <div className="w-full h-full ">
                 <img src="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?q=80&w=1600" alt="faq image" className="w-full h-full object-fit rounded-lg" />
               </div>
@@ -660,7 +656,7 @@ export default function Home() {
         </section>
 
         {/* CONTACT SECTION */}
-        <section className="bg-transparent py-12 border-b border-gray-300">
+        <section className="bg-transparent py-12 border-b border-gray-300 overflow-hidden">
           <div className="container mx-auto px-6">
             <div className="grid lg:grid-cols-12 gap-12 items-start">
 
@@ -672,14 +668,14 @@ export default function Home() {
                 variants={fadeInUp}
                 className="lg:col-span-6 space-y-8"
               >
-                <div className="space-y-3">
+                <div className="space-y-3 md:text-left text-center">
                   <span className="text-xs font-bold uppercase tracking-widest text-[#C72323] block">
                     GET IN TOUCH
                   </span>
                   <h3 className="lg:text-5xl md:text-4xl text-3xl font-bold tracking-tight text-gray-900 leading-tight">
                     Contact Us
                   </h3>
-                  <p className="text-sm text-gray-500 leading-relaxed">
+                  <p className="text-sm max-w-xl text-gray-500 leading-relaxed">
                     Have any administrative or technical questions? Get in touch with our technical support team or visit our head office.
                   </p>
                 </div>
@@ -687,14 +683,14 @@ export default function Home() {
                 <div className="space-y-6">
 
                   {/* Address */}
-                  <div className="flex gap-4 items-start">
+                  <div className="flex flex-col md:flex-row gap-4 items-center md:items-start text-center md:text-left">
                     <div className="p-3 rounded-full bg-[#C72323]/5 border border-[#C72323]/10 text-[#C72323] shrink-0" style={{ borderRadius: "100%" }}>
                       <MapPin size={18} />
                     </div>
                     <div className="space-y-1">
                       <h4 className="font-bold text-xs uppercase tracking-wider text-gray-500">Main Campus Location</h4>
                       <p className="text-sm text-gray-900 font-semibold leading-relaxed">
-                        ACHARIYA Educational Public Trust, <br />
+                        ACHARIYA Educational Public Trust,
                         Villianur Bypass Road, <br />
                         Villianur, Puducherry - 605010, India.
                       </p>
@@ -702,46 +698,60 @@ export default function Home() {
                   </div>
 
                   {/* Phone */}
-                  <div className="flex gap-4 items-start">
-                    <div className="p-3  bg-[#20407D]/5 border border-[#20407D]/10 text-[#20407D] shrink-0" style={{ borderRadius: "100%" }}>
+                  <div className="flex flex-col md:flex-row gap-4 items-center md:items-start text-center md:text-left">
+                    <div className="p-3 bg-[#20407D]/5 border border-[#20407D]/10 text-[#20407D] shrink-0" style={{ borderRadius: "100%" }}>
                       <Phone size={18} />
                     </div>
                     <div className="space-y-1">
                       <h4 className="font-bold text-xs uppercase tracking-wider text-gray-500">Admissions & Helpdesk</h4>
-                      <p className="text-sm text-gray-900 font-semibold">
-                        +91 413 220 5301 / 220 5302
+                      <p className="text-sm text-gray-900 font-semibold break-words">
+                        +91 413 220 5301
+                        <span className="hidden sm:inline text-gray-400 font-normal mx-2">/</span>
+                        <br className="sm:hidden" />
+                        220 5302
                       </p>
                     </div>
                   </div>
 
                   {/* Email */}
-                  <div className="flex gap-4 items-start">
+                  <div className="flex flex-col md:flex-row gap-4 items-center md:items-start text-center md:text-left">
                     <div className="p-3 rounded-full bg-[#DE2589]/5 border border-[#DE2589]/10 text-[#DE2589] shrink-0 " style={{ borderRadius: "100%" }}>
                       <Mail size={18} />
                     </div>
                     <div className="space-y-1">
                       <h4 className="font-bold text-xs uppercase tracking-wider text-gray-500">Corporate Correspondence</h4>
-                      <p className="text-sm text-gray-900 font-semibold">
-                        info@achariya.org / support@achariya.org
+                      <p className="text-sm text-gray-900 font-semibold break-all">
+                        info@achariya.org
+                        <span className="hidden sm:inline text-gray-400 font-normal mx-2">/</span>
+                        <br className="sm:hidden" />
+                        support@achariya.org
                       </p>
                     </div>
                   </div>
-
-                  <div className="flex items-center gap-4">
-                    <a href="https://x.com" target="_blank" rel="noopener noreferrer" className="w-24 h-24 hover:opacity-80 transition-opacity block">
-                      <img src={x.src} alt="X" className="w-full h-full object-contain" />
-                    </a>
-                    <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="w-24 h-24 hover:opacity-80 transition-opacity block">
+                <div className="mt-8">
+                    {/* <h3 className="lg:text-4xl md:text-left text-center md:text-3xl mb-2 underline underline-offset-6 decoration-[#C1120C] text-2xl font-bold tracking-tight text-gray-900 leading-tight">
+                    Follow us on
+                  </h3> */}
+                  <div className="flex flex-wrap items-center gap-3 md:gap-4 justify-center md:justify-start">
+                    
+                    <a href="https://www.instagram.com/achariya_world_class_education?igsh=czVseWtjZ3drMHpn" target="_blank" rel="noopener noreferrer" className="w-12 h-12 md:w-16 md:h-16 hover:opacity-80 transition-opacity block">
                       <img src={insta.src} alt="Instagram" className="w-full h-full object-contain" />
                     </a>
-                    <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="w-24 h-24 hover:opacity-80 transition-opacity block">
+                    <a href="https://www.facebook.com/share/1679nE6dpg/?mibextid=wwXIfr" target="_blank" rel="noopener noreferrer" className="w-12 h-12 md:w-16 md:h-16 hover:opacity-80 transition-opacity block">
                       <img src={fb.src} alt="Facebook" className="w-full h-full object-contain" />
                     </a>
-                    <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="w-24 h-24 hover:opacity-80 transition-opacity block">
+                    <a href="https://www.youtube.com/c/AchariyaWorldClassEducation" target="_blank" rel="noopener noreferrer" className="w-18 h-18 md:w-22 md:h-22 hover:opacity-80 transition-opacity block">
+                      <img src={youtube.src} alt="Facebook" className="w-full h-full object-contain" />
+                    </a>
+                    <a href="https://www.linkedin.com/company/achariya-world-class-institutions" target="_blank" rel="noopener noreferrer" className="w-12 h-12 md:w-16 md:h-16 hover:opacity-80 transition-opacity block">
                       <img src={linkedin.src} alt="LinkedIn" className="w-full h-full object-contain" />
+                    </a>
+                    <a href="https://x.com/achariyaschools" target="_blank" rel="noopener noreferrer" className="w-12 h-12 md:w-16 md:h-16 hover:opacity-80 transition-opacity block">
+                      <img src={x.src} alt="X" className="w-full h-full object-contain" />
                     </a>
                   </div>
 
+                </div>
                 </div>
 
                 {/* Office hours note */}
@@ -757,7 +767,7 @@ export default function Home() {
                 whileInView="visible"
                 viewport={{ once: true }}
                 variants={fadeInUp}
-                className="lg:col-span-6 bg-white border border-gray-300 p-8 shadow-md rounded-none"
+                className="lg:col-span-6 bg-white border border-gray-300 p-5 sm:p-8 shadow-md rounded-none"
               >
 
 

@@ -93,7 +93,7 @@ const RowScroller = ({
             <img
               src={logo}
               alt={`school-logo-${i}`}
-              className="max-w-full max-h-28 object-contain  transition duration-300"
+              className="max-w-full md:max-h-28 max-h-20 object-contain  transition duration-300"
               loading="lazy"
             />
           </div>

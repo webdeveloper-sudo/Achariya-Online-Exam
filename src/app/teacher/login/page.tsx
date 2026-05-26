@@ -46,14 +46,14 @@ export default function TeacherLogin() {
       <div className="w-full max-w-md relative z-10">
         
         {/* Back Link */}
-        <div className="mb-6">
+        {/* <div className="mb-6">
           <Link
             href="/"
             className="inline-flex items-center gap-2 text-xs text-gray-600 hover:text-gray-900 transition-colors font-bold"
           >
             <ArrowLeft size={14} className="text-[#C72323]" /> Back to Gateway Selection
           </Link>
-        </div>
+        </div> */}
 
         {/* Brand Header */}
         <div className="text-center mb-8">

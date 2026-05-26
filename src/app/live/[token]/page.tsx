@@ -248,12 +248,49 @@ export default function StudentLivePage() {
       registerTabSwitch();
     };
 
+    const preventCopy = (e: any) => e.preventDefault();
+    const preventCut = (e: any) => e.preventDefault();
+    const preventPaste = (e: any) => e.preventDefault();
+    const preventContextMenu = (e: any) => e.preventDefault();
+    const preventDrag = (e: any) => e.preventDefault();
+    const preventSelect = (e: any) => {
+      const target = e.target as HTMLElement;
+      if (target?.tagName === "INPUT" || target?.tagName === "TEXTAREA") {
+        return;
+      }
+      e.preventDefault();
+    };
+
+    const handleOrientationChange = () => {
+      registerTabSwitch();
+    };
+
     window.addEventListener("visibilitychange", handleVisibilityChange);
     window.addEventListener("blur", handleWindowBlur);
+    document.addEventListener("copy", preventCopy);
+    document.addEventListener("cut", preventCut);
+    document.addEventListener("paste", preventPaste);
+    document.addEventListener("contextmenu", preventContextMenu);
+    document.addEventListener("dragstart", preventDrag);
+    document.addEventListener("selectstart", preventSelect);
+    window.addEventListener("orientationchange", handleOrientationChange);
+    if (screen.orientation) {
+      screen.orientation.addEventListener("change", handleOrientationChange);
+    }
 
     return () => {
       window.removeEventListener("visibilitychange", handleVisibilityChange);
       window.removeEventListener("blur", handleWindowBlur);
+      document.removeEventListener("copy", preventCopy);
+      document.removeEventListener("cut", preventCut);
+      document.removeEventListener("paste", preventPaste);
+      document.removeEventListener("contextmenu", preventContextMenu);
+      document.removeEventListener("dragstart", preventDrag);
+      document.removeEventListener("selectstart", preventSelect);
+      window.removeEventListener("orientationchange", handleOrientationChange);
+      if (screen.orientation) {
+        screen.orientation.removeEventListener("change", handleOrientationChange);
+      }
     };
   }, [sessionStatus, participantId]);
 

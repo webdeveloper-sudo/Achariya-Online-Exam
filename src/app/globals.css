@@ -159,7 +159,34 @@ body {
   color: #1f2937;
 }
 
+.input-field.pl-12 {
+  padding-left: 3rem !important;
+}
+
 .input-field:focus {
   border-color: #20407D;
   box-shadow: 0 0 0 2px rgba(32, 64, 125, 0.15);
+}
+
+/* Responsive adjustments for portal layouts */
+@media (max-width: 768px) {
+  /* Scope paddings only within data-portal-layout wrappers to avoid impacting home page layouts */
+  [data-portal-layout="true"] .p-8 {
+    padding: 1.25rem !important;
+  }
+  [data-portal-layout="true"] .p-6 {
+    padding: 1rem !important;
+  }
+  [data-portal-layout="true"] .p-5 {
+    padding: 0.875rem !important;
+  }
+  [data-portal-layout="true"] .gap-6 {
+    gap: 1rem !important;
+  }
+  [data-portal-layout="true"] .gap-8 {
+    gap: 1.25rem !important;
+  }
+  [data-portal-layout="true"] .gap-12 {
+    gap: 1.5rem !important;
+  }
 }

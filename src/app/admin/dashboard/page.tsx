@@ -4,6 +4,7 @@ import { useState, useEffect, Fragment } from "react";
 import { useRouter } from "next/navigation";
 import Sidebar from "@/components/Sidebar";
 import {
+  Menu,
   Users,
   UserPlus,
   FileSpreadsheet,
@@ -58,6 +59,7 @@ export default function AdminDashboard() {
   const router = useRouter();
   const [token, setToken] = useState<string | null>(null);
   const [adminUser, setAdminUser] = useState<any>(null);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   // Layout Tab selection
   const [activeSidebarTab, setActiveSidebarTab] = useState<string>("teachers");
@@ -593,13 +595,34 @@ export default function AdminDashboard() {
   const pendingCount = totalCount - activatedCount;
 
   return (
-    <div className="min-h-screen text-gray-900 font-sans flex relative overflow-hidden bg-transparent">
+    <div className="min-h-screen text-gray-900 font-sans flex flex-col md:flex-row relative overflow-hidden bg-transparent" data-portal-layout="true">
+      {/* Soft Ambient Glows (from home page aesthetic) */}
+      <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-[#C72323]/5 blur-[120px] rounded-full z-0 pointer-events-none" />
+      <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-[#20407D]/5 blur-[120px] rounded-full z-0 pointer-events-none" />
+
+      {/* Mobile Top Header */}
+      <div className="flex md:hidden items-center justify-between px-6 py-4 bg-white border-b border-gray-300 relative z-20 w-full shrink-0 shadow-sm">
+        <div className="flex items-center gap-3">
+          <div className="h-8 w-8 bg-[#C72323] flex items-center justify-center font-bold text-base text-white shadow-sm">
+            A
+          </div>
+          <span className="text-sm font-black text-gray-900 tracking-wider">ACHARIYA</span>
+        </div>
+        <button 
+          onClick={() => setIsSidebarOpen(true)}
+          className="p-2 text-gray-700 hover:bg-gray-100 border border-gray-200 cursor-pointer"
+        >
+          <Menu size={20} />
+        </button>
+      </div>
+
       {/* Shared Global Sidebar */}
       <Sidebar
         role="admin"
         activeTab={activeSidebarTab}
         setActiveTab={(tab) => {
           setActiveSidebarTab(tab);
+          setIsSidebarOpen(false);
           if (tab === "teachers") {
             setActiveTab("list");
           }
@@ -607,9 +630,11 @@ export default function AdminDashboard() {
         userName="Super Admin"
         userEmail={adminUser?.email || "admin@achariya.org"}
         onLogout={handleLogout}
+        isOpen={isSidebarOpen}
+        onClose={() => setIsSidebarOpen(false)}
       />
 
-      <div className="flex-1 flex flex-col justify-between h-screen overflow-y-auto relative z-10 p-8">
+      <div className="flex-1 flex flex-col justify-between h-screen overflow-y-auto relative z-10 p-4 sm:p-8">
         <main className="flex-1 space-y-8 pb-12">
           {/* Toast Alerts */}
           {message && (

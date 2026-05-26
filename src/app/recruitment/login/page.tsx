@@ -46,14 +46,14 @@ export default function RecruiterLogin() {
     <div className="min-h-screen text-gray-900 flex flex-col items-center justify-center p-4 relative overflow-hidden bg-transparent">
       <div className="w-full max-w-md relative z-10">
         {/* Back Link */}
-        <div className="mb-6">
+        {/* <div className="mb-6">
           <Link
             href="/"
             className="inline-flex items-center gap-2 text-xs text-gray-600 hover:text-gray-900 transition-colors font-bold"
           >
             <ArrowLeft size={14} className="text-[#C72323]" /> Back to Portal Selection
           </Link>
-        </div>
+        </div> */}
 
         {/* Brand Header */}
         <div className="text-center mb-8">
