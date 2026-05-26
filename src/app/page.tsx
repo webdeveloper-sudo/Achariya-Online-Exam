@@ -33,6 +33,7 @@ import linkedin from "@/assets/images/sm/3dicons-linkedin-front-color.png";
 import youtube from "@/assets/images/sm/3dicons-youtube-front-color.png"
 import hero from "@/assets/images/achariyanew1-scaled.avif"
 import mobileHero from "@/assets/images/Artboard-1.avif"
+import thumbnail from "@/assets/images/thumbanil.png"
 // Background images for the Hero carousel slider
 const carouselSlides = [
   {
@@ -542,7 +543,7 @@ export default function Home() {
             >
               {isPlayerOpen ? (
                 <iframe
-                  src="https://www.youtube.com/embed/9No-FiEInyA?autoplay=1"
+                  src="https://www.youtube.com/embed/WbP0xBV-0hw?autoplay=1&controls=0"
                   title="Achariya Digital Exam Infrastructure Walkthrough"
                   className="w-full h-full border-0 absolute inset-0"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -554,11 +555,11 @@ export default function Home() {
                   <div
                     className="absolute inset-0 bg-cover bg-center bg-no-repeat"
                     style={{
-                      backgroundImage: `url('https://images.unsplash.com/photo-1541339907198-e08756dedf3f?q=80&w=1600')`
+                      backgroundImage: `url('${thumbnail.src}')`
                     }}
                   />
                   {/* Overlay */}
-                  <div className="absolute inset-0 bg-black/45 z-10" />
+                  <div className="absolute inset-0 bg-black/25 z-10" />
 
                   {/* Pulsing Play Button (center of thumbnail) */}
                   <button
