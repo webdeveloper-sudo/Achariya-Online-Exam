@@ -18,20 +18,29 @@ export async function GET(request: Request) {
       return NextResponse.json({ message: "Access Denied: Invalid token." }, { status: 401 });
     }
 
-    // Retrieve assessments created by this recruiter
-    const myAssessments = await prisma.recruitmentAssessment.findMany({
-      where: { createdById: decoded.id },
-      orderBy: { createdAt: "desc" }
-    });
+    // Retrieve assessments (all if Admin, otherwise by recruiter)
+    let myAssessments;
+    let publicAssessments: any[] = [];
 
-    // Retrieve public assessments created by other recruiters
-    const publicAssessments = await prisma.recruitmentAssessment.findMany({
-      where: {
-        createdById: { not: decoded.id },
-        isPublic: true
-      },
-      orderBy: { createdAt: "desc" }
-    });
+    if (decoded.role === "Admin") {
+      myAssessments = await prisma.recruitmentAssessment.findMany({
+        orderBy: { createdAt: "desc" }
+      });
+    } else {
+      myAssessments = await prisma.recruitmentAssessment.findMany({
+        where: { createdById: decoded.id },
+        orderBy: { createdAt: "desc" }
+      });
+
+      // Retrieve public assessments created by other recruiters
+      publicAssessments = await prisma.recruitmentAssessment.findMany({
+        where: {
+          createdById: { not: decoded.id },
+          isPublic: true
+        },
+        orderBy: { createdAt: "desc" }
+      });
+    }
 
     return NextResponse.json({
       success: true,

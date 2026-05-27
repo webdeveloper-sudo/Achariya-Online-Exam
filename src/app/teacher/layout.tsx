@@ -33,6 +33,8 @@ export default function TeacherLayout({ children }: { children: React.ReactNode 
     activeTab = "generator";
   } else if (pathname.includes("/teacher/assessments")) {
     activeTab = "assessments";
+  } else if (pathname.includes("/teacher/live-sessions")) {
+    activeTab = "live_sessions";
   }
 
   const handleTabChange = (tab: string) => {
@@ -42,6 +44,8 @@ export default function TeacherLayout({ children }: { children: React.ReactNode 
       router.push("/teacher/generate");
     } else if (tab === "assessments") {
       router.push("/teacher/assessments");
+    } else if (tab === "live_sessions") {
+      router.push("/teacher/live-sessions");
     }
   };
 

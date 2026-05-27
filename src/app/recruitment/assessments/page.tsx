@@ -237,11 +237,19 @@ export default function RecruiterAssessmentsPage() {
                       {hosting === a.id ? "Launching..." : "Host Live Room"}
                     </button>
 
+                    <Link
+                      href={`/recruitment/assessments/${a.id}`}
+                      className="p-2.5 bg-white hover:bg-gray-50 border border-gray-300 text-gray-700 rounded-none transition-all flex items-center justify-center cursor-pointer shadow-sm"
+                      title="View & Edit Details"
+                    >
+                      <FolderOpen size={13} />
+                    </Link>
+
                     {activeTab === "mine" && (
                       <button
                         onClick={() => handleDelete(a.id)}
                         disabled={deleting === a.id}
-                        className="p-2.5 bg-red-50 hover:bg-red-100 border border-red-200 text-red-600 rounded-none transition-all disabled:opacity-50 cursor-pointer"
+                        className="p-2.5 bg-red-50 hover:bg-red-100 border border-red-200 text-red-600 rounded-none transition-all disabled:opacity-50 cursor-pointer shadow-sm"
                       >
                         <Trash2 size={13} />
                       </button>

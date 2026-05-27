@@ -36,10 +36,17 @@ export default function Sidebar({
     { id: "live_sessions", label: "Conducted Sessions", icon: Activity }
   ];
 
+  const recruiterAdminMenuItems = [
+    { id: "recruiter_candidates", label: "Candidate Registry", icon: Users },
+    { id: "recruiter_sessions", label: "Recruiter Conducted Sessions", icon: Activity },
+    { id: "recruiter_assessments", label: "Recruiters Generated All Assessments", icon: ClipboardCheck }
+  ];
+
   const teacherMenuItems = [
     { id: "dashboard", label: "Console Overview", icon: LayoutDashboard },
     { id: "generator", label: "AI Generator", icon: Brain },
-    { id: "assessments", label: "My Assessments", icon: ClipboardCheck }
+    { id: "assessments", label: "My Assessments", icon: ClipboardCheck },
+    { id: "live_sessions", label: "Conducted Sessions", icon: Activity }
   ];
 
   const recruiterMenuItems = [
@@ -80,7 +87,7 @@ export default function Sidebar({
         }`}
       >
         {/* Upper Brand Section */}
-        <div className="p-6 space-y-6">
+        <div className="p-6 space-y-6 overflow-y-auto max-h-[calc(100vh-140px)]">
           <div className="flex items-center gap-3">
             {/* Logo box: sharp flat edges (no rounded corners) */}
             <div className="h-10 w-10 bg-[#C72323] flex items-center justify-center font-bold text-lg text-white shadow-sm">
@@ -101,32 +108,97 @@ export default function Sidebar({
           </div>
 
           {/* Menu Navigation */}
-          <nav className="space-y-1 pt-2">
-            {menuItems.map((item) => {
-              const Icon = item.icon;
-              const isActive = activeTab === item.id || 
-                               (item.id === "teachers" && ["list", "create", "upload"].includes(activeTab)) ||
-                               (item.id === "live_sessions" && activeTab === "view_live_session") ||
-                               (item.id === "candidates" && activeTab === "candidate_detail");
-              
-              return (
-                <button
-                  key={item.id}
-                  onClick={() => {
-                    setActiveTab(item.id);
-                    if (onClose) onClose();
-                  }}
-                  className={`w-full flex items-center gap-3 px-4 py-3 text-xs font-bold transition-all ${
-                    isActive
-                      ? "bg-[#20407D] text-white"
-                      : "text-gray-700 hover:text-[#20407D] hover:bg-gray-100"
-                  }`}
-                >
-                  <Icon size={16} className={isActive ? "text-white" : "text-gray-500"} />
-                  <span>{item.label}</span>
-                </button>
-              );
-            })}
+          <nav className="space-y-6 pt-2">
+            {role === "admin" ? (
+              <>
+                <div className="space-y-1">
+                  <p className="text-[9px] font-bold uppercase tracking-wider text-gray-400 px-4 mb-2">Teacher Activities</p>
+                  {adminMenuItems.map((item) => {
+                    const Icon = item.icon;
+                    const isActive = activeTab === item.id || 
+                                     (item.id === "teachers" && ["list", "create", "upload"].includes(activeTab)) ||
+                                     (item.id === "live_sessions" && activeTab === "view_live_session") ||
+                                     (item.id === "assessments" && activeTab === "view_assessment");
+                    
+                    return (
+                      <button
+                        key={item.id}
+                        onClick={() => {
+                          setActiveTab(item.id);
+                          if (onClose) onClose();
+                        }}
+                        className={`w-full flex items-center gap-3 px-4 py-3 text-xs font-bold transition-all ${
+                          isActive
+                            ? "bg-[#20407D] text-white"
+                            : "text-gray-700 hover:text-[#20407D] hover:bg-gray-100"
+                        }`}
+                      >
+                        <Icon size={16} className={isActive ? "text-white" : "text-gray-500"} />
+                        <span>{item.label}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                <div className="space-y-1">
+                  <p className="text-[9px] font-bold uppercase tracking-wider text-gray-400 px-4 mb-2">Recruiter Activities</p>
+                  {recruiterAdminMenuItems.map((item) => {
+                    const Icon = item.icon;
+                    const isActive = activeTab === item.id || 
+                                     (item.id === "recruiter_candidates" && activeTab === "view_recruiter_candidate") ||
+                                     (item.id === "recruiter_sessions" && activeTab === "view_recruiter_session") ||
+                                     (item.id === "recruiter_assessments" && activeTab === "view_recruiter_assessment");
+                    
+                    return (
+                      <button
+                        key={item.id}
+                        onClick={() => {
+                          setActiveTab(item.id);
+                          if (onClose) onClose();
+                        }}
+                        className={`w-full flex items-center gap-3 px-4 py-3 text-xs font-bold transition-all ${
+                          isActive
+                            ? "bg-[#20407D] text-white"
+                            : "text-gray-700 hover:text-[#20407D] hover:bg-gray-100"
+                        }`}
+                      >
+                        <Icon size={16} className={isActive ? "text-white" : "text-gray-500"} />
+                        <span>{item.label}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </>
+            ) : (
+              <div className="space-y-1">
+                {menuItems.map((item) => {
+                  const Icon = item.icon;
+                  const isActive = activeTab === item.id || 
+                                   (item.id === "teachers" && ["list", "create", "upload"].includes(activeTab)) ||
+                                   (item.id === "live_sessions" && activeTab === "view_live_session") ||
+                                   (item.id === "candidates" && activeTab === "candidate_detail") ||
+                                   (item.id === "assessments" && activeTab === "view_assessment");
+                  
+                  return (
+                    <button
+                      key={item.id}
+                      onClick={() => {
+                        setActiveTab(item.id);
+                        if (onClose) onClose();
+                      }}
+                      className={`w-full flex items-center gap-3 px-4 py-3 text-xs font-bold transition-all ${
+                        isActive
+                          ? "bg-[#20407D] text-white"
+                          : "text-gray-700 hover:text-[#20407D] hover:bg-gray-100"
+                      }`}
+                    >
+                      <Icon size={16} className={isActive ? "text-white" : "text-gray-500"} />
+                      <span>{item.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
           </nav>
         </div>
 

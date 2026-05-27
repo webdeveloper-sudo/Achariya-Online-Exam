@@ -77,12 +77,21 @@ export default function StudentLivePage() {
   const [submittingJoin, setSubmittingJoin] = useState(false);
   const [joinError, setJoinError] = useState<string | null>(null);
 
+  // Lookup states
+  const [showLookupModal, setShowLookupModal] = useState(false);
+  const [lookupQuery, setLookupQuery] = useState("");
+  const [searchingLookup, setSearchingLookup] = useState(false);
+  const [lookupError, setLookupError] = useState<string | null>(null);
+  const [isPrefilled, setIsPrefilled] = useState(false);
+  const [isDuplicateFlow, setIsDuplicateFlow] = useState(false);
+
   // Time tracking
   const [timeLeft, setTimeLeft] = useState<number | null>(null);
 
   // Refs for tracking changes
   const answersRef = useRef<Record<string, string>>({});
   const tabSwitchesRef = useRef<number>(0);
+  const lastSwitchTimeRef = useRef<number>(0);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // Update refs when state changes
@@ -295,6 +304,10 @@ export default function StudentLivePage() {
   }, [sessionStatus, participantId]);
 
   const registerTabSwitch = async () => {
+    const now = Date.now();
+    if (now - lastSwitchTimeRef.current < 1000) return;
+    lastSwitchTimeRef.current = now;
+
     setTabSwitches((prev) => prev + 1);
     setShowWarning(true);
 
@@ -412,6 +425,17 @@ export default function StudentLivePage() {
         }),
       });
       const data = await res.json();
+
+      // Duplicate student detected — auto-open the lookup/retrieve modal
+      if (res.status === 409 && data.duplicate) {
+        setJoinError(null);
+        setLookupQuery(formStudentId);
+        setLookupError(null);
+        setIsDuplicateFlow(true);
+        setShowLookupModal(true);
+        return;
+      }
+
       if (!res.ok) {
         throw new Error(data.message || "Failed to join live session.");
       }
@@ -444,6 +468,37 @@ export default function StudentLivePage() {
       setJoinError(err.message || "Could not join session.");
     } finally {
       setSubmittingJoin(false);
+    }
+  };
+
+  const handleLookupSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!lookupQuery.trim()) {
+      setLookupError("Please enter your Student ID.");
+      return;
+    }
+    setSearchingLookup(true);
+    setLookupError(null);
+
+    try {
+      const res = await fetch(`/api/live/${token}/lookup?query=${encodeURIComponent(lookupQuery.trim())}`);
+      const data = await res.json();
+      if (!res.ok || data.success === false) {
+        throw new Error(data.message || "Student profile not found.");
+      }
+
+      setFormName(data.student.name || "");
+      setFormGrade(data.student.grade || "");
+      setFormSection(data.student.section || "");
+      setFormStudentId(data.student.studentId || "");
+
+      setIsPrefilled(true);
+      setShowLookupModal(false);
+      setJoinError(null);
+    } catch (err: any) {
+      setLookupError(err.message || "No matching student profile found.");
+    } finally {
+      setSearchingLookup(false);
     }
   };
 
@@ -587,6 +642,13 @@ export default function StudentLivePage() {
             </div>
           )}
 
+          {isPrefilled && (
+            <div className="p-3 bg-blue-50 border border-blue-200 text-blue-600 rounded-none text-xs flex items-center gap-2 animate-in fade-in slide-in-from-top-1">
+              <CheckCircle2 size={14} className="shrink-0 text-emerald-500" />
+              <p>Profile retrieved! You can review or edit your details before joining.</p>
+            </div>
+          )}
+
           <form onSubmit={handleJoinSubmit} className="space-y-4">
             <div className="space-y-1.5">
               <label className="text-[10px] font-black uppercase tracking-wider text-gray-500">Full Name</label>
@@ -603,25 +665,43 @@ export default function StudentLivePage() {
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
                 <label className="text-[10px] font-black uppercase tracking-wider text-gray-500">Grade / Class</label>
-                <input
+                <select
                   required
-                  type="text"
-                  placeholder="e.g. Grade 10"
                   value={formGrade}
                   onChange={(e) => setFormGrade(e.target.value)}
-                  className="w-full bg-white border border-gray-300 rounded-none px-4 py-3 text-sm focus:border-blue-600 outline-none transition-all placeholder:text-gray-400 font-bold text-gray-900"
-                />
+                  className="w-full bg-white border border-gray-300 rounded-none px-4 py-3 text-sm focus:border-blue-600 outline-none transition-all font-bold text-gray-900 cursor-pointer"
+                >
+                  <option value="" disabled>Select Grade</option>
+                  <option value="Grade I">Grade I</option>
+                  <option value="Grade II">Grade II</option>
+                  <option value="Grade III">Grade III</option>
+                  <option value="Grade IV">Grade IV</option>
+                  <option value="Grade V">Grade V</option>
+                  <option value="Grade VI">Grade VI</option>
+                  <option value="Grade VII">Grade VII</option>
+                  <option value="Grade VIII">Grade VIII</option>
+                  <option value="Grade IX">Grade IX</option>
+                  <option value="Grade X">Grade X</option>
+                </select>
               </div>
               <div className="space-y-1.5">
                 <label className="text-[10px] font-black uppercase tracking-wider text-gray-500">Section</label>
-                <input
+                <select
                   required
-                  type="text"
-                  placeholder="e.g. A"
                   value={formSection}
                   onChange={(e) => setFormSection(e.target.value)}
-                  className="w-full bg-white border border-gray-300 rounded-none px-4 py-3 text-sm focus:border-blue-600 outline-none transition-all placeholder:text-gray-400 font-bold text-gray-900"
-                />
+                  className="w-full bg-white border border-gray-300 rounded-none px-4 py-3 text-sm focus:border-blue-600 outline-none transition-all font-bold text-gray-900 cursor-pointer"
+                >
+                  <option value="" disabled>Select Section</option>
+                  <option value="Section A">Section A</option>
+                  <option value="Section B">Section B</option>
+                  <option value="Section C">Section C</option>
+                  <option value="Section D">Section D</option>
+                  <option value="Section E">Section E</option>
+                  <option value="Section F">Section F</option>
+                  <option value="Section G">Section G</option>
+                  <option value="Section H">Section H</option>
+                </select>
               </div>
             </div>
 
@@ -640,13 +720,95 @@ export default function StudentLivePage() {
             <button
               disabled={submittingJoin}
               type="submit"
-              className="w-full bg-blue-600 hover:bg-blue-700 border border-blue-600 text-white font-bold py-3.5 rounded-none text-sm flex items-center justify-center gap-2 shadow-sm transition-all disabled:opacity-50"
+              className="w-full bg-blue-600 hover:bg-blue-700 border border-blue-600 text-white font-bold py-3.5 rounded-none text-sm flex items-center justify-center gap-2 shadow-sm transition-all disabled:opacity-50 cursor-pointer"
             >
               {submittingJoin ? "Entering Live Session..." : "Join Waiting Room"}
               <ArrowRight size={16} />
             </button>
+
+            <div className="pt-2 text-center">
+              <button
+                type="button"
+                onClick={() => {
+                  setLookupQuery("");
+                  setLookupError(null);
+                  setIsDuplicateFlow(false);
+                  setShowLookupModal(true);
+                }}
+                className="text-xs text-blue-600 hover:text-blue-700 font-bold transition-colors hover:underline cursor-pointer"
+              >
+                Already onboarded? Find Existing Profile
+              </button>
+            </div>
           </form>
         </div>
+
+        {/* Lookup Modal Overlay */}
+        {showLookupModal && (
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[250] flex items-center justify-center p-4">
+            <div className="max-w-md w-full bg-white border border-gray-200 rounded-none p-6 space-y-6 shadow-sm relative animate-in fade-in zoom-in-95 duration-200">
+              <div className="text-center space-y-2">
+                <h3 className="text-lg font-black text-gray-900">Find Existing Profile</h3>
+                <p className="text-xs text-gray-500">Enter your registered Student ID to pull up your profile details.</p>
+              </div>
+
+              {isDuplicateFlow && (
+                <div className="p-3 bg-amber-50 border border-amber-300 text-amber-700 rounded-none text-xs flex items-start gap-2">
+                  <AlertTriangle size={14} className="shrink-0 mt-0.5" />
+                  <div>
+                    <p className="font-black">Account Already Registered</p>
+                    <p className="mt-0.5">A student profile with this Student ID already exists. Enter your Student ID below to retrieve your account and join the waiting room.</p>
+                  </div>
+                </div>
+              )}
+
+              {lookupError && !isDuplicateFlow && (
+                <div className="p-3 bg-red-50 border border-red-200 text-red-600 rounded-none text-xs flex items-center gap-2">
+                  <AlertTriangle size={14} className="shrink-0" />
+                  <p>{lookupError}</p>
+                </div>
+              )}
+
+              <form onSubmit={handleLookupSubmit} className="space-y-4">
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-black uppercase tracking-wider text-gray-500">Student ID</label>
+                  <input
+                    required
+                    type="text"
+                    placeholder="Enter Student ID"
+                    value={lookupQuery}
+                    onChange={(e) => setLookupQuery(e.target.value)}
+                    className="w-full bg-white border border-gray-300 rounded-none px-4 py-3 text-sm focus:border-blue-600 outline-none transition-all placeholder:text-gray-400 text-gray-900 font-bold"
+                  />
+                </div>
+
+                <div className="flex gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setShowLookupModal(false)}
+                    className="flex-1 bg-white hover:bg-gray-50 border border-gray-300 text-gray-700 py-3 rounded-none text-xs font-bold transition-all cursor-pointer shadow-sm"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={searchingLookup}
+                    className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-none text-xs font-bold transition-all flex items-center justify-center gap-1.5 disabled:opacity-50 cursor-pointer"
+                  >
+                    {searchingLookup ? (
+                      <>
+                        <RefreshCw className="animate-spin" size={12} />
+                        Searching...
+                      </>
+                    ) : (
+                      "Search Profile"
+                    )}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
       </div>
     );
   }

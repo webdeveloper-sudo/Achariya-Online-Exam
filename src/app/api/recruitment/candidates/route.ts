@@ -18,9 +18,9 @@ export async function GET(request: Request) {
       return NextResponse.json({ message: "Access Denied: Invalid token." }, { status: 401 });
     }
 
-    // Fetch all assessments created by this recruiter
+    // Fetch all assessments created by this recruiter (or all if Admin)
     const assessments = await prisma.recruitmentAssessment.findMany({
-      where: { createdById: decoded.id },
+      where: decoded.role === "Admin" ? {} : { createdById: decoded.id },
       select: { id: true },
     });
 

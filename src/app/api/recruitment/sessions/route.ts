@@ -20,9 +20,9 @@ export async function GET(request: Request) {
       return NextResponse.json({ message: "Access Denied: Invalid token." }, { status: 401 });
     }
 
-    // Fetch recruitment live sessions conducted only by this recruiter
+    // Fetch recruitment live sessions conducted (all if Admin)
     const sessions = await prisma.recruitmentLiveSession.findMany({
-      where: { recruiterId: decoded.id },
+      where: decoded.role === "Admin" ? {} : { recruiterId: decoded.id },
       orderBy: { createdAt: "desc" },
       include: {
         assessment: {
@@ -70,6 +70,7 @@ export async function GET(request: Request) {
         startedAt: session.startedAt,
         endedAt: session.endedAt,
         createdAt: session.createdAt,
+        assessmentId: session.assessmentId,
         assessment: {
           title: session.assessment?.title || "Untitled Assessment",
           position: session.assessment?.position || "N/A",

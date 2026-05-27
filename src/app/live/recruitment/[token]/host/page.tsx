@@ -39,6 +39,7 @@ export default function RecruiterHostPage() {
   const [assessment, setAssessment] = useState<any>(null);
   const [startedAt, setStartedAt] = useState<string | null>(null);
   const [endedAt, setEndedAt] = useState<string | null>(null);
+  const [sessionId, setSessionId] = useState<string | null>(null);
 
   // Roster
   const [roster, setRoster] = useState<SSEParticipant[]>([]);
@@ -85,12 +86,21 @@ export default function RecruiterHostPage() {
       setStartedAt(data.startedAt);
       setEndedAt(data.endedAt);
       setRoster(data.participants || []);
+      if (data.sessionId) {
+        setSessionId(data.sessionId);
+      }
+      if (data.status === "COMPLETED") {
+        if (data.sessionId) {
+          router.push(`/recruitment/sessions/${data.sessionId}`);
+          return;
+        }
+      }
       setLoading(false);
     } catch (e: any) {
       setError(e.message || "Session could not be loaded.");
       setLoading(false);
     }
-  }, [token, recruiterToken]);
+  }, [token, recruiterToken, router]);
 
   // Initialize default email invitation template when assessment loads
   useEffect(() => {
@@ -126,6 +136,14 @@ export default function RecruiterHostPage() {
           setSessionStatus(data.status);
           setStartedAt(data.startedAt);
           setEndedAt(data.endedAt);
+          if (data.sessionId) {
+            setSessionId(data.sessionId);
+          }
+          if (data.status === "COMPLETED") {
+            if (data.sessionId) {
+              router.push(`/recruitment/sessions/${data.sessionId}`);
+            }
+          }
         }
       } catch (e) {
         console.error("Error syncing status", e);
@@ -133,7 +151,7 @@ export default function RecruiterHostPage() {
     }, 3000);
 
     return () => clearInterval(interval);
-  }, [token, recruiterToken, loading]);
+  }, [token, recruiterToken, loading, router]);
 
   // Timer countdown
   useEffect(() => {
@@ -212,6 +230,9 @@ export default function RecruiterHostPage() {
       }
       setRoster(data.leaderboard || []);
       setSessionStatus("COMPLETED");
+      if (sessionId) {
+        router.push(`/recruitment/sessions/${sessionId}`);
+      }
     } catch (e: any) {
       alert("Error ending assessment: " + e.message);
     } finally {

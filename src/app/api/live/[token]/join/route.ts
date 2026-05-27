@@ -42,6 +42,54 @@ export async function POST(
       );
     }
 
+    // Check if the student is already registered in the CURRENT session to support re-joining
+    const currentExisting = await prisma.liveSessionParticipant.findFirst({
+      where: {
+        sessionId: session.id,
+        studentId: studentId.trim(),
+      },
+    });
+
+    if (currentExisting) {
+      return NextResponse.json({
+        success: true,
+        message: "Welcome back! Re-joining live session.",
+        participantId: currentExisting.id,
+      });
+    }
+
+    // Check if a student with the same Student ID exists GLOBALLY in any past session
+    const globalExisting = await prisma.liveSessionParticipant.findFirst({
+      where: {
+        studentId: studentId.trim(),
+      },
+      orderBy: { joinedAt: "desc" },
+    });
+
+    if (globalExisting) {
+      // If they exist globally, but the submitted details don't match, return 409 conflict
+      const nameMatch = globalExisting.name.toLowerCase().trim() === name.toLowerCase().trim();
+      const gradeMatch = globalExisting.grade.toLowerCase().trim() === grade.toLowerCase().trim();
+      const sectionMatch = globalExisting.section.toLowerCase().trim() === section.toLowerCase().trim();
+
+      if (!nameMatch || !gradeMatch || !sectionMatch) {
+        return NextResponse.json(
+          {
+            success: false,
+            duplicate: true,
+            message: "A student profile with this Student ID already exists. Please use the 'Find Existing Profile' option to retrieve your account.",
+            existingProfile: {
+              name: globalExisting.name,
+              grade: globalExisting.grade,
+              section: globalExisting.section,
+              studentId: globalExisting.studentId,
+            },
+          },
+          { status: 409 }
+        );
+      }
+    }
+
     const participant = await prisma.liveSessionParticipant.create({
       data: {
         sessionId: session.id,

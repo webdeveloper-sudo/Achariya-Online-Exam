@@ -5,7 +5,8 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
   Calendar, Search, RefreshCw, Trophy, Users, BarChart2,
-  ArrowRight, Activity, Trash2, HelpCircle, Compass, Globe
+  ArrowRight, Activity, Trash2, HelpCircle, Compass, Globe,
+  ChevronDown, ChevronUp, Shield, ShieldAlert, Check, X, AlertCircle
 } from "lucide-react";
 
 export default function TeacherLiveSessionsPage() {
@@ -14,6 +15,49 @@ export default function TeacherLiveSessionsPage() {
   const [sessions, setSessions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  const [expandedSessionId, setExpandedSessionId] = useState<string | null>(null);
+  const [sessionDetails, setSessionDetails] = useState<{ [key: string]: any }>({});
+  const [detailsLoading, setDetailsLoading] = useState<{ [key: string]: boolean }>({});
+  const [expandedStudentId, setExpandedStudentId] = useState<string | null>(null);
+
+  const formatTime = (sec: number | null) => {
+    if (sec === null || sec === undefined) return "N/A";
+    const mins = Math.floor(sec / 60);
+    const remainder = sec % 60;
+    return mins > 0 ? `${mins}m ${remainder}s` : `${remainder}s`;
+  };
+
+  const handleToggleSession = async (sessionId: string) => {
+    if (expandedSessionId === sessionId) {
+      setExpandedSessionId(null);
+      setExpandedStudentId(null);
+      return;
+    }
+
+    setExpandedSessionId(sessionId);
+    setExpandedStudentId(null);
+
+    if (!sessionDetails[sessionId]) {
+      setDetailsLoading((prev) => ({ ...prev, [sessionId]: true }));
+      try {
+        const res = await fetch(`/api/live/sessions/details/${sessionId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const data = await res.json();
+        if (res.ok && data.success) {
+          setSessionDetails((prev) => ({ ...prev, [sessionId]: data.session }));
+        }
+      } catch (err) {
+        console.error("Error loading session details:", err);
+      } finally {
+        setDetailsLoading((prev) => ({ ...prev, [sessionId]: false }));
+      }
+    }
+  };
+
+  const toggleStudentExpand = (studentId: string) => {
+    setExpandedStudentId(expandedStudentId === studentId ? null : studentId);
+  };
 
   useEffect(() => {
     const t = localStorage.getItem("teacherToken");
@@ -194,23 +238,153 @@ export default function TeacherLiveSessionsPage() {
                 </div>
 
                 {/* Actions */}
-                <div className="flex gap-2">
-                  <Link
-                    href={`/teacher/live-sessions/${session.id}`}
-                    className="flex-1 bg-white hover:bg-gray-50 border border-gray-300 text-gray-700 px-3 py-2.5 rounded-none text-[11px] font-bold text-center transition-all flex items-center justify-center gap-1 cursor-pointer"
-                  >
-                    Open Roster Report <ArrowRight size={12} />
-                  </Link>
-
-                  {session.status === "ACTIVE" && (
+                <div className="flex flex-col gap-2 mt-auto">
+                  <div className="flex gap-2">
                     <Link
-                      href={`/live/${session.token}/host`}
-                      className="bg-blue-600 hover:bg-blue-700 border border-blue-600 text-white px-3 py-2.5 rounded-none text-[11px] font-bold text-center transition-all flex items-center justify-center gap-1 cursor-pointer shadow-sm"
+                      href={`/teacher/live-sessions/${session.id}`}
+                      className="flex-1 bg-white hover:bg-gray-50 border border-gray-300 text-gray-700 px-3 py-2.5 rounded-none text-[11px] font-bold text-center transition-all flex items-center justify-center gap-1 cursor-pointer"
                     >
-                      Connect Room
+                      Open Roster Report <ArrowRight size={12} />
                     </Link>
-                  )}
+
+                    {session.status === "ACTIVE" && (
+                      <Link
+                        href={`/live/${session.token}/host`}
+                        className="bg-blue-600 hover:bg-blue-700 border border-blue-600 text-white px-3 py-2.5 rounded-none text-[11px] font-bold text-center transition-all flex items-center justify-center gap-1 cursor-pointer shadow-sm"
+                      >
+                        Connect Room
+                      </Link>
+                    )}
+                  </div>
+
+                  <button
+                    onClick={() => handleToggleSession(session.id)}
+                    className="w-full bg-[#20407D] hover:bg-[#20407D]/90 text-white border border-[#20407D] px-3 py-2.5 rounded-none text-[11px] font-bold text-center transition-all flex items-center justify-center gap-1 cursor-pointer shadow-sm"
+                  >
+                    <span>{expandedSessionId === session.id ? "Hide Attended Students" : "Inspect Attended Students"}</span>
+                    {expandedSessionId === session.id ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
+                  </button>
                 </div>
+
+                {/* Collapsible Attendee Details Section */}
+                {expandedSessionId === session.id && (
+                  <div className="mt-4 pt-4 border-t border-gray-200 w-full text-left space-y-4 animate-in fade-in slide-in-from-top duration-200">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] font-black uppercase text-gray-700">Student Attendance List</span>
+                      <span className="text-[10px] text-gray-400 font-mono">Count: {session.stats.participantCount}</span>
+                    </div>
+
+                    {detailsLoading[session.id] ? (
+                      <div className="flex items-center justify-center py-6 gap-2 text-gray-550 text-xs">
+                        <RefreshCw size={14} className="animate-spin text-[#20407D]" />
+                        <span>Fetching attendees details...</span>
+                      </div>
+                    ) : !sessionDetails[session.id] || sessionDetails[session.id].participants.length === 0 ? (
+                      <p className="text-xs text-gray-500 italic py-2 text-center">No students attended this exam.</p>
+                    ) : (
+                      <div className="space-y-3 max-h-[350px] overflow-y-auto pr-1">
+                        {sessionDetails[session.id].participants.map((p: any) => {
+                          const scorePercentage = totalQ > 0 ? (p.score / totalQ) * 100 : 0;
+                          const isStudentExpanded = expandedStudentId === p.id;
+                          const integrityColor = p.tabSwitches > 0 ? "text-[#C72323] font-bold" : "text-emerald-600";
+
+                          const assessmentQuestions = sessionDetails[session.id].assessment.questions
+                            ? (typeof sessionDetails[session.id].assessment.questions === "string"
+                                ? JSON.parse(sessionDetails[session.id].assessment.questions)
+                                : sessionDetails[session.id].assessment.questions)
+                            : [];
+
+                          const studentAnswers = p.answers
+                            ? (typeof p.answers === "string"
+                                ? JSON.parse(p.answers)
+                                : p.answers)
+                            : {};
+
+                          const answersArray = Array.isArray(assessmentQuestions)
+                            ? assessmentQuestions.map((q: any, qIdx: number) => {
+                                const studentAnswer = studentAnswers[q.id] || "No Answer";
+                                const isCorrect = studentAnswer === q.correctAnswer;
+                                return {
+                                  questionIndex: qIdx,
+                                  questionText: q.question,
+                                  studentAnswer,
+                                  correctAnswer: q.correctAnswer,
+                                  isCorrect,
+                                };
+                              })
+                            : [];
+
+                          return (
+                            <div key={p.id} className="p-3 bg-gray-50 border border-gray-300 rounded-none space-y-2 text-xs">
+                              <div className="flex justify-between items-start">
+                                <div>
+                                  <p className="font-extrabold text-gray-900">{p.name}</p>
+                                  <p className="text-[10px] text-gray-400 font-mono mt-0.5">ID: {p.studentId} · {p.grade}-{p.section}</p>
+                                </div>
+                                <div className="text-right">
+                                  <p className="font-black text-gray-900">{p.score !== null ? `${p.score}/${totalQ}` : "—"}</p>
+                                  <p className="text-[10px] text-gray-400 mt-0.5">{scorePercentage.toFixed(0)}% accuracy</p>
+                                </div>
+                              </div>
+
+                              <div className="flex justify-between items-center text-[9px] text-gray-505 border-t border-gray-200 pt-2">
+                                <span>Switches: <span className={integrityColor}>{p.tabSwitches}</span></span>
+                                <span>Duration: <span className="font-mono text-gray-700">{formatTime(p.timeTakenSeconds)}</span></span>
+                                <button
+                                  onClick={() => toggleStudentExpand(p.id)}
+                                  className="px-2 py-1 bg-white border border-gray-300 hover:border-gray-400 text-gray-700 font-bold text-[9px] flex items-center gap-0.5 cursor-pointer rounded-none"
+                                >
+                                  <span>{isStudentExpanded ? "Close" : "Inspect"}</span>
+                                  {isStudentExpanded ? <ChevronUp size={8} /> : <ChevronDown size={8} />}
+                                </button>
+                              </div>
+
+                              {isStudentExpanded && (
+                                <div className="mt-3 pt-3 border-t border-gray-200 space-y-2 animate-in slide-in-from-top-2 duration-150">
+                                  <div className="flex items-center justify-between mb-1">
+                                    <span className="text-[9px] font-black uppercase text-gray-500 tracking-wider">Attempt Details</span>
+                                    <span className="text-[8px] text-gray-450 font-mono">{p.completedAt ? new Date(p.completedAt).toLocaleTimeString() : ""}</span>
+                                  </div>
+
+                                  {answersArray.length === 0 ? (
+                                    <p className="text-[10px] text-gray-450 italic">No answers logged.</p>
+                                  ) : (
+                                    <div className="space-y-2 max-h-[220px] overflow-y-auto pr-1">
+                                      {answersArray.map((ans: any, aIdx: number) => (
+                                        <div key={aIdx} className={`p-2.5 border text-[11px] space-y-1 ${
+                                          ans.isCorrect
+                                            ? "bg-emerald-50/70 border-emerald-200 text-emerald-800"
+                                            : "bg-red-50/75 border-red-200 text-brand-red"
+                                        }`}>
+                                          <div className="flex items-start gap-1.5">
+                                            <span className="mt-0.5 shrink-0">
+                                              {ans.isCorrect ? <Check size={11} className="text-emerald-650" /> : <X size={11} className="text-[#C72323]" />}
+                                            </span>
+                                            <div className="space-y-1">
+                                              <p className="font-extrabold text-gray-900 leading-snug">Q{ans.questionIndex + 1}: {ans.questionText}</p>
+                                              <p className="text-[10px] text-gray-500">
+                                                Student Selection: <span className="font-black text-gray-800">{ans.studentAnswer}</span>
+                                              </p>
+                                              {!ans.isCorrect && (
+                                                <p className="text-[10px] text-emerald-700 font-bold">
+                                                  ✔ Expected Solution: <span className="font-black">{ans.correctAnswer}</span>
+                                                </p>
+                                              )}
+                                            </div>
+                                          </div>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  )}
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             );
           })}

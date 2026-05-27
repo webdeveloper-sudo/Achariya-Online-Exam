@@ -81,6 +81,7 @@ export default function CandidateLivePage() {
   // Refs for tracking changes
   const answersRef = useRef<Record<string, string>>({});
   const tabSwitchesRef = useRef<number>(0);
+  const lastSwitchTimeRef = useRef<number>(0);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // Update refs when state changes
@@ -293,6 +294,10 @@ export default function CandidateLivePage() {
   const registerTabSwitch = async () => {
     if (submitted || isTerminated) return;
 
+    const now = Date.now();
+    if (now - lastSwitchTimeRef.current < 1000) return;
+    lastSwitchTimeRef.current = now;
+
     const nextTabSwitches = tabSwitchesRef.current + 1;
     setTabSwitches(nextTabSwitches);
 
@@ -484,7 +489,18 @@ export default function CandidateLivePage() {
       setParticipantId(pId);
       setCandidateInfo(cInfo);
 
-      saveToLocalState({}, 0, false, false);
+      // Save directly to localStorage to avoid React state batching delays
+      localStorage.setItem(
+        `recruitment_candidate_${token}`,
+        JSON.stringify({
+          participantId: pId,
+          candidateInfo: cInfo,
+          answers: {},
+          tabSwitches: 0,
+          isTerminated: false,
+          submitted: false
+        })
+      );
 
       await enterFullscreen();
     } catch (err: any) {

@@ -33,8 +33,27 @@ export async function POST(
       );
     }
 
+    // Check if the candidate is already registered in the CURRENT session to support re-joining
+    const currentExisting = await prisma.recruitmentLiveSessionParticipant.findFirst({
+      where: {
+        sessionId: session.id,
+        OR: [
+          { email: email.toLowerCase().trim() },
+          { phone: phone.trim() },
+        ],
+      },
+    });
+
+    if (currentExisting) {
+      return NextResponse.json({
+        success: true,
+        message: "Welcome back! Re-joining live session.",
+        participantId: currentExisting.id,
+      });
+    }
+
     // Check if a candidate with the same email or phone already exists GLOBALLY
-    // (across any session) to prevent duplicate registrations
+    // (across any session) to prevent duplicate registrations with mismatching details
     const globalExisting = await prisma.recruitmentLiveSessionParticipant.findFirst({
       where: {
         OR: [
@@ -46,22 +65,28 @@ export async function POST(
     });
 
     if (globalExisting) {
-      // Return 409 with existing profile so the frontend can prompt the lookup flow
-      return NextResponse.json(
-        {
-          success: false,
-          duplicate: true,
-          message: "A candidate profile with this email or mobile number already exists. Please use the 'Find Existing Profile' option to retrieve your account.",
-          existingProfile: {
-            name: globalExisting.name,
-            email: globalExisting.email,
-            phone: globalExisting.phone,
-            qualification: globalExisting.qualification,
-            experience: globalExisting.experience,
+      // If they exist globally, but the submitted details don't match, return 409 conflict
+      const nameMatch = globalExisting.name.toLowerCase().trim() === name.toLowerCase().trim();
+      const emailMatch = globalExisting.email.toLowerCase().trim() === email.toLowerCase().trim();
+      const phoneMatch = globalExisting.phone.trim() === phone.trim();
+
+      if (!nameMatch || !emailMatch || !phoneMatch) {
+        return NextResponse.json(
+          {
+            success: false,
+            duplicate: true,
+            message: "A candidate profile with this email or mobile number already exists. Please use the 'Find Existing Profile' option to retrieve your account.",
+            existingProfile: {
+              name: globalExisting.name,
+              email: globalExisting.email,
+              phone: globalExisting.phone,
+              qualification: globalExisting.qualification,
+              experience: globalExisting.experience,
+            },
           },
-        },
-        { status: 409 }
-      );
+          { status: 409 }
+        );
+      }
     }
 
     // No duplicate — create a fresh participant entry

@@ -49,6 +49,7 @@ export default function TeacherHostPage() {
   const [assessment, setAssessment] = useState<any>(null);
   const [startedAt, setStartedAt] = useState<string | null>(null);
   const [endedAt, setEndedAt] = useState<string | null>(null);
+  const [sessionId, setSessionId] = useState<string | null>(null);
 
   // Real-time roster
   const [roster, setRoster] = useState<SSEParticipant[]>([]);
@@ -96,9 +97,16 @@ export default function TeacherHostPage() {
       setStartedAt(data.startedAt);
       setEndedAt(data.endedAt);
       setRoster(data.participants || []);
+      if (data.sessionId) {
+        setSessionId(data.sessionId);
+      }
 
       if (data.status === "COMPLETED") {
         deriveLeaderboard(data.participants || []);
+        if (data.sessionId) {
+          router.push(`/teacher/live-sessions/${data.sessionId}`);
+          return;
+        }
       }
       setLoading(false);
     } catch (e: any) {
@@ -114,8 +122,14 @@ export default function TeacherHostPage() {
       if (res.ok) {
         setRoster(data.participants || []);
         setSessionStatus(data.status);
+        if (data.sessionId) {
+          setSessionId(data.sessionId);
+        }
         if (data.status === "COMPLETED") {
           deriveLeaderboard(data.participants || []);
+          if (data.sessionId) {
+            router.push(`/teacher/live-sessions/${data.sessionId}`);
+          }
         }
       }
     } catch (e) {
@@ -218,6 +232,9 @@ export default function TeacherHostPage() {
       }
       setLeaderboard(data.leaderboard || []);
       setSessionStatus("COMPLETED");
+      if (sessionId) {
+        router.push(`/teacher/live-sessions/${sessionId}`);
+      }
     } catch (e: any) {
       alert("Error ending assessment: " + e.message);
     } finally {

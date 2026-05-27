@@ -1233,7 +1233,7 @@ export default function GeneratePage() {
                       <input
                         value={q.correctAnswer}
                         onChange={(e) => updateQuestion(idx, "correctAnswer", e.target.value)}
-                        className="w-full bg-blue-50/50 border border-blue-200 px-3 py-1.5 text-xs text-blue-800 outline-none focus:border-blue-600"
+                        className="w-full bg-green-50/50 border border-green-200 px-3 py-1.5 text-xs text-blue-800 outline-none focus:border-blue-600"
                       />
                     </div>
 

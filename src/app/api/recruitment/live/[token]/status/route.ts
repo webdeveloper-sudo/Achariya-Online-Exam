@@ -58,6 +58,7 @@ export async function GET(
     return NextResponse.json({
       success: true,
       status: session.status,
+      sessionId: session.id,
       startedAt: session.startedAt,
       endedAt: session.endedAt,
       assessment: {
