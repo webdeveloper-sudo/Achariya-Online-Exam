@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 
 interface SidebarProps {
-  role: "admin" | "teacher" | "recruiter";
+  role: "admin" | "teacher" | "recruiter" | "director";
   activeTab: string;
   setActiveTab: (tab: string) => void;
   userName: string;
@@ -57,11 +57,21 @@ export default function Sidebar({
     { id: "assessments", label: "Assessments", icon: ClipboardCheck }
   ];
 
+  const directorMenuItems = [
+    { id: "generator", label: "AI Generator", icon: Brain },
+    { id: "dashboard", label: "Console Overview", icon: LayoutDashboard },
+    { id: "teachers", label: "Teacher Registry", icon: Users },
+    { id: "sessions", label: "Sessions Conducted", icon: History },
+    { id: "assessments", label: "Assessments", icon: ClipboardCheck }
+  ];
+
   let menuItems = adminMenuItems;
   if (role === "teacher") {
     menuItems = teacherMenuItems;
   } else if (role === "recruiter") {
     menuItems = recruiterMenuItems;
+  } else if (role === "director") {
+    menuItems = directorMenuItems;
   }
 
   let roleLabel = "Admin Gateway";
@@ -69,6 +79,8 @@ export default function Sidebar({
     roleLabel = "Educator Hub";
   } else if (role === "recruiter") {
     roleLabel = "Recruiter Console";
+  } else if (role === "director") {
+    roleLabel = "Director Console";
   }
 
   return (
@@ -174,7 +186,7 @@ export default function Sidebar({
                 {menuItems.map((item) => {
                   const Icon = item.icon;
                   const isActive = activeTab === item.id || 
-                                   (item.id === "teachers" && ["list", "create", "upload"].includes(activeTab)) ||
+                                   (item.id === "teachers" && (["list", "create", "upload"].includes(activeTab) || activeTab === "teacher_detail")) ||
                                    (item.id === "live_sessions" && activeTab === "view_live_session") ||
                                    (item.id === "candidates" && activeTab === "candidate_detail") ||
                                    (item.id === "assessments" && activeTab === "view_assessment");

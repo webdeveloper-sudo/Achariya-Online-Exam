@@ -49,6 +49,22 @@ async function main() {
   });
 
   console.log('Successfully seeded recruiter:', recruiter.email);
+
+  const directorEmail = 'director.la@achariya.org';
+  const directorPassword = 'password123';
+  const directorPasswordHash = await bcrypt.hash(directorPassword, 10);
+
+  const director = await prisma.director.upsert({
+    where: { email: directorEmail.toLowerCase().trim() },
+    update: { passwordHash: directorPasswordHash },
+    create: {
+      email: directorEmail.toLowerCase().trim(),
+      passwordHash: directorPasswordHash,
+      name: 'Director LA',
+    },
+  });
+
+  console.log('Successfully seeded director:', director.email);
 }
 
 main()

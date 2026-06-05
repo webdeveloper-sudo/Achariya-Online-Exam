@@ -42,7 +42,7 @@ export async function POST(request: Request) {
       const emailTrimmed = email.trim().toLowerCase();
       if (!emailTrimmed) continue;
 
-      const subject = customSubject || `Invitation to Complete Recruitment Assessment: ${assessmentTitle || "Hiring Assessment"}`;
+      const subject = customSubject || `Invitation to Complete Academic Assessment: ${assessmentTitle || "Teacher Evaluation"}`;
       
       const bodyContent = customBody ? `
         <p style="margin-top: 0; color: #e2e8f0; font-size: 15px; line-height: 1.6; white-space: pre-wrap;">
@@ -50,24 +50,24 @@ export async function POST(request: Request) {
         </p>
       ` : `
         <p style="margin-top: 0; color: #e2e8f0; font-size: 16px; line-height: 1.6;">
-          Hello Applicant,
+          Dear Teacher,
         </p>
         <p style="color: #e2e8f0; font-size: 16px; line-height: 1.6;">
-          You have been invited to participate in a live hiring assessment for the position of <strong>${position || "Candidate"}</strong>.
+          You have been invited by the Director of Academics to participate in a live assessment session.
         </p>
         <p style="color: #cbd5e1; font-size: 14px; margin-bottom: 0;">
-          Assessment Title: <strong>${assessmentTitle || "General Recruitment Evaluation"}</strong>
+          Assessment: <strong>${assessmentTitle || "General Teacher Evaluation"}</strong>
         </p>
       `;
 
       const html = `
         <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; padding: 30px; border-radius: 12px; background: #0f172a; color: #f8fafc; border: 1px solid #1e293b;">
           <div style="text-align: center; margin-bottom: 25px;">
-            <h2 style="color: #6366f1; font-weight: 700; margin: 0; font-size: 24px; letter-spacing: -0.025em;">ACHARIYA Online Portal</h2>
-            <p style="color: #94a3b8; font-size: 14px; margin-top: 5px;">Recruitment & Candidate Assessments</p>
+            <h2 style="color: #3b82f6; font-weight: 700; margin: 0; font-size: 24px; letter-spacing: -0.025em;">ACHARIYA Online Portal</h2>
+            <p style="color: #94a3b8; font-size: 14px; margin-top: 5px;">Director Panel & Teacher Assessments</p>
           </div>
           
-          <div style="background: #1e293b; padding: 25px; border-radius: 8px; border-left: 4px solid #6366f1; margin-bottom: 25px;">
+          <div style="background: #1e293b; padding: 25px; border-radius: 8px; border-left: 4px solid #3b82f6; margin-bottom: 25px;">
             ${bodyContent}
           </div>
 
@@ -76,14 +76,14 @@ export async function POST(request: Request) {
           </p>
 
           <div style="text-align: center; margin: 30px 0;">
-            <a href="${joinUrl}" target="_blank" style="background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); color: #ffffff; text-decoration: none; padding: 14px 30px; font-weight: 600; border-radius: 6px; display: inline-block; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3); transition: all 0.2s ease;">
+            <a href="${joinUrl}" target="_blank" style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: #ffffff; text-decoration: none; padding: 14px 30px; font-weight: 600; border-radius: 6px; display: inline-block; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3); transition: all 0.2s ease;">
               Start Live Assessment
             </a>
           </div>
 
           <p style="color: #64748b; font-size: 12px; text-align: center; margin-top: 40px; border-top: 1px solid #1e293b; padding-top: 20px;">
             If the button doesn't work, copy and paste this link into your browser:<br>
-            <span style="color: #6366f1; word-break: break-all;">${joinUrl}</span>
+            <span style="color: #3b82f6; word-break: break-all;">${joinUrl}</span>
           </p>
           
           <p style="color: #64748b; font-size: 11px; text-align: center; margin-top: 10px;">
@@ -102,7 +102,7 @@ export async function POST(request: Request) {
       results: sentResults,
     });
   } catch (error: any) {
-    console.error("Error in recruitment live invitation sending:", error);
+    console.error("Error in director live invitation sending:", error);
     return NextResponse.json(
       { message: "Internal server error: " + error.message },
       { status: 500 }

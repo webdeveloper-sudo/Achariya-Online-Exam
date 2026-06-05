@@ -13,7 +13,9 @@ interface SSEParticipant {
   email: string;
   phone: string;
   qualification: string;
-  experience: string;
+  branch: string;
+  designation: string;
+  userId: string;
   joinedAt: string;
   completedAt?: string | null;
   score?: number | null;
@@ -21,16 +23,15 @@ interface SSEParticipant {
   timeTakenSeconds?: number | null;
   tabSwitches: number;
   terminated: boolean;
-  answers?: any;
 }
 
-export default function RecruiterHostPage() {
+export default function DirectorHostPage() {
   const params = useParams();
   const router = useRouter();
   const token = params?.token as string;
 
-  // Recruiter identity
-  const [recruiterToken, setRecruiterToken] = useState<string | null>(null);
+  // Director identity
+  const [directorToken, setDirectorToken] = useState<string | null>(null);
 
   // States
   const [loading, setLoading] = useState(true);
@@ -59,13 +60,13 @@ export default function RecruiterHostPage() {
 
   // Check auth
   useEffect(() => {
-    const savedToken = localStorage.getItem("recruiterToken");
-    const savedUser = localStorage.getItem("recruiterUser");
+    const savedToken = localStorage.getItem("directorToken");
+    const savedUser = localStorage.getItem("directorUser");
     if (!savedToken || !savedUser) {
-      router.push("/recruitment/login");
+      router.push("/director/login");
       return;
     }
-    setRecruiterToken(savedToken);
+    setDirectorToken(savedToken);
   }, [router]);
 
   // Fetch and poll
@@ -73,13 +74,13 @@ export default function RecruiterHostPage() {
     if (!token) return;
     try {
       const headers: Record<string, string> = {};
-      if (recruiterToken) {
-        headers["Authorization"] = `Bearer ${recruiterToken}`;
+      if (directorToken) {
+        headers["Authorization"] = `Bearer ${directorToken}`;
       }
-      const res = await fetch(`/api/recruitment/live/${token}/status`, { headers });
+      const res = await fetch(`/api/director/live/${token}/status`, { headers });
       const data = await res.json();
       if (!res.ok) {
-        throw new Error(data.message || "Failed to load recruitment session.");
+        throw new Error(data.message || "Failed to load teacher evaluation session.");
       }
       setSessionStatus(data.status);
       setAssessment(data.assessment);
@@ -91,7 +92,7 @@ export default function RecruiterHostPage() {
       }
       if (data.status === "COMPLETED") {
         if (data.sessionId) {
-          router.push(`/recruitment/sessions/${data.sessionId}`);
+          router.push(`/director/sessions/${data.sessionId}`);
           return;
         }
       }
@@ -100,36 +101,36 @@ export default function RecruiterHostPage() {
       setError(e.message || "Session could not be loaded.");
       setLoading(false);
     }
-  }, [token, recruiterToken, router]);
+  }, [token, directorToken, router]);
 
   // Initialize default email invitation template when assessment loads
   useEffect(() => {
     if (assessment) {
       if (!customSubject) {
-        setCustomSubject(`Invitation to Complete Recruitment Assessment: ${assessment.title || "Hiring Assessment"}`);
+        setCustomSubject(`Invitation to Complete Teacher Assessment: ${assessment.title || "Academic Evaluation"}`);
       }
       if (!customBody) {
-        setCustomBody(`Hello Applicant,\n\nYou have been invited to participate in a live hiring assessment for the position of ${assessment.position || "Candidate"}.\n\nAssessment Title: ${assessment.title || "General Recruitment Evaluation"}\n\nPlease join the waiting room using the link below.`);
+        setCustomBody(`Hello Teacher,\n\nYou have been invited by the Director of Academics to participate in a live assessment session.\n\nAssessment Title: ${assessment.title || "General Evaluation"}\n\nPlease join the waiting room using the link below.`);
       }
     }
   }, [assessment, customSubject, customBody]);
 
   // Initial load
   useEffect(() => {
-    if (!token || !recruiterToken) return;
+    if (!token || !directorToken) return;
     fetchSessionDetails();
-  }, [token, recruiterToken, fetchSessionDetails]);
+  }, [token, directorToken, fetchSessionDetails]);
 
   // Periodic polling every 3 seconds
   useEffect(() => {
-    if (!token || !recruiterToken || loading) return;
+    if (!token || !directorToken || loading) return;
 
     const interval = setInterval(async () => {
       try {
         const headers: Record<string, string> = {
-          Authorization: `Bearer ${recruiterToken}`
+          Authorization: `Bearer ${directorToken}`
         };
-        const res = await fetch(`/api/recruitment/live/${token}/status`, { headers });
+        const res = await fetch(`/api/director/live/${token}/status`, { headers });
         const data = await res.json();
         if (res.ok) {
           setRoster(data.participants || []);
@@ -141,7 +142,7 @@ export default function RecruiterHostPage() {
           }
           if (data.status === "COMPLETED") {
             if (data.sessionId) {
-              router.push(`/recruitment/sessions/${data.sessionId}`);
+              router.push(`/director/sessions/${data.sessionId}`);
             }
           }
         }
@@ -151,7 +152,7 @@ export default function RecruiterHostPage() {
     }, 3000);
 
     return () => clearInterval(interval);
-  }, [token, recruiterToken, loading, router]);
+  }, [token, directorToken, loading, router]);
 
   // Timer countdown
   useEffect(() => {
@@ -180,7 +181,7 @@ export default function RecruiterHostPage() {
   }, [sessionStatus, startedAt, assessment]);
 
   const handleCopyLink = () => {
-    const joinUrl = `${window.location.origin}/live/recruitment/${token}`;
+    const joinUrl = `${window.location.origin}/live/director/${token}`;
     navigator.clipboard.writeText(joinUrl);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
@@ -188,15 +189,15 @@ export default function RecruiterHostPage() {
 
   const startAssessment = async () => {
     if (roster.length === 0) {
-      alert("At least one candidate must register and join the waiting room before starting.");
+      alert("At least one teacher must register and join the waiting room before starting.");
       return;
     }
     setActionLoading(true);
     try {
-      const res = await fetch(`/api/recruitment/live/${token}/start`, {
+      const res = await fetch(`/api/director/live/${token}/start`, {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${recruiterToken}`,
+          Authorization: `Bearer ${directorToken}`,
           "Content-Type": "application/json",
         },
       });
@@ -214,13 +215,13 @@ export default function RecruiterHostPage() {
   };
 
   const endAssessment = async () => {
-    if (!confirm("Are you sure you want to end this live assessment? All outstanding candidates will have their scores compiled and locked.")) return;
+    if (!confirm("Are you sure you want to end this live assessment? All outstanding teachers will have their responses compiled and evaluated.")) return;
     setActionLoading(true);
     try {
-      const res = await fetch(`/api/recruitment/live/${token}/end`, {
+      const res = await fetch(`/api/director/live/${token}/end`, {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${recruiterToken}`,
+          Authorization: `Bearer ${directorToken}`,
           "Content-Type": "application/json",
         },
       });
@@ -231,7 +232,7 @@ export default function RecruiterHostPage() {
       setRoster(data.leaderboard || []);
       setSessionStatus("COMPLETED");
       if (sessionId) {
-        router.push(`/recruitment/sessions/${sessionId}`);
+        router.push(`/director/sessions/${sessionId}`);
       }
     } catch (e: any) {
       alert("Error ending assessment: " + e.message);
@@ -268,20 +269,19 @@ export default function RecruiterHostPage() {
     setSendingInvites(true);
     setInviteFeedback(null);
 
-    const joinUrl = `${window.location.origin}/live/recruitment/${token}`;
+    const joinUrl = `${window.location.origin}/live/director/${token}`;
 
     try {
-      const res = await fetch("/api/recruitment/live/send-invitation", {
+      const res = await fetch("/api/director/live/send-invitation", {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${recruiterToken}`,
+          Authorization: `Bearer ${directorToken}`,
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
           emails: validEmails,
           joinUrl,
           assessmentTitle: assessment?.title,
-          position: assessment?.position,
           customSubject,
           customBody
         })
@@ -313,7 +313,7 @@ export default function RecruiterHostPage() {
     return (
       <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center text-gray-700">
         <Loader className="animate-spin text-blue-600 mb-4" size={40} />
-        <p className="text-sm text-gray-500">Loading live recruitment room...</p>
+        <p className="text-sm text-gray-500">Loading live assessment room...</p>
       </div>
     );
   }
@@ -327,7 +327,7 @@ export default function RecruiterHostPage() {
           </div>
           <h2 className="text-xl font-black text-gray-900">Hosting Inaccessible</h2>
           <p className="text-sm text-gray-500 leading-relaxed">{error}</p>
-          <button onClick={() => router.push("/recruitment/assessments")} className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-none font-bold text-sm transition-all">
+          <button onClick={() => router.push("/director/assessments")} className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-none font-bold text-sm transition-all">
             Return to Assessments
           </button>
         </div>
@@ -335,7 +335,7 @@ export default function RecruiterHostPage() {
     );
   }
 
-  const joinUrl = `${typeof window !== "undefined" ? window.location.origin : ""}/live/recruitment/${token}`;
+  const joinUrl = `${typeof window !== "undefined" ? window.location.origin : ""}/live/director/${token}`;
 
   return (
     <div className="min-h-screen bg-gray-50 font-sans flex flex-col relative overflow-hidden">
@@ -346,14 +346,14 @@ export default function RecruiterHostPage() {
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div className="flex items-center gap-3">
             <button
-              onClick={() => router.push(`/recruitment/assessments`)}
+              onClick={() => router.push(`/director/assessments`)}
               className="p-2.5 bg-white border border-gray-200 rounded-none hover:bg-gray-50 text-gray-500 hover:text-gray-900 transition-colors shadow-sm"
             >
               <ArrowLeft size={16} />
             </button>
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-[11px] font-black uppercase tracking-widest text-blue-600 bg-blue-50 px-2 py-0.5 border border-blue-200 rounded-none">HR Live Session</span>
+                <span className="text-[11px] font-black uppercase tracking-widest text-blue-600 bg-blue-50 px-2 py-0.5 border border-blue-200 rounded-none">Director Live Control Deck</span>
                 <span className="text-xs font-bold text-gray-400">· Status: {sessionStatus}</span>
               </div>
               <h1 className="text-xl md:text-2xl font-black mt-1 text-gray-900">{assessment?.title}</h1>
@@ -392,15 +392,13 @@ export default function RecruiterHostPage() {
           </div>
         </div>
 
-        {/* ───────────────────────────────────────────────────────────────────
-            1. WAITING ROOM VIEW (WAITING FOR CANDIDATES)
-           ─────────────────────────────────────────────────────────────────── */}
+        {/* 1. WAITING ROOM VIEW (WAITING FOR TEACHERS) */}
         {sessionStatus === "WAITING" && (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="md:col-span-1 space-y-6">
               <div className="bg-white/80 border border-gray-200 rounded-none p-6 space-y-6 shadow-sm backdrop-blur-sm">
                 <div>
-                  <h3 className="text-base font-bold text-gray-900">Invite Candidates</h3>
+                  <h3 className="text-base font-bold text-gray-900">Invite Teachers</h3>
                   <p className="text-xs text-gray-500 mt-1">Share the access URL or dispatch email invitations instantly.</p>
                 </div>
 
@@ -431,20 +429,20 @@ export default function RecruiterHostPage() {
 
                 <div className="border-t border-gray-100 pt-4 space-y-3 text-xs">
                   <div className="flex justify-between">
-                    <span className="text-gray-400">Target Position</span>
-                    <span className="font-bold text-blue-600">{assessment?.position}</span>
+                    <span className="text-gray-400">Subject</span>
+                    <span className="font-bold text-blue-600">{assessment?.subject || "General"}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-400">Department</span>
-                    <span className="font-bold text-gray-700">{assessment?.department}</span>
+                    <span className="text-gray-400">Grade Level</span>
+                    <span className="font-bold text-gray-700">{assessment?.grade || "All"}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-400">Institutions</span>
-                    <span className="font-bold text-gray-700">{assessment?.recruitmentFor}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-400">Classification</span>
-                    <span className="font-bold text-gray-700">{assessment?.teaching ? "Teaching" : "Non-Teaching"}</span>
+                    <span className="text-gray-400">Total Questions</span>
+                    <span className="font-bold text-gray-700">
+                      {Array.isArray(assessment?.questions)
+                        ? assessment?.questions.length
+                        : JSON.parse(assessment?.questions || "[]").length} Qs
+                    </span>
                   </div>
                 </div>
               </div>
@@ -457,40 +455,41 @@ export default function RecruiterHostPage() {
                     <Users size={18} />
                   </div>
                   <div>
-                    <h3 className="font-black text-lg text-gray-900">Candidates Waitlist Lobby</h3>
-                    <p className="text-[11px] text-gray-400 mt-0.5">Applicants currently queued for onboarding</p>
+                    <h3 className="font-black text-lg text-gray-900">Teachers Waitlist Lobby</h3>
+                    <p className="text-[11px] text-gray-400 mt-0.5">Educators currently joined and awaiting start</p>
                   </div>
                 </div>
 
                 <span className="text-xs font-bold text-blue-600 bg-blue-50 px-3 py-1 border border-blue-200 rounded-none">
-                  {roster.length} Active Candidates
+                  {roster.length} Teachers Online
                 </span>
               </div>
 
               {roster.length === 0 ? (
                 <div className="flex-1 border-2 border-dashed border-gray-200 rounded-none p-12 flex flex-col items-center justify-center text-center space-y-3">
                   <Users className="text-gray-300" size={32} />
-                  <p className="text-sm font-bold text-gray-400">Waitlist Lobby is empty</p>
+                  <p className="text-sm font-bold text-gray-400">Waitlist lobby is empty</p>
                   <p className="text-xs text-gray-400 max-w-xs leading-relaxed">
-                    Share the invitation link to wait for participants. Live updates will populate automatically.
+                    Share the evaluation invitation link. Educators will populate here automatically in real time.
                   </p>
                 </div>
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 overflow-y-auto max-h-[400px] pr-2 custom-scrollbar">
-                  {roster.map((candidate, idx) => (
-                    <div key={candidate.id || idx} className="bg-gray-50 border border-gray-200 rounded-none p-4 space-y-3 hover:border-blue-300 transition-all">
+                  {roster.map((teacher, idx) => (
+                    <div key={teacher.id || idx} className="bg-gray-50 border border-gray-200 rounded-none p-4 space-y-3 hover:border-blue-300 transition-all">
                       <div className="flex items-center gap-3">
                         <div className="h-9 w-9 bg-blue-50 border border-blue-200 text-blue-600 rounded-none flex items-center justify-center font-bold text-xs shrink-0">
-                          {candidate.name.slice(0, 2).toUpperCase()}
+                          {teacher.name.slice(0, 2).toUpperCase()}
                         </div>
                         <div className="min-w-0 flex-1">
-                          <p className="text-xs font-bold truncate text-gray-700">{candidate.name}</p>
-                          <p className="text-[9px] text-gray-400 truncate mt-0.5">{candidate.qualification} · Exp: {candidate.experience}</p>
+                          <p className="text-xs font-bold truncate text-gray-700">{teacher.name}</p>
+                          <p className="text-[9px] text-gray-400 truncate mt-0.5">{teacher.designation} · {teacher.branch}</p>
                         </div>
                       </div>
                       <div className="border-t border-gray-100 pt-2 flex flex-col gap-1 text-[9px] text-gray-400">
-                        <p className="truncate">Email: {candidate.email}</p>
-                        <p>Phone: {candidate.phone}</p>
+                        <p className="truncate">Employee ID: <span className="font-semibold text-gray-600">{teacher.userId}</span></p>
+                        <p className="truncate">Email: {teacher.email}</p>
+                        <p className="truncate">Qualifications: {teacher.qualification}</p>
                       </div>
                     </div>
                   ))}
@@ -500,9 +499,7 @@ export default function RecruiterHostPage() {
           </div>
         )}
 
-        {/* ───────────────────────────────────────────────────────────────────
-            2. ACTIVE MONITORING ROOM (EXAM IN PROGRESS)
-           ─────────────────────────────────────────────────────────────────── */}
+        {/* 2. ACTIVE MONITORING ROOM (EXAM IN PROGRESS) */}
         {sessionStatus === "ACTIVE" && (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             
@@ -510,8 +507,8 @@ export default function RecruiterHostPage() {
             <div className="md:col-span-1 space-y-6">
               <div className="bg-white/80 border border-gray-200 rounded-none p-6 space-y-6 shadow-sm backdrop-blur-sm">
                 <div>
-                  <h3 className="text-base font-bold text-gray-900">Proctoring Analytics</h3>
-                  <p className="text-xs text-gray-500 mt-1">Real-time status updates of evaluation pipeline.</p>
+                  <h3 className="text-base font-bold text-gray-900">Session Proctor Stats</h3>
+                  <p className="text-xs text-gray-500 mt-1">Real-time status updates of active educators.</p>
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
@@ -570,19 +567,19 @@ export default function RecruiterHostPage() {
                     <Users size={18} />
                   </div>
                   <div>
-                    <h3 className="font-black text-lg text-gray-900">Candidates Proctor Supervisor</h3>
-                    <p className="text-[11px] text-gray-400 mt-0.5">Interactive list showing live active progress &amp; violations</p>
+                    <h3 className="font-black text-lg text-gray-900">Teachers Live Proctor Board</h3>
+                    <p className="text-[11px] text-gray-400 mt-0.5">Focus switch integrity and compliance reports</p>
                   </div>
                 </div>
               </div>
 
               <div className="space-y-3 overflow-y-auto max-h-[400px] pr-2 custom-scrollbar">
-                {roster.map((candidate, idx) => {
-                  const isSubmitted = !!candidate.completedAt;
-                  const isDisqualified = candidate.terminated || candidate.tabSwitches > 2;
+                {roster.map((teacher, idx) => {
+                  const isSubmitted = !!teacher.completedAt;
+                  const isDisqualified = teacher.terminated || teacher.tabSwitches > 2;
 
                   return (
-                    <div key={candidate.id || idx} className="bg-gray-50 border border-gray-200 rounded-none p-4 flex flex-col sm:flex-row justify-between sm:items-center gap-4 hover:border-blue-200 transition-colors">
+                    <div key={teacher.id || idx} className="bg-gray-50 border border-gray-200 rounded-none p-4 flex flex-col sm:flex-row justify-between sm:items-center gap-4 hover:border-blue-200 transition-colors">
                       <div className="flex items-center gap-3">
                         <div className={`h-8 w-8 rounded-none flex items-center justify-center text-xs font-bold shrink-0 border ${
                           isDisqualified ? "bg-red-50 text-red-600 border-red-200" :
@@ -592,8 +589,8 @@ export default function RecruiterHostPage() {
                           {idx + 1}
                         </div>
                         <div>
-                          <p className="text-xs font-bold text-gray-700">{candidate.name}</p>
-                          <p className="text-[9px] text-gray-400 mt-0.5">Email: {candidate.email} · Phone: {candidate.phone}</p>
+                          <p className="text-xs font-bold text-gray-700">{teacher.name}</p>
+                          <p className="text-[9px] text-gray-400 mt-0.5">Emp ID: {teacher.userId} · {teacher.designation} ({teacher.branch})</p>
                         </div>
                       </div>
 
@@ -601,12 +598,12 @@ export default function RecruiterHostPage() {
                         {isDisqualified ? (
                           <span className="flex items-center gap-1 text-[11px] font-black uppercase text-red-600 bg-red-50 border border-red-200 px-2 py-0.5 rounded-none animate-pulse">
                             <AlertTriangle size={10} />
-                            Disqualified (Tab Violation)
+                            Disqualified
                           </span>
-                        ) : candidate.tabSwitches > 0 ? (
+                        ) : teacher.tabSwitches > 0 ? (
                           <span className="flex items-center gap-1 text-[11px] font-black uppercase text-amber-600 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-none">
                             <AlertTriangle size={10} />
-                            {candidate.tabSwitches} Warning{candidate.tabSwitches > 1 ? "s" : ""}
+                            {teacher.tabSwitches} Warning{teacher.tabSwitches > 1 ? "s" : ""}
                           </span>
                         ) : (
                           <span className="flex items-center gap-1 text-[11px] font-black uppercase text-gray-400">
@@ -620,7 +617,7 @@ export default function RecruiterHostPage() {
                           isSubmitted ? "bg-emerald-50 text-emerald-600 border-emerald-200" :
                           "bg-gray-100 text-gray-500 border-gray-200 animate-pulse"
                         }`}>
-                          {isDisqualified ? "Locked Out" : isSubmitted ? `Score: ${candidate.score}/${candidate.totalQuestions}` : "Writing"}
+                          {isDisqualified ? "Locked Out" : isSubmitted ? `Score: ${teacher.score}/${teacher.totalQuestions}` : "Writing"}
                         </span>
                       </div>
                     </div>
@@ -631,18 +628,14 @@ export default function RecruiterHostPage() {
           </div>
         )}
 
-        {/* ───────────────────────────────────────────────────────────────────
-            3. COMPLETED STATE VIEW (HR BOARD SUMMARY)
-           ─────────────────────────────────────────────────────────────────── */}
+        {/* 3. COMPLETED STATE VIEW */}
         {sessionStatus === "COMPLETED" && (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            
-            {/* Analytics metric block */}
             <div className="lg:col-span-1 space-y-6">
               <div className="bg-white/80 border border-gray-200 rounded-none p-6 space-y-6 shadow-sm backdrop-blur-sm">
                 <div>
-                  <h3 className="text-base font-bold text-gray-900">HR Finalized Metrics</h3>
-                  <p className="text-xs text-gray-500 mt-1">Hiring exam compliance audit &amp; statistics</p>
+                  <h3 className="text-base font-bold text-gray-900">Session Completed</h3>
+                  <p className="text-xs text-gray-500 mt-1">Summary of evaluation results</p>
                 </div>
 
                 <div className="space-y-3">
@@ -664,7 +657,7 @@ export default function RecruiterHostPage() {
                       </p>
                     </div>
                     <div className="bg-gray-50 border border-gray-200 rounded-none p-4 text-center">
-                      <p className="text-[9px] text-gray-400 uppercase tracking-wider font-bold">Class Average</p>
+                      <p className="text-[9px] text-gray-400 uppercase tracking-wider font-bold">Average Score</p>
                       <p className="text-2xl font-black text-emerald-600 mt-1">
                         {roster.length > 0
                           ? Math.round((roster.reduce((acc, curr) => acc + (curr.score || 0), 0) / roster.length) * 10) / 10
@@ -673,33 +666,17 @@ export default function RecruiterHostPage() {
                     </div>
                   </div>
                 </div>
-
-                <div className="border-t border-gray-100 pt-4 space-y-3 text-xs">
-                  <div className="flex justify-between">
-                    <span className="text-gray-400">Total Applicants</span>
-                    <span className="font-bold text-gray-700">{roster.length} Candidates</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-400">Full Integrity rate</span>
-                    <span className="font-bold text-emerald-600">
-                      {roster.length > 0
-                        ? Math.round((roster.filter(p => !p.terminated).length / roster.length) * 100)
-                        : 100}% Passed Audit
-                    </span>
-                  </div>
-                </div>
               </div>
             </div>
 
-            {/* Results Leaderboard Table */}
             <div className="lg:col-span-2 bg-white/80 border border-gray-200 rounded-none p-6 md:p-8 space-y-6 shadow-sm backdrop-blur-sm">
               <div className="flex items-center gap-3">
                 <div className="h-10 w-10 bg-blue-50 border border-blue-200 text-blue-600 rounded-none flex items-center justify-center">
                   <Award size={18} />
                 </div>
                 <div>
-                  <h3 className="font-black text-lg text-gray-900">Evaluation Leaderboard</h3>
-                  <p className="text-[11px] text-gray-400 mt-0.5">Ranked candidate scores and integrity audits</p>
+                  <h3 className="font-black text-lg text-gray-900">Evaluation Roster Summary</h3>
+                  <p className="text-[11px] text-gray-400 mt-0.5">Educator outcomes and session metrics</p>
                 </div>
               </div>
 
@@ -708,21 +685,21 @@ export default function RecruiterHostPage() {
                   <thead>
                     <tr className="bg-gray-50 border-b border-gray-200 text-gray-500 font-bold uppercase tracking-wider text-[10px]">
                       <th className="py-3 px-2">Rank</th>
-                      <th className="py-3 px-4">Applicant</th>
+                      <th className="py-3 px-4">Teacher</th>
                       <th className="py-3 px-4">Score</th>
-                      <th className="py-3 px-4">Duration</th>
-                      <th className="py-3 px-4">Proctor Audit</th>
+                      <th className="py-3 px-4">Time Taken</th>
+                      <th className="py-3 px-4">Audit Status</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {roster.map((candidate, idx) => {
-                      const isDisqualified = candidate.terminated || candidate.tabSwitches > 2;
-                      const formattedTime = candidate.timeTakenSeconds
-                        ? `${Math.floor(candidate.timeTakenSeconds / 60)}:${(candidate.timeTakenSeconds % 60).toString().padStart(2, "0")}`
+                    {roster.map((teacher, idx) => {
+                      const isDisqualified = teacher.terminated || teacher.tabSwitches > 2;
+                      const formattedTime = teacher.timeTakenSeconds
+                        ? `${Math.floor(teacher.timeTakenSeconds / 60)}:${(teacher.timeTakenSeconds % 60).toString().padStart(2, "0")}`
                         : "N/A";
 
                       return (
-                        <tr key={candidate.id || idx} className="hover:bg-gray-50/30 transition-all border-b border-gray-100">
+                        <tr key={teacher.id || idx} className="hover:bg-gray-50/30 transition-all border-b border-gray-100">
                           <td className="py-4 px-2">
                             <span className={`h-6 w-6 rounded-none flex items-center justify-center text-xs font-black border ${
                               isDisqualified ? "bg-gray-100 text-gray-400 border-gray-200" :
@@ -735,11 +712,11 @@ export default function RecruiterHostPage() {
                             </span>
                           </td>
                           <td className="py-4 px-4">
-                            <p className="font-bold text-gray-700">{candidate.name}</p>
-                            <p className="text-[9px] text-gray-400 mt-0.5">Email: {candidate.email} · Exp: {candidate.experience}</p>
+                            <p className="font-bold text-gray-700">{teacher.name}</p>
+                            <p className="text-[9px] text-gray-400 mt-0.5">Emp ID: {teacher.userId} · {teacher.designation} ({teacher.branch})</p>
                           </td>
                           <td className={`py-4 px-4 font-black text-sm ${isDisqualified ? "text-gray-400 line-through" : "text-emerald-600"}`}>
-                            {candidate.score} / {candidate.totalQuestions}
+                            {teacher.score} / {teacher.totalQuestions}
                           </td>
                           <td className="py-4 px-4 font-mono font-medium text-gray-600">
                             {formattedTime}
@@ -750,15 +727,15 @@ export default function RecruiterHostPage() {
                                 <AlertTriangle size={10} />
                                 Disqualified
                               </span>
-                            ) : candidate.tabSwitches > 0 ? (
+                            ) : teacher.tabSwitches > 0 ? (
                               <span className="inline-flex items-center gap-1 text-[9px] font-black uppercase text-amber-600 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-none">
                                 <AlertTriangle size={10} />
-                                {candidate.tabSwitches} Warning{candidate.tabSwitches > 1 ? "s" : ""}
+                                {teacher.tabSwitches} Warning{teacher.tabSwitches > 1 ? "s" : ""}
                               </span>
                             ) : (
                               <span className="inline-flex items-center gap-1 text-[9px] font-black uppercase text-gray-400">
                                 <ShieldCheck size={11} className="text-emerald-500" />
-                                Confirmed Safe
+                                Secure Pass
                               </span>
                             )}
                           </td>
@@ -767,22 +744,13 @@ export default function RecruiterHostPage() {
                     })}
                   </tbody>
                 </table>
-
-                {roster.length === 0 && (
-                  <div className="text-center py-12 text-gray-400">
-                    No candidates joined this session.
-                  </div>
-                )}
               </div>
             </div>
           </div>
         )}
-
       </div>
 
-      {/* ───────────────────────────────────────────────────────────────────
-          EMAIL INVITATIONS POPUP MODAL
-         ─────────────────────────────────────────────────────────────────── */}
+      {/* EMAIL INVITATIONS POPUP MODAL */}
       {isInviteOpen && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-6">
           <div className="max-w-5xl h-full w-full bg-white border border-gray-200 rounded-none p-8 space-y-6 shadow-sm relative overflow-y-auto">
@@ -820,7 +788,7 @@ export default function RecruiterHostPage() {
                 <div className="space-y-4 max-w-xl">
                   <div>
                     <h4 className="text-sm mb-2 font-black uppercase text-blue-600 tracking-wider">1. Recipient Emails</h4>
-                    <p className="text-[11px] text-gray-500 mt-1">Specify target email addresses (Max 25 candidates).</p>
+                    <p className="text-[11px] text-gray-500 mt-1">Specify target email addresses (Max 25 teachers).</p>
                   </div>
 
                   <div className="space-y-2.5 max-h-[220px] overflow-y-auto pr-1">
@@ -829,7 +797,7 @@ export default function RecruiterHostPage() {
                         <input
                           required
                           type="email"
-                          placeholder="candidate@example.com"
+                          placeholder="teacher@example.com"
                           value={email}
                           onChange={(e) => updateEmailField(idx, e.target.value)}
                           className="bg-white border border-gray-300 rounded-none px-4 py-3 text-[12px] focus:border-blue-600 outline-none flex-1 font-bold text-gray-700 transition-all placeholder:text-gray-400"
@@ -853,7 +821,7 @@ export default function RecruiterHostPage() {
                       onClick={addEmailField}
                       className="w-full bg-white hover:bg-gray-50 border border-dashed border-gray-300 py-2.5 rounded-none font-bold text-[11px] text-gray-500 flex items-center justify-center gap-1.5 transition-all"
                     >
-                      <Plus size={12} /> Add Candidate Input
+                      <Plus size={12} /> Add Teacher Input
                     </button>
                   )}
                 </div>
@@ -892,7 +860,7 @@ export default function RecruiterHostPage() {
 
                     <div className="bg-gray-50 border border-gray-200 rounded-none p-3">
                       <p className="text-[11px] leading-relaxed text-gray-500">
-                        <span className="font-bold text-gray-600 mr-2">Pro-Tip:</span> The premium assessment portal logo, interactive &quot;Start Live Assessment&quot; primary button, instructions, and proctor rules will be dynamically appended below your custom body.
+                        <span className="font-bold text-gray-600 mr-2">Pro-Tip:</span> The premium assessment portal logo, interactive &quot;Start Live Assessment&quot; button, instructions, and proctoring rules will be dynamically appended below your custom body.
                       </p>
                     </div>
                   </div>

@@ -182,3 +182,77 @@ model RecruitmentLiveSessionParticipant {
   @@map("recruitment_live_session_participants")
 }
 
+model Director {
+  id           String               @id @default(uuid())
+  email        String               @unique
+  passwordHash String
+  name         String
+  role         String               @default("Director")
+  createdAt    DateTime             @default(now())
+  updatedAt    DateTime             @updatedAt
+  assessments  DirectorAssessment[]
+
+  @@map("directors")
+}
+
+model DirectorAssessment {
+  id                  String                @id @default(uuid())
+  title               String
+  isPublic            Boolean               @default(false)
+  teaching            String                // teaching or non teaching
+  department          String
+  duration            Int                   @default(30) // in minutes
+  date                String                // Date of assessment
+  day                 String                // Day of week
+  generatedBy         String                // Director name
+  position            String                // Assessment for teachers (target role/subject)
+  recruitmentFor      String                // School name(s)
+  questions           Json                  // Array of question objects
+  createdById         String
+  createdBy           Director              @relation(fields: [createdById], references: [id], onDelete: Cascade)
+  createdAt           DateTime              @default(now())
+  updatedAt           DateTime              @updatedAt
+  liveSessions        DirectorLiveSession[]
+
+  @@map("director_assessments")
+}
+
+model DirectorLiveSession {
+  id           String                           @id @default(uuid())
+  token        String                           @unique
+  assessmentId String
+  directorId   String
+  status       LiveSessionStatus                @default(WAITING)
+  startedAt    DateTime?
+  endedAt      DateTime?
+  createdAt    DateTime                         @default(now())
+  assessment   DirectorAssessment               @relation(fields: [assessmentId], references: [id])
+  participants DirectorLiveSessionParticipant[]
+
+  @@map("director_live_sessions")
+}
+
+model DirectorLiveSessionParticipant {
+  id               String              @id @default(uuid())
+  sessionId        String
+  userId           String              // Employee ID of the teacher
+  name             String
+  email            String
+  phone            String
+  qualification    String
+  branch           String
+  designation      String
+  joinedAt         DateTime            @default(now())
+  completedAt      DateTime?
+  timeTakenSeconds Int?
+  score            Int?
+  totalQuestions   Int?
+  answers          Json?
+  tabSwitches      Int                 @default(0)
+  terminated       Boolean             @default(false)
+  session          DirectorLiveSession @relation(fields: [sessionId], references: [id])
+
+  @@map("director_live_session_participants")
+}
+
+
