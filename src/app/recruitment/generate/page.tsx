@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import {
   UploadCloud, FileText, Sliders, Zap, Loader, Plus, Trash2,
-  CheckCircle, AlertCircle, Save, X, Eye, FileDown, Printer, Award
+  CheckCircle, AlertCircle, Save, X, Eye, FileDown, Printer, Award,
+  Image as ImageIcon, RefreshCw, Edit2, ArrowLeft, Lightbulb, TimerIcon
 } from "lucide-react";
 import dynamic from "next/dynamic";
 
@@ -53,11 +54,14 @@ export const allschoolsdata = [
 
 interface Question {
   id: string;
-  type: string;
+  type: string; // "multiple_choice" | "true_false" | "short_answer" | "diagram_mcq" | "diagram_short_answer"
   question: string;
   options: string[];
   correctAnswer: string;
   explanation?: string;
+  imageUrl?: string; // Cloudinary URL (after save) or base64 (pending upload)
+  imagePending?: boolean; // true = base64, not yet uploaded to Cloudinary
+  imageGenerating?: boolean; // true = AI is currently generating image
 }
 
 export default function RecruiterGeneratePage() {
@@ -91,13 +95,15 @@ export default function RecruiterGeneratePage() {
   const [position, setPosition] = useState("");
   const [department, setDepartment] = useState("");
   const [teachingType, setTeachingType] = useState("teaching"); // teaching or non teaching
-  const [recruitmentFor, setRecruitmentFor] = useState(allschoolsdata[0].name);
+  const [recruitmentFor, setRecruitmentFor] = useState<string | undefined>(allschoolsdata[0].name);
   const [difficulty, setDifficulty] = useState("mixed");
   const [numQuestions, setNumQuestions] = useState(10);
   const [questionTypes, setQuestionTypes] = useState({
     multiple_choice: true,
     true_false: true,
     short_answer: false,
+    diagram_mcq: false,
+    diagram_short_answer: false,
   });
 
   const [generatorLoading, setGeneratorLoading] = useState(false);
@@ -114,6 +120,43 @@ export default function RecruiterGeneratePage() {
 
   const [newQuestionForm, setNewQuestionForm] = useState<any | null>(null);
   const [newQuestionError, setNewQuestionError] = useState<string | null>(null);
+  const newImageInputRef = useRef<HTMLInputElement>(null);
+
+  const [editingImageIdx, setEditingImageIdx] = useState<Record<number, boolean>>({});
+  const [isStateLoaded, setIsStateLoaded] = useState(false);
+  const formRef = useRef<HTMLFormElement>(null);
+  const [formHeight, setFormHeight] = useState<number | null>(null);
+
+  // Resize observer for form height
+  useEffect(() => {
+    if (!formRef.current) return;
+    const resizeObserver = new ResizeObserver((entries) => {
+      for (let entry of entries) {
+        setFormHeight(entry.target.clientHeight);
+      }
+    });
+    resizeObserver.observe(formRef.current);
+    return () => resizeObserver.disconnect();
+  }, []);
+
+  const facts = [
+    "The word 'school' comes from the ancient Greek word 'schole', which originally meant 'free time' or 'leisure'.",
+    "AI can process millions of tokens of context, enabling it to read entire textbooks in seconds.",
+    "The oldest continuously operating university in the world is the University of Al-Qarawiyyin, founded in 859 AD in Fez, Morocco.",
+    "Adaptive learning systems use AI to adjust the difficulty of questions based on a student's performance in real time.",
+    "The concept of multiple-choice questions was first introduced in the early 20th century to grade military recruits quickly.",
+    "Studies show that taking practice tests can improve long-term retention of information by up to 50% compared to just studying.",
+  ];
+
+  const [currentFact, setCurrentFact] = useState(facts[0]);
+
+  useEffect(() => {
+    if (!generatorLoading) return;
+    const interval = setInterval(() => {
+      setCurrentFact(facts[Math.floor(Math.random() * facts.length)]);
+    }, 4000);
+    return () => clearInterval(interval);
+  }, [generatorLoading]);
 
   useEffect(() => {
     setIsMounted(true);
@@ -125,7 +168,82 @@ export default function RecruiterGeneratePage() {
     }
     setToken(t);
     setRecruiter(JSON.parse(u));
+
+    // Load saved generator state from localStorage
+    try {
+      const savedGenQuestions = localStorage.getItem("rec_generatedQuestions");
+      if (savedGenQuestions) {
+        setGeneratedQuestions(JSON.parse(savedGenQuestions));
+      }
+
+      const savedGenMode = localStorage.getItem("rec_generationMode");
+      if (savedGenMode) setGenerationMode(savedGenMode as any);
+
+      const savedContextText = localStorage.getItem("rec_contextText");
+      if (savedContextText) setContextText(savedContextText);
+
+      const savedPosition = localStorage.getItem("rec_position");
+      if (savedPosition) setPosition(savedPosition);
+
+      const savedDept = localStorage.getItem("rec_department");
+      if (savedDept) setDepartment(savedDept);
+
+      const savedTeachingType = localStorage.getItem("rec_teachingType");
+      if (savedTeachingType) setTeachingType(savedTeachingType);
+
+      const savedRecruitmentFor = localStorage.getItem("rec_recruitmentFor");
+      if (savedRecruitmentFor) setRecruitmentFor(savedRecruitmentFor);
+
+      const savedDiff = localStorage.getItem("rec_difficulty");
+      if (savedDiff) setDifficulty(savedDiff);
+
+      const savedNumQuestions = localStorage.getItem("rec_numQuestions");
+      if (savedNumQuestions) setNumQuestions(Number(savedNumQuestions));
+
+      const savedQuestionTypes = localStorage.getItem("rec_questionTypes");
+      if (savedQuestionTypes) {
+        setQuestionTypes(JSON.parse(savedQuestionTypes));
+      }
+    } catch (err) {
+      console.warn("Failed to load saved assessment generator state from localStorage:", err);
+    }
+    setIsStateLoaded(true);
   }, [router]);
+
+  // Auto-save generator state to localStorage
+  useEffect(() => {
+    if (!isStateLoaded) return;
+    try {
+      localStorage.setItem("rec_generatedQuestions", JSON.stringify(generatedQuestions));
+      localStorage.setItem("rec_generationMode", generationMode);
+      localStorage.setItem("rec_contextText", contextText);
+      localStorage.setItem("rec_position", position);
+      localStorage.setItem("rec_department", department);
+      localStorage.setItem("rec_teachingType", teachingType);
+      if (recruitmentFor) {
+        localStorage.setItem("rec_recruitmentFor", recruitmentFor);
+      } else {
+        localStorage.removeItem("rec_recruitmentFor");
+      }
+      localStorage.setItem("rec_difficulty", difficulty);
+      localStorage.setItem("rec_numQuestions", String(numQuestions));
+      localStorage.setItem("rec_questionTypes", JSON.stringify(questionTypes));
+    } catch (err) {
+      console.warn("Failed to save assessment generator state to localStorage:", err);
+    }
+  }, [
+    isStateLoaded,
+    generatedQuestions,
+    generationMode,
+    contextText,
+    position,
+    department,
+    teachingType,
+    recruitmentFor,
+    difficulty,
+    numQuestions,
+    questionTypes
+  ]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -201,8 +319,47 @@ export default function RecruiterGeneratePage() {
       });
       const data = await res.json();
       if (res.ok && data.success) {
-        setGeneratedQuestions(data.questions);
+        const questions: Question[] = data.questions;
         setAssessmentTitle(`${position} Assessment - ${new Date().toLocaleDateString("en-IN")}`);
+
+        // Mark diagram questions as generating
+        const markedQuestions = questions.map((q) =>
+          isDiagramType(q.type) ? { ...q, imageGenerating: true } : q,
+        );
+        setGeneratedQuestions(markedQuestions);
+
+        // Generate images for diagram questions in parallel
+        const imagePromises = markedQuestions.map(async (q, idx) => {
+          if (!isDiagramType(q.type)) return;
+          try {
+            const imgRes = await fetch("/api/recruitment/generate-diagram-image", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                questionText: q.question,
+                context: contextText,
+              }),
+            });
+            const imgData = await imgRes.json();
+            setGeneratedQuestions((prev) => {
+              const updated = [...prev];
+              updated[idx] = {
+                ...updated[idx],
+                imageGenerating: false,
+                imageUrl: imgData.success ? imgData.base64 : undefined,
+                imagePending: imgData.success ? true : false,
+              };
+              return updated;
+            });
+          } catch {
+            setGeneratedQuestions((prev) => {
+              const updated = [...prev];
+              updated[idx] = { ...updated[idx], imageGenerating: false };
+              return updated;
+            });
+          }
+        });
+        await Promise.allSettled(imagePromises);
       } else {
         setGeneratorError(data.message || "Failed to generate recruitment assessment.");
       }
@@ -222,21 +379,32 @@ export default function RecruiterGeneratePage() {
     setSaveLoading(true);
     setSaveError(null);
 
-    const payload = {
-      title: assessmentTitle.trim(),
-      duration,
-      teaching: teachingType === "teaching" ? "Teaching" : "Non-Teaching",
-      department: department || "General",
-      date: new Date().toISOString().split("T")[0],
-      day: new Date().toLocaleDateString("en-US", { weekday: "long" }),
-      generatedBy: recruiter?.name || "HR Manager",
-      position: position.trim(),
-      recruitmentFor: recruitmentFor,
-      isPublic,
-      questions: generatedQuestions,
-    };
-
     try {
+      // 1. Upload any pending (base64) images to Cloudinary
+      const finalQuestions = await uploadPendingImages(
+        generatedQuestions,
+        token!,
+      );
+
+      // 2. Clean imageGenerating / imagePending flags before saving
+      const cleanQuestions = finalQuestions.map(
+        ({ imageGenerating, imagePending, ...rest }: any) => rest,
+      );
+
+      const payload = {
+        title: assessmentTitle.trim(),
+        duration,
+        teaching: teachingType === "teaching" ? "Teaching" : "Non-Teaching",
+        department: department || "General",
+        date: new Date().toISOString().split("T")[0],
+        day: new Date().toLocaleDateString("en-US", { weekday: "long" }),
+        generatedBy: recruiter?.name || "HR Manager",
+        position: position.trim(),
+        recruitmentFor: recruitmentFor,
+        isPublic,
+        questions: cleanQuestions,
+      };
+
       const res = await fetch("/api/recruitment/assessment/save", {
         method: "POST",
         headers: {
@@ -247,6 +415,17 @@ export default function RecruiterGeneratePage() {
       });
       const data = await res.json();
       if (res.ok && data.success) {
+        localStorage.removeItem("rec_generatedQuestions");
+        localStorage.removeItem("rec_generationMode");
+        localStorage.removeItem("rec_contextText");
+        localStorage.removeItem("rec_position");
+        localStorage.removeItem("rec_department");
+        localStorage.removeItem("rec_teachingType");
+        localStorage.removeItem("rec_recruitmentFor");
+        localStorage.removeItem("rec_difficulty");
+        localStorage.removeItem("rec_numQuestions");
+        localStorage.removeItem("rec_questionTypes");
+
         router.push("/recruitment/assessments");
       } else {
         setSaveError(data.message || "Failed to save assessment template.");
@@ -256,6 +435,147 @@ export default function RecruiterGeneratePage() {
     } finally {
       setSaveLoading(false);
     }
+  };
+
+  const handleDiscardAssessment = () => {
+    if (
+      window.confirm(
+        "Are you sure you want to discard this generated assessment? This will clear the current question board and reset your inputs.",
+      )
+    ) {
+      localStorage.removeItem("rec_generatedQuestions");
+      localStorage.removeItem("rec_generationMode");
+      localStorage.removeItem("rec_contextText");
+      localStorage.removeItem("rec_position");
+      localStorage.removeItem("rec_department");
+      localStorage.removeItem("rec_teachingType");
+      localStorage.removeItem("rec_recruitmentFor");
+      localStorage.removeItem("rec_difficulty");
+      localStorage.removeItem("rec_numQuestions");
+      localStorage.removeItem("rec_questionTypes");
+
+      setGeneratedQuestions([]);
+      setGenerationMode("text_only");
+      setContextText("");
+      setPosition("");
+      setDepartment("");
+      setTeachingType("teaching");
+      setRecruitmentFor(allschoolsdata[0].name);
+      setDifficulty("mixed");
+      setNumQuestions(10);
+      setQuestionTypes({
+        multiple_choice: true,
+        true_false: true,
+        short_answer: false,
+        diagram_mcq: false,
+        diagram_short_answer: false,
+      } as any);
+      setFiles([]);
+    }
+  };
+
+  const uploadPendingImages = async (
+    questions: Question[],
+    authToken: string,
+  ): Promise<Question[]> => {
+    return Promise.all(
+      questions.map(async (q) => {
+        if (!q.imagePending || !q.imageUrl) return q;
+        try {
+          const res = await fetch("/api/recruitment/upload-image", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${authToken}`,
+            },
+            body: JSON.stringify({ base64: q.imageUrl }),
+          });
+          const data = await res.json();
+          if (data.success && data.url) {
+            return { ...q, imageUrl: data.url, imagePending: false };
+          }
+        } catch (err) {
+          console.warn(
+            "[Upload pending image] failed for question:",
+            q.id,
+            err,
+          );
+        }
+        return q;
+      }),
+    );
+  };
+
+  const handleReplaceImage = (idx: number, file: File) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const base64 = e.target?.result as string;
+      setGeneratedQuestions((prev) => {
+        const updated = [...prev];
+        updated[idx] = {
+          ...updated[idx],
+          imageUrl: base64,
+          imagePending: true,
+          imageGenerating: false,
+        };
+        return updated;
+      });
+      setEditingImageIdx((prev) => ({ ...prev, [idx]: false }));
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleRegenerateImage = async (idx: number) => {
+    const q = generatedQuestions[idx];
+    setGeneratedQuestions((prev) => {
+      const updated = [...prev];
+      updated[idx] = { ...updated[idx], imageGenerating: true };
+      return updated;
+    });
+    try {
+      const imgRes = await fetch("/api/recruitment/generate-diagram-image", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          questionText: q.question,
+          context: contextText,
+          recruitmentFor: recruitmentFor
+        }),
+      });
+      const imgData = await imgRes.json();
+      setGeneratedQuestions((prev) => {
+        const updated = [...prev];
+        updated[idx] = {
+          ...updated[idx],
+          imageGenerating: false,
+          imageUrl: imgData.success ? imgData.base64 : updated[idx].imageUrl,
+          imagePending: imgData.success ? true : updated[idx].imagePending,
+        };
+        return updated;
+      });
+    } catch {
+      setGeneratedQuestions((prev) => {
+        const updated = [...prev];
+        updated[idx] = { ...updated[idx], imageGenerating: false };
+        return updated;
+      });
+    }
+  };
+
+  const isDiagramType = (type: string) =>
+    type === "diagram_mcq" || type === "diagram_short_answer";
+
+  const handleNewQuestionImageUpload = (file: File) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const base64 = e.target?.result as string;
+      setNewQuestionForm((prev: any) => ({
+        ...prev,
+        imageUrl: base64,
+        imagePending: true,
+      }));
+    };
+    reader.readAsDataURL(file);
   };
 
   const addQuestion = () => {
@@ -269,7 +589,9 @@ export default function RecruiterGeneratePage() {
       question: "",
       options: ["", "", "", ""],
       correctAnswer: "",
-      explanation: ""
+      explanation: "",
+      imageUrl: undefined,
+      imagePending: false,
     });
   };
 
@@ -279,7 +601,7 @@ export default function RecruiterGeneratePage() {
       setNewQuestionError("Please enter the question text.");
       return;
     }
-    if (newQuestionForm.type === "multiple_choice") {
+    if (newQuestionForm.type === "multiple_choice" || newQuestionForm.type === "diagram_mcq") {
       if (newQuestionForm.options.some((opt: string) => !opt.trim())) {
         setNewQuestionError("All 4 options must be completed.");
         return;
@@ -293,22 +615,26 @@ export default function RecruiterGeneratePage() {
         setNewQuestionError("Select True or False.");
         return;
       }
-    } else if (!newQuestionForm.correctAnswer.trim()) {
-      setNewQuestionError("Provide a baseline correct answer description.");
-      return;
+    } else if (newQuestionForm.type === "short_answer" || newQuestionForm.type === "diagram_short_answer") {
+      if (!newQuestionForm.correctAnswer.trim()) {
+        setNewQuestionError("Provide a baseline correct answer description.");
+        return;
+      }
     }
 
     const newQ: Question = {
       id: Date.now().toString(),
       type: newQuestionForm.type,
       question: newQuestionForm.question.trim(),
-      options: newQuestionForm.type === "multiple_choice"
+      options: (newQuestionForm.type === "multiple_choice" || newQuestionForm.type === "diagram_mcq")
         ? newQuestionForm.options.map((o: string) => o.trim())
         : newQuestionForm.type === "true_false"
           ? ["True", "False"]
           : [],
       correctAnswer: newQuestionForm.correctAnswer.trim(),
-      explanation: newQuestionForm.explanation.trim()
+      explanation: newQuestionForm.explanation?.trim() || "",
+      imageUrl: newQuestionForm.imageUrl,
+      imagePending: newQuestionForm.imagePending,
     };
 
     setGeneratedQuestions(prev => [...prev, newQ]);
@@ -351,10 +677,13 @@ export default function RecruiterGeneratePage() {
         </p>
       </div>
 
-      <div className="grid lg:grid-cols-5 gap-8">
+      <div
+        className="grid lg:grid-cols-5 gap-8 items-start"
+        style={formHeight ? { height: `${formHeight}px` } : undefined}
+      >
         {/* LEFT: Config Panel */}
         <div className="lg:col-span-2 space-y-6 no-print">
-          <form onSubmit={handleGenerate} className="space-y-6">
+          <form ref={formRef} onSubmit={handleGenerate} className="space-y-6">
             
             {/* Position, school metadata */}
             <div className="bg-white/80 border border-gray-200 rounded-none p-6 space-y-4 shadow-sm backdrop-blur-sm">
@@ -528,7 +857,21 @@ export default function RecruiterGeneratePage() {
                   { key: "multiple_choice", label: "Multiple Choice Questions (MCQ)" },
                   { key: "true_false", label: "True / False Questions" },
                   { key: "short_answer", label: "Subjective Short Answers" },
-                ].map(({ key, label }) => (
+                  {
+                    key: "diagram_mcq",
+                    label: "Diagram-Based MCQ (AI Image Generated)",
+                    badge: "NEW",
+                    badgeColor:
+                      "bg-violet-100 text-violet-700 border-violet-200",
+                  },
+                  {
+                    key: "diagram_short_answer",
+                    label: "Diagram-Based Short Answer (AI Image Generated)",
+                    badge: "NEW",
+                    badgeColor:
+                      "bg-violet-100 text-violet-700 border-violet-200",
+                  },
+                ].map(({ key, label, badge, badgeColor }) => (
                   <label key={key} className="flex items-center gap-3 cursor-pointer group">
                     <div
                       onClick={() => setQuestionTypes({ ...questionTypes, [key]: !(questionTypes as any)[key] })}
@@ -538,9 +881,31 @@ export default function RecruiterGeneratePage() {
                     >
                       {(questionTypes as any)[key] && <CheckCircle size={12} className="text-white" />}
                     </div>
-                    <span className="text-xs text-gray-600 group-hover:text-gray-900 transition-colors">{label}</span>
+                    <span className="text-xs text-gray-600 group-hover:text-gray-900 transition-colors flex-1">{label}</span>
+                    {badge && (
+                      <span
+                        className={`text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 border rounded-none ${badgeColor}`}
+                      >
+                        {badge}
+                      </span>
+                    )}
                   </label>
                 ))}
+
+                {(questionTypes.diagram_mcq ||
+                  questionTypes.diagram_short_answer) && (
+                  <div className="mt-2 p-3 bg-violet-50 border border-violet-200 rounded-none flex items-start gap-2">
+                    <ImageIcon
+                      size={13}
+                      className="text-violet-600 shrink-0 mt-0.5"
+                    />
+                    <p className="text-[10px] text-violet-700 font-medium leading-relaxed">
+                      Diagram questions will automatically generate a relevant
+                      educational illustration using AI. Images are saved to
+                      Cloudinary when you save the assessment.
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -572,16 +937,18 @@ export default function RecruiterGeneratePage() {
         </div>
 
         {/* RIGHT: Generated Questions Preview */}
-        <div className="lg:col-span-3 space-y-6 relative">
+        <div className="lg:col-span-3 space-y-6 relative h-full overflow-y-auto custom-scrollbar bg-white/20 border border-gray-200 rounded-none px-6 pb-6 space-y-4 shadow-sm backdrop-blur-sm">
           
-          <div className="flex items-center justify-between no-print border-b border-gray-200 pb-4">
-            <h3 className="text-lg font-extrabold flex items-center gap-2">
-              <Eye size={18} className="text-blue-600" />
-              <span className="text-gray-900 font-extrabold">Assessment Question Board ({generatedQuestions.length} Questions)</span>
-            </h3>
-
+          <div className="flex items-center justify-end no-print border-b absolute border-gray-200 py-4 sticky bg-white z-10">
             {generatedQuestions.length > 0 && (
               <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={addQuestion}
+                  className="flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-gray-50 text-xs font-bold text-gray-705 border border-gray-300 transition-all cursor-pointer"
+                >
+                  <Plus size={12} /> Add Question
+                </button>
                 <button
                   onClick={() => openPrintModal("print")}
                   className="bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 px-4 py-2 rounded-none text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer"
@@ -597,6 +964,13 @@ export default function RecruiterGeneratePage() {
                   <span>Export PDF</span>
                 </button>
                 <button
+                  type="button"
+                  onClick={handleDiscardAssessment}
+                  className="bg-red-50 border border-red-200 hover:bg-red-100 text-red-650 px-4 py-2 rounded-none text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm cursor-pointer"
+                >
+                  <Trash2 size={13} /> Discard
+                </button>
+                <button
                   onClick={() => setShowSaveModal(true)}
                   className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-none text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm cursor-pointer"
                 >
@@ -606,8 +980,32 @@ export default function RecruiterGeneratePage() {
               </div>
             )}
           </div>
+          <h3 className="text-lg font-extrabold flex items-center gap-2">
+            <Eye size={18} className="text-blue-600" />
+            <span className="text-gray-900 font-extrabold">Assessment Question Board ({generatedQuestions.length} Questions)</span>
+          </h3>
 
-          {generatedQuestions.length === 0 ? (
+          {generatorLoading ? (
+            <div className="bg-white border border-gray-200 rounded-none p-16 text-center text-gray-500 h-1/2 flex flex-col items-center justify-start space-y-6 no-print shadow-sm min-h-[350px]">
+              <h3 className="text-lg font-extrabold flex items-center gap-2">
+                <TimerIcon/>
+                <span className="text-gray-900 font-extrabold">
+                  Please Wait, It May Take Few Minutes...
+                </span>
+              </h3>
+              <div className="h-32 w-32 flex items-center justify-center text-blue-600 rounded-none animate-spin">
+                <RefreshCw size={64} />
+              </div>
+              <div className="space-y-2 max-w-md">
+                <p className="text-[10px] font-black uppercase tracking-wider text-blue-600 animate-pulse flex items-end mx-auto justify-center gap-1">
+                 <Lightbulb size={18}/> Did you know?
+                </p>
+                <p className="text-xs text-gray-700 leading-relaxed font-bold italic text-center">
+                  "{currentFact}"
+                </p>
+              </div>
+            </div>
+          ) : generatedQuestions.length === 0 ? (
             <div className="bg-white/40 border border-dashed border-gray-300 rounded-none p-16 text-center text-gray-500 space-y-2 no-print">
               <FileText size={48} className="mx-auto text-gray-300 mb-2" />
               <p className="text-sm font-bold text-gray-700">Ready to build your assessment?</p>
@@ -630,8 +1028,146 @@ export default function RecruiterGeneratePage() {
                     <div className="text-xs font-bold uppercase tracking-wider text-blue-600 flex items-center gap-1">
                       <span>Question #{idx + 1}</span>
                       <span className="text-gray-300">•</span>
-                      <span>{q.type.replace("_", " ")}</span>
+                      <span>{q.type.replace(/_/g, " ")}</span>
+                      {isDiagramType(q.type) && (
+                        <span className="text-[9px] font-black uppercase bg-violet-100 text-violet-700 border border-violet-200 px-1.5 py-0.5 rounded-none ml-2">
+                          Diagram
+                        </span>
+                      )}
                     </div>
+
+                    {/* Diagram image section */}
+                    {isDiagramType(q.type) && (
+                      <div className="space-y-2 print:hidden">
+                        {q.imageGenerating ? (
+                          <div className="h-48 bg-gradient-to-r from-violet-50 via-purple-50 to-violet-50 border border-violet-200 rounded-none flex flex-col items-center justify-center gap-3 animate-pulse">
+                            <ImageIcon size={28} className="text-violet-400" />
+                            <p className="text-xs text-violet-600 font-bold">
+                              Generating diagram with AI...
+                            </p>
+                          </div>
+                        ) : q.imageUrl && !editingImageIdx[idx] ? (
+                          <div className="relative group">
+                            <img
+                              src={q.imageUrl}
+                              alt={`Diagram for question ${idx + 1}`}
+                              className="w-full max-h-56 object-contain border border-gray-200 rounded-none bg-gray-50"
+                            />
+                            <div className="absolute top-2 right-2 flex gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                              <button
+                                type="button"
+                                onClick={() => handleRegenerateImage(idx)}
+                                className="bg-white border border-gray-300 text-gray-650 hover:text-violet-600 p-1.5 rounded-none shadow-sm cursor-pointer"
+                                title="Re-generate with AI"
+                              >
+                                <RefreshCw size={11} />
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  setEditingImageIdx((prev) => ({
+                                    ...prev,
+                                    [idx]: true,
+                                  }))
+                                }
+                                className="bg-white border border-gray-300 text-gray-650 hover:text-blue-600 p-1.5 rounded-none shadow-sm cursor-pointer"
+                                title="Edit Image URL or File"
+                              >
+                                <Edit2 size={11} />
+                              </button>
+                            </div>
+                            {q.imagePending && (
+                              <div className="absolute bottom-2 left-2 bg-amber-50 border border-amber-200 text-amber-700 text-[9px] font-black px-2 py-1 rounded-none uppercase tracking-wider font-bold">
+                                Will upload to Cloudinary on Save
+                              </div>
+                            )}
+                          </div>
+                        ) : (
+                          <div className="border border-dashed border-violet-300 p-6 flex flex-col gap-3 bg-violet-50/10">
+                            <div className="flex justify-between items-center">
+                              <div className="flex items-center gap-1.5">
+                                <ImageIcon
+                                  size={22}
+                                  className="text-violet-400"
+                                />
+                                <p className="text-xs text-violet-600 font-bold">
+                                  {q.imageUrl
+                                    ? "Modify Diagram Image"
+                                    : "No image generated"}
+                                </p>
+                              </div>
+                              {q.imageUrl && (
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    setEditingImageIdx((prev) => ({
+                                      ...prev,
+                                      [idx]: false,
+                                    }))
+                                  }
+                                  className="text-[10px] uppercase font-black tracking-wider text-red-650 hover:text-red-800 transition-colors cursor-pointer font-bold"
+                                >
+                                  Cancel Edit
+                                </button>
+                              )}
+                            </div>
+                            <div className="space-y-1.5">
+                              <label className="text-[9px] font-black uppercase tracking-wider text-gray-400 block font-bold">
+                                Backup image / Custom image
+                              </label>
+                              <div className="flex gap-2">
+                                <input
+                                  type="text"
+                                  placeholder="Paste image link (starts with http/https)..."
+                                  value={
+                                    q.imageUrl &&
+                                    !q.imageUrl.startsWith("data:")
+                                      ? q.imageUrl
+                                      : ""
+                                  }
+                                  onChange={(e) => {
+                                    const url = e.target.value;
+                                    const updated = [...generatedQuestions];
+                                    if (url.trim() === "") {
+                                      updated[idx].imageUrl = undefined;
+                                      updated[idx].imagePending = false;
+                                    } else if (
+                                      url.startsWith("http://") ||
+                                      url.startsWith("https://")
+                                    ) {
+                                      updated[idx].imageUrl = url.trim();
+                                      updated[idx].imagePending = false;
+                                      setEditingImageIdx((prev) => ({
+                                        ...prev,
+                                        [idx]: false,
+                                      }));
+                                    }
+                                    setGeneratedQuestions(updated);
+                                  }}
+                                  className="flex-1 bg-white border border-gray-300 rounded-none px-3 py-1.5 text-xs text-gray-955 font-bold outline-none focus:border-blue-600"
+                                />
+                                <label
+                                  className="bg-white border border-gray-300 text-gray-650 hover:text-blue-600 px-3 py-1.5 rounded-none shadow-sm cursor-pointer flex items-center gap-1 text-xs font-bold animate-in duration-200"
+                                  title="Upload custom image"
+                                >
+                                  <UploadCloud size={14} />
+                                  <span>Upload</span>
+                                  <input
+                                    type="file"
+                                    accept="image/*"
+                                    className="hidden"
+                                    onChange={(e) => {
+                                      const f = e.target.files?.[0];
+                                      if (f) handleReplaceImage(idx, f);
+                                    }}
+                                  />
+                                </label>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
 
                     <div className="space-y-2">
                       <label className="text-[10px] font-bold uppercase text-gray-400">Question Text</label>
@@ -646,7 +1182,7 @@ export default function RecruiterGeneratePage() {
                       />
                     </div>
 
-                    {q.type === "multiple_choice" && (
+                    {(q.type === "multiple_choice" || q.type === "diagram_mcq") && (
                       <div className="grid grid-cols-2 gap-3 pl-4">
                         {q.options.map((opt, oIdx) => (
                           <div key={oIdx} className="space-y-1">
@@ -728,10 +1264,25 @@ export default function RecruiterGeneratePage() {
                         <select
                           value={newQuestionForm.type}
                           onChange={(e) => {
+                            const newType = e.target.value;
                             setNewQuestionForm({
                               ...newQuestionForm,
-                              type: e.target.value,
-                              correctAnswer: e.target.value === "true_false" ? "True" : ""
+                              type: newType,
+                              options:
+                                newType === "multiple_choice" ||
+                                newType === "diagram_mcq"
+                                  ? ["", "", "", ""]
+                                  : newType === "true_false"
+                                    ? ["True", "False"]
+                                    : [],
+                              correctAnswer:
+                                newType === "true_false" ? "True" : "",
+                              imageUrl: isDiagramType(newType)
+                                ? newQuestionForm.imageUrl
+                                : undefined,
+                              imagePending: isDiagramType(newType)
+                                ? newQuestionForm.imagePending
+                                : false,
                             });
                           }}
                           className="w-full bg-white border border-gray-300 rounded-none px-3 py-2 text-xs text-gray-900 focus:border-blue-600 outline-none"
@@ -739,6 +1290,8 @@ export default function RecruiterGeneratePage() {
                           <option value="multiple_choice">Multiple Choice (MCQ)</option>
                           <option value="true_false">True / False</option>
                           <option value="short_answer">Short Answer</option>
+                          <option value="diagram_mcq">Diagram MCQ</option>
+                          <option value="diagram_short_answer">Diagram Short Answer</option>
                         </select>
                       </div>
 
@@ -752,7 +1305,103 @@ export default function RecruiterGeneratePage() {
                       </div>
                     </div>
 
-                    {newQuestionForm.type === "multiple_choice" && (
+                    {/* Diagram image upload for manual question */}
+                    {isDiagramType(newQuestionForm.type) && (
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-bold text-gray-400 uppercase flex items-center gap-1.5">
+                          <ImageIcon size={11} className="text-violet-600" />{" "}
+                          Diagram Image
+                          <span className="text-gray-400 normal-case font-normal">
+                            (upload or generate)
+                          </span>
+                        </label>
+
+                        {newQuestionForm.type === "diagram_mcq" && (
+                          <div className="space-y-1.5 border border-gray-150 p-3 bg-gray-50/50">
+                            <label className="text-[9px] font-black uppercase tracking-wider text-gray-500 block">
+                              Backup image (optional)
+                            </label>
+                            <input
+                              type="text"
+                              placeholder="Paste image link (starts with http/https)..."
+                              value={
+                                newQuestionForm.imageUrl &&
+                                !newQuestionForm.imageUrl.startsWith("data:")
+                                  ? newQuestionForm.imageUrl
+                                  : ""
+                              }
+                              onChange={(e) => {
+                                const url = e.target.value;
+                                if (url.trim() === "") {
+                                  setNewQuestionForm({
+                                    ...newQuestionForm,
+                                    imageUrl: undefined,
+                                    imagePending: false,
+                                  });
+                                } else if (
+                                  url.startsWith("http://") ||
+                                  url.startsWith("https://")
+                                ) {
+                                  setNewQuestionForm({
+                                    ...newQuestionForm,
+                                    imageUrl: url.trim(),
+                                    imagePending: false,
+                                  });
+                                }
+                              }}
+                              className="w-full bg-white border border-gray-300 rounded-none px-3 py-1.5 text-xs text-gray-950 font-bold outline-none focus:border-blue-600"
+                            />
+                          </div>
+                        )}
+
+                        {newQuestionForm.imageUrl ? (
+                          <div className="relative group">
+                            <img
+                              src={newQuestionForm.imageUrl}
+                              alt="Diagram preview"
+                              className="w-full max-h-40 object-contain border border-violet-200 rounded-none bg-violet-50/30"
+                            />
+                            <label className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 bg-white border border-gray-300 text-gray-650 hover:text-blue-600 p-1.5 rounded-none shadow-sm cursor-pointer transition-opacity">
+                              <UploadCloud size={11} />
+                              <input
+                                type="file"
+                                accept="image/*"
+                                className="hidden"
+                                onChange={(e) => {
+                                  const f = e.target.files?.[0];
+                                  if (f) handleNewQuestionImageUpload(f);
+                                }}
+                              />
+                            </label>
+                          </div>
+                        ) : (
+                          <label className="border-2 border-dashed border-violet-300 hover:border-violet-500 rounded-none p-5 flex flex-col items-center gap-2 bg-violet-50/30 cursor-pointer transition-colors">
+                            <UploadCloud
+                              size={20}
+                              className="text-violet-400"
+                            />
+                            <p className="text-xs text-violet-600 font-bold">
+                              Upload diagram image
+                            </p>
+                            <p className="text-[10px] text-gray-400">
+                              PNG, JPG, GIF, WebP
+                            </p>
+                            <input
+                              ref={newImageInputRef}
+                              type="file"
+                              accept="image/*"
+                              className="hidden"
+                              onChange={(e) => {
+                                const f = e.target.files?.[0];
+                                if (f) handleNewQuestionImageUpload(f);
+                              }}
+                            />
+                          </label>
+                        )}
+                      </div>
+                    )}
+
+                    {(newQuestionForm.type === "multiple_choice" || newQuestionForm.type === "diagram_mcq") && (
                       <div className="grid grid-cols-2 gap-3 pl-4">
                         {newQuestionForm.options.map((opt: string, oIdx: number) => (
                           <div key={oIdx} className="space-y-1">
@@ -844,7 +1493,17 @@ export default function RecruiterGeneratePage() {
                     <div key={q.id} className="space-y-2">
                       <p className="font-bold text-sm">{idx + 1}. {q.question}</p>
                       
-                      {q.type === "multiple_choice" && (
+                      {q.imageUrl &&
+                        !q.imageGenerating &&
+                        isDiagramType(q.type) && (
+                          <img
+                            src={q.imageUrl}
+                            alt={`Diagram ${idx + 1}`}
+                            className="max-h-48 object-contain border border-gray-200 my-2"
+                          />
+                        )}
+
+                      {(q.type === "multiple_choice" || q.type === "diagram_mcq") && (
                         <div className="grid grid-cols-2 gap-2 pl-4 text-xs">
                           {q.options.map((opt, oIdx) => (
                             <p key={oIdx}>({String.fromCharCode(97 + oIdx)}) {opt}</p>
@@ -882,6 +1541,18 @@ export default function RecruiterGeneratePage() {
                 <X size={18} />
               </button>
             </div>
+
+            {generatedQuestions.some((q) => q.imagePending) && (
+              <div className="flex items-start gap-2 p-3 bg-violet-50 border border-violet-200 rounded-none text-xs text-violet-750 font-bold">
+                <ImageIcon size={13} className="shrink-0 mt-0.5" />
+                <span>
+                  <strong>
+                    {generatedQuestions.filter((q) => q.imagePending).length}
+                  </strong>{" "}
+                  diagram image(s) will be uploaded to Cloudinary when you save.
+                </span>
+              </div>
+            )}
 
             {saveError && (
               <div className="p-3 bg-red-50 border border-red-200 rounded-none text-xs text-red-600 flex items-center gap-2">

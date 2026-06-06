@@ -6,12 +6,14 @@ import {
   Clock, AlertTriangle, RefreshCw, CheckCircle2,
   ShieldAlert, FileText, ArrowRight, Maximize, User, Mail, Phone, GraduationCap, Building2, Briefcase
 } from "lucide-react";
+import { allschoolsdata } from "@/app/recruitment/generate/page";
 
 interface Question {
   id: string;
   type: string;
   question: string;
   options?: string[];
+  imageUrl?: string;
 }
 
 interface Assessment {
@@ -765,17 +767,23 @@ export default function TeacherLivePage() {
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <label className="text-[10px] font-black uppercase tracking-wider text-gray-500">Branch Hub *</label>
+                <label className="text-[10px] font-black uppercase tracking-wider text-gray-500">Institution or school branch *</label>
                 <div className="relative">
-                  <Building2 size={14} className="absolute left-3 top-3.5 text-gray-400" />
-                  <input
+                  <Building2 size={14} className="absolute left-3 top-3.5 text-gray-400 z-10" />
+                  <select
                     required
-                    type="text"
-                    placeholder="e.g. Puducherry"
                     value={formBranch}
                     onChange={(e) => setFormBranch(e.target.value)}
-                    className="w-full bg-white border border-gray-300 rounded-none pl-9 pr-3 py-3 text-xs focus:border-blue-600 outline-none transition-all placeholder:text-gray-400 font-bold text-gray-900"
-                  />
+                    className="w-full bg-white border border-gray-300 rounded-none pl-9 pr-10 py-3 text-xs focus:border-blue-600 outline-none transition-all font-bold text-gray-900 appearance-none"
+                  >
+                    <option value="" disabled>Select Institution or school branch</option>
+                    {allschoolsdata.map((school) => (
+                      <option key={school.id} value={school.name}>
+                        {school.name}
+                      </option>
+                    ))}
+                  </select>
+                  <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400 text-[8px]">▼</div>
                 </div>
               </div>
 
@@ -1111,13 +1119,24 @@ export default function TeacherLivePage() {
                     {idx + 1}
                   </span>
                   <span className="text-[10px] font-black uppercase tracking-widest text-gray-400">
-                    {q.type.replace("_", " ")}
+                    {q.type.replace(/_/g, " ")}
                   </span>
                 </div>
 
+                {/* Diagram image — show above question for diagram types */}
+                {(q.type === "diagram_mcq" || q.type === "diagram_short_answer") && q.imageUrl && (
+                  <div className="rounded-none border border-violet-100 bg-violet-50/20 p-2">
+                    <img
+                      src={q.imageUrl}
+                      alt={`Diagram for Q${idx + 1}`}
+                      className="w-full max-h-64 object-contain mx-auto"
+                    />
+                  </div>
+                )}
+
                 <h3 className="text-base font-bold text-gray-900 leading-relaxed">{q.question}</h3>
 
-                {(q.type === "multiple_choice" || q.type === "true_false") && (
+                {(q.type === "multiple_choice" || q.type === "true_false" || q.type === "diagram_mcq") && (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     {(q.options && q.options.length > 0 ? q.options : ["True", "False"]).map((opt: string, optIdx: number) => {
                       const optLabel = String.fromCharCode(65 + optIdx);
@@ -1149,7 +1168,7 @@ export default function TeacherLivePage() {
                   </div>
                 )}
 
-                {q.type === "short_answer" && (
+                {(q.type === "short_answer" || q.type === "diagram_short_answer") && (
                   <div className="w-full">
                     <input
                       type="text"

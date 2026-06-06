@@ -77,8 +77,15 @@ export default function DirectorTeachersPage() {
             Centralised registry of all unique educators who participated in live evaluations — deduplicated by Employee ID and Email.
           </p>
         </div>
-        <div className="flex items-center gap-3 w-full md:max-w-sm">
-          <div className="flex-1 relative">
+        <div className="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
+          <Link
+            href="/director/teachers/onboard"
+            className="w-full sm:w-auto text-center px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-none transition-all shadow-sm flex items-center justify-center gap-2 border border-blue-600 cursor-pointer"
+          >
+            <Users size={14} />
+            <span>Onboard Educators Console</span>
+          </Link>
+          <div className="relative flex-1 w-full sm:w-64">
             <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
             <input
               value={searchQuery}

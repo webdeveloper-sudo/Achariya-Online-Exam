@@ -9,7 +9,7 @@ async function checkAdmin(request: Request) {
   }
   const token = authHeader.split(" ")[1];
   const decoded = verifyToken(token);
-  if (!decoded || decoded.role !== "Admin") {
+  if (!decoded || (decoded.role !== "Admin" && decoded.role !== "Director")) {
     return null;
   }
   return decoded;

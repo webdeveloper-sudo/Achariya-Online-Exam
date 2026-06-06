@@ -15,6 +15,7 @@ interface Question {
   options: string[];
   correctAnswer: string;
   explanation?: string;
+  imageUrl?: string;
 }
 
 interface PrintConfig {
@@ -274,7 +275,71 @@ const styles = StyleSheet.create({
     color: "#94a3b8",
     fontFamily: "Helvetica-Bold",
   },
+  diagramImage: {
+    maxWidth: 240,
+    maxHeight: 160,
+    marginTop: 6,
+    marginBottom: 6,
+    marginLeft: 14,
+    objectFit: "contain",
+    borderWidth: 0.5,
+    borderColor: "#cbd5e1",
+  },
 });
+
+const decodeBase64Utf8 = (base64: string): string => {
+  if (typeof Buffer !== "undefined") {
+    return Buffer.from(base64, "base64").toString("utf-8");
+  }
+  const binaryString = atob(base64);
+  const len = binaryString.length;
+  const bytes = new Uint8Array(len);
+  for (let i = 0; i < len; i++) {
+    bytes[i] = binaryString.charCodeAt(i);
+  }
+  return new TextDecoder().decode(bytes);
+};
+
+const encodeBase64Utf8 = (str: string): string => {
+  if (typeof Buffer !== "undefined") {
+    return Buffer.from(str, "utf-8").toString("base64");
+  }
+  const bytes = new TextEncoder().encode(str);
+  let binaryString = "";
+  for (let i = 0; i < bytes.length; i++) {
+    binaryString += String.fromCharCode(bytes[i]);
+  }
+  return btoa(binaryString);
+};
+
+const sanitizeSvgUrl = (url: string): string => {
+  if (!url || !url.startsWith("data:image/svg+xml;base64,")) {
+    return url;
+  }
+  try {
+    const base64Data = url.substring("data:image/svg+xml;base64,".length);
+    const decoded = decodeBase64Utf8(base64Data);
+    
+    // Replace any font-family declaration in styles or attributes with Helvetica
+    let sanitized = decoded;
+    sanitized = sanitized.replace(/font-family\s*:\s*[^'";}]+/gi, 'font-family: Helvetica');
+    sanitized = sanitized.replace(/font-family\s*=\s*["'][^"']*["']/gi, 'font-family="Helvetica"');
+    
+    // Remove font-weight styles and attributes to avoid react-pdf font-resolution crashes
+    sanitized = sanitized.replace(/font-weight\s*:\s*[^'";}]+;?/gi, '');
+    sanitized = sanitized.replace(/font-weight\s*=\s*["'][^"']*["']/gi, '');
+
+    // Remove font-style styles and attributes to avoid react-pdf font-resolution crashes
+    sanitized = sanitized.replace(/font-style\s*:\s*[^'";}]+;?/gi, '');
+    sanitized = sanitized.replace(/font-style\s*=\s*["'][^"']*["']/gi, '');
+    
+    const newBase64 = encodeBase64Utf8(sanitized);
+    return `data:image/svg+xml;base64,${newBase64}`;
+  } catch (e) {
+    console.error("Error sanitizing SVG font family:", e);
+    return url;
+  }
+};
 
 export const QuestionBankPDFDocument = ({
   questions,
@@ -298,7 +363,14 @@ export const QuestionBankPDFDocument = ({
         </Text>
       </View>
 
-      {q.type === "multiple_choice" &&
+      {q.imageUrl && (
+        <Image
+          src={sanitizeSvgUrl(q.imageUrl)}
+          style={styles.diagramImage}
+        />
+      )}
+
+      {(q.type === "multiple_choice" || q.type === "diagram_mcq") &&
         q.options &&
         q.options.length > 0 && (
           <View style={styles.optionsGrid}>

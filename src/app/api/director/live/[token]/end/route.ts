@@ -114,6 +114,7 @@ export async function POST(
     return NextResponse.json({
       success: true,
       message: "Director session successfully completed.",
+      sessionId: session.id,
       leaderboard: freshParticipants,
     });
   } catch (error: any) {

@@ -6,6 +6,7 @@ import {
   Users, Trophy, Copy, Check, Play, Square, Loader, ArrowLeft,
   Calendar, RefreshCw, AlertTriangle, ShieldCheck, Mail, Send, Plus, Trash2, Award
 } from "lucide-react";
+import DirectorLayout from "@/app/director/layout";
 
 interface SSEParticipant {
   id: string;
@@ -338,9 +339,8 @@ export default function DirectorHostPage() {
   const joinUrl = `${typeof window !== "undefined" ? window.location.origin : ""}/live/director/${token}`;
 
   return (
-    <div className="min-h-screen bg-gray-50 font-sans flex flex-col relative overflow-hidden">
-      {/* Main container */}
-      <div className="flex-1 max-w-6xl w-full mx-auto p-6 md:p-8 flex flex-col gap-6 relative z-10 overflow-y-auto">
+    <DirectorLayout>
+      <div className="p-8 space-y-6 max-w-6xl w-full mx-auto relative z-10">
 
         {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -596,18 +596,27 @@ export default function DirectorHostPage() {
 
                       <div className="flex items-center justify-between sm:justify-end gap-6 text-xs">
                         {isDisqualified ? (
-                          <span className="flex items-center gap-1 text-[11px] font-black uppercase text-red-600 bg-red-50 border border-red-200 px-2 py-0.5 rounded-none animate-pulse">
-                            <AlertTriangle size={10} />
+                          <span className="flex items-center gap-1.5 text-[11px] font-black uppercase text-red-650 bg-red-50 border border-red-200 px-2 py-1 rounded-none">
+                            <span className="relative flex h-2 w-2 shrink-0">
+                              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                              <span className="relative inline-flex rounded-full h-2 w-2 bg-red-650"></span>
+                            </span>
                             Disqualified
                           </span>
                         ) : teacher.tabSwitches > 0 ? (
-                          <span className="flex items-center gap-1 text-[11px] font-black uppercase text-amber-600 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-none">
-                            <AlertTriangle size={10} />
+                          <span className="flex items-center gap-1.5 text-[11px] font-black uppercase text-amber-600 bg-amber-50 border border-amber-200 px-2 py-1 rounded-none animate-pulse">
+                            <span className="relative flex h-2 w-2 shrink-0">
+                              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                              <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
+                            </span>
                             {teacher.tabSwitches} Warning{teacher.tabSwitches > 1 ? "s" : ""}
                           </span>
                         ) : (
-                          <span className="flex items-center gap-1 text-[11px] font-black uppercase text-gray-400">
-                            <ShieldCheck size={11} className="text-emerald-500" />
+                          <span className="flex items-center gap-1.5 text-[11px] font-black uppercase text-emerald-600 bg-emerald-50 border border-emerald-250 px-2 py-1 rounded-none">
+                            <span className="relative flex h-2 w-2 shrink-0">
+                              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-600"></span>
+                            </span>
                             Secure Lock
                           </span>
                         )}
@@ -723,18 +732,27 @@ export default function DirectorHostPage() {
                           </td>
                           <td className="py-4 px-4">
                             {isDisqualified ? (
-                              <span className="inline-flex items-center gap-1 text-[9px] font-black uppercase text-red-600 bg-red-50 border border-red-200 px-2 py-0.5 rounded-none">
-                                <AlertTriangle size={10} />
+                              <span className="inline-flex items-center gap-1.5 text-[9px] font-black uppercase text-red-650 bg-red-50 border border-red-200 px-2 py-1 rounded-none">
+                                <span className="relative flex h-1.5 w-1.5 shrink-0">
+                                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                                  <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-red-650"></span>
+                                </span>
                                 Disqualified
                               </span>
                             ) : teacher.tabSwitches > 0 ? (
-                              <span className="inline-flex items-center gap-1 text-[9px] font-black uppercase text-amber-600 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-none">
-                                <AlertTriangle size={10} />
+                              <span className="inline-flex items-center gap-1.5 text-[9px] font-black uppercase text-amber-600 bg-amber-50 border border-amber-200 px-2 py-1 rounded-none animate-pulse">
+                                <span className="relative flex h-1.5 w-1.5 shrink-0">
+                                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                                  <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-amber-500"></span>
+                                </span>
                                 {teacher.tabSwitches} Warning{teacher.tabSwitches > 1 ? "s" : ""}
                               </span>
                             ) : (
-                              <span className="inline-flex items-center gap-1 text-[9px] font-black uppercase text-gray-400">
-                                <ShieldCheck size={11} className="text-emerald-500" />
+                              <span className="inline-flex items-center gap-1.5 text-[9px] font-black uppercase text-emerald-600 bg-emerald-50 border border-emerald-250 px-2 py-1 rounded-none">
+                                <span className="relative flex h-1.5 w-1.5 shrink-0">
+                                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                                  <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-600"></span>
+                                </span>
                                 Secure Pass
                               </span>
                             )}
@@ -882,7 +900,6 @@ export default function DirectorHostPage() {
           </div>
         </div>
       )}
-
-    </div>
+    </DirectorLayout>
   );
 }

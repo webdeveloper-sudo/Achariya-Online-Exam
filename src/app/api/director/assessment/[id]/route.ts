@@ -159,8 +159,34 @@ export async function DELETE(
       return NextResponse.json({ message: "Access Denied: You cannot delete assessments created by other users." }, { status: 403 });
     }
 
-    await prisma.directorAssessment.delete({
-      where: { id },
+    await prisma.$transaction(async (tx) => {
+      // Find all live sessions for this assessment
+      const liveSessions = await tx.directorLiveSession.findMany({
+        where: { assessmentId: id },
+        select: { id: true },
+      });
+      const sessionIds = liveSessions.map((s) => s.id);
+
+      if (sessionIds.length > 0) {
+        // Delete all participants in these sessions
+        await tx.directorLiveSessionParticipant.deleteMany({
+          where: {
+            sessionId: { in: sessionIds },
+          },
+        });
+
+        // Delete the live sessions
+        await tx.directorLiveSession.deleteMany({
+          where: {
+            id: { in: sessionIds },
+          },
+        });
+      }
+
+      // Delete the assessment template itself
+      await tx.directorAssessment.delete({
+        where: { id },
+      });
     });
 
     return NextResponse.json({

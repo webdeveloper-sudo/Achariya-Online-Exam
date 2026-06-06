@@ -147,41 +147,70 @@ export default function DirectorSessionsPage() {
             const totalQ = session.assessment.totalQuestions;
 
             return (
-              <div key={session.id} className="bg-white/80 border border-gray-200 rounded-none p-6 hover:border-blue-300 hover:shadow-md transition-all shadow-sm backdrop-blur-sm flex flex-col justify-between min-h-[240px]">
+              <div 
+                key={session.id} 
+                className={`group relative bg-white border border-gray-200 rounded-none p-6 hover:border-blue-500 transition-all duration-300 flex flex-col justify-between min-h-[250px] ${
+                  session.status === "ACTIVE" ? "shadow-[0_0_15px_-3px_rgba(59,130,246,0.25)] border-blue-400" : "shadow-sm hover:shadow-md"
+                }`}
+              >
+                {/* Status Bar for Active Rooms */}
+                {session.status === "ACTIVE" && (
+                  <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 to-indigo-500 animate-pulse" />
+                )}
+
                 <div>
                   {/* Status and timestamp */}
                   <div className="flex items-center justify-between mb-4">
-                    <span className={`text-[9px] font-black uppercase px-2.5 py-0.5 rounded-none border ${
+                    <span className={`inline-flex items-center gap-1.5 text-[9px] font-black uppercase px-2.5 py-0.5 rounded-none border ${
                       session.status === "COMPLETED" ? "bg-emerald-50 text-emerald-600 border-emerald-200" :
-                      session.status === "ACTIVE" ? "bg-blue-50 text-blue-600 border-blue-200 animate-pulse" :
+                      session.status === "ACTIVE" ? "bg-blue-50 text-blue-600 border-blue-200" :
                       "bg-gray-100 text-gray-500 border-gray-200"
                     }`}>
+                      {session.status === "ACTIVE" && (
+                        <span className="relative flex h-1.5 w-1.5 shrink-0">
+                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                          <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-blue-600"></span>
+                        </span>
+                      )}
                       {session.status}
                     </span>
-                    <span className="text-[10px] text-gray-400">{formattedTime}</span>
+                    <span className="text-[10px] text-gray-400 font-bold flex items-center gap-1">
+                      <Calendar size={11} />
+                      {formattedTime}
+                    </span>
                   </div>
 
                   {/* Title & metadata */}
-                  <h4 className="font-black text-base text-gray-900 leading-tight mb-1 line-clamp-1">{session.assessment.title}</h4>
-                  <p className="text-xs text-gray-500 mb-2">Focus Focus: <span className="font-bold text-gray-700">{session.assessment.position}</span></p>
-                  <p className="text-[10px] text-gray-400 line-clamp-1">{session.assessment.recruitmentFor}</p>
+                  <h4 className="font-black text-base text-gray-900 group-hover:text-blue-600 transition-colors leading-tight mb-2 line-clamp-1">{session.assessment.title}</h4>
+                  
+                  <div className="space-y-1 mb-3">
+                    <p className="text-xs text-gray-600 flex items-center gap-1.5">
+                      <span className="text-[9px] font-black uppercase tracking-wider text-gray-400">Focus:</span>
+                      <span className="font-bold text-gray-700">{session.assessment.position}</span>
+                    </p>
+                    <p className="text-[10px] text-gray-400 font-medium line-clamp-1">{session.assessment.recruitmentFor}</p>
+                  </div>
                 </div>
 
                 {/* Score Stats */}
-                <div className="grid grid-cols-3 gap-2 py-3 border-t border-b border-gray-100 my-4 bg-gray-50 px-3 text-center">
-                  <div>
+                <div className="grid grid-cols-3 gap-2 py-3 border-t border-b border-gray-100 my-4 bg-gray-50/50 px-2 text-center">
+                  <div className="space-y-0.5">
                     <span className="text-[9px] font-bold text-gray-400 block uppercase">Teachers</span>
-                    <span className="text-sm font-extrabold text-gray-700 mt-0.5 block">{session.stats.participantCount}</span>
+                    <span className="text-sm font-black text-gray-800 flex items-center justify-center gap-1">
+                      <Users size={12} className="text-gray-400" />
+                      {session.stats.participantCount}
+                    </span>
                   </div>
-                  <div>
+                  <div className="space-y-0.5 border-l border-gray-200">
                     <span className="text-[9px] font-bold text-gray-400 block uppercase">Average</span>
-                    <span className="text-sm font-extrabold text-blue-600 mt-0.5 block">
+                    <span className="text-sm font-black text-blue-600 block">
                       {session.status === "COMPLETED" ? `${session.stats.avgScore}/${totalQ}` : "—"}
                     </span>
                   </div>
-                  <div>
+                  <div className="space-y-0.5 border-l border-gray-200">
                     <span className="text-[9px] font-bold text-gray-400 block uppercase">Top Score</span>
-                    <span className="text-sm font-extrabold text-emerald-600 mt-0.5 block">
+                    <span className="text-sm font-black text-emerald-600 flex items-center justify-center gap-1">
+                      <Trophy size={11} className="text-emerald-500" />
                       {session.status === "COMPLETED" ? `${session.stats.highScore}/${totalQ}` : "—"}
                     </span>
                   </div>
@@ -191,15 +220,16 @@ export default function DirectorSessionsPage() {
                 <div className="flex gap-2">
                   <Link
                     href={`/director/sessions/${session.id}`}
-                    className="flex-1 bg-white hover:bg-gray-50 border border-gray-300 text-gray-700 px-3 py-2.5 rounded-none text-[11px] font-bold text-center transition-all flex items-center justify-center gap-1 cursor-pointer shadow-sm"
+                    className="flex-1 bg-white hover:bg-gray-50 border border-gray-300 text-gray-700 px-3 py-2.5 rounded-none text-[11px] font-bold text-center transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-sm group-hover:border-blue-500/30"
                   >
-                    Open Roster Report <ArrowRight size={12} />
+                    <span>Open Roster Report</span>
+                    <ArrowRight size={12} className="transition-transform group-hover:translate-x-1" />
                   </Link>
 
                   {session.status === "ACTIVE" && (
                     <Link
                       href={`/live/director/${session.token}/host`}
-                      className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2.5 rounded-none text-[11px] font-bold text-center transition-all flex items-center justify-center gap-1 cursor-pointer"
+                      className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-none text-[11px] font-bold text-center transition-all flex items-center justify-center gap-1 cursor-pointer shrink-0 shadow-sm"
                     >
                       Connect Room
                     </Link>

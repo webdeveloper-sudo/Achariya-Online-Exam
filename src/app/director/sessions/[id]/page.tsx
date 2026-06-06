@@ -5,8 +5,10 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
   ArrowLeft, Trophy, Users, BarChart2, ShieldAlert,
-  ChevronDown, ChevronUp, AlertCircle, Check, X, Shield, Mail, Phone, Award, School, Briefcase
+  ChevronDown, ChevronUp, AlertCircle, Check, X, Shield, Mail, Phone, Award, School, Briefcase,
+  Download
 } from "lucide-react";
+import * as XLSX from "xlsx";
 
 interface Question {
   id: string;
@@ -26,6 +28,80 @@ export default function DirectorLiveSessionDetailPage({ params }: { params: Prom
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [expandedStudentId, setExpandedStudentId] = useState<string | null>(null);
+  const [sharingStudentId, setSharingStudentId] = useState<string | null>(null);
+  const [shareSuccessMsg, setShareSuccessMsg] = useState<string | null>(null);
+  const [shareErrorMsg, setShareErrorMsg] = useState<string | null>(null);
+
+  const handleExportExcel = () => {
+    if (!session || !session.participants) return;
+
+    const totalQuestionsCount = session.assessment?.totalQuestions || 0;
+    const formatDuration = (sec: number | null) => {
+      if (sec === null || sec === undefined) return "N/A";
+      const mins = Math.floor(sec / 60);
+      const remainder = sec % 60;
+      return mins > 0 ? `${mins}m ${remainder}s` : `${remainder}s`;
+    };
+
+    const data = session.participants.map((p: any, idx: number) => {
+      const scorePercentage = totalQuestionsCount > 0 && p.score !== null ? Math.round((p.score / totalQuestionsCount) * 100) : 0;
+      return {
+        "Rank": p.terminated ? "DQ" : (idx + 1),
+        "Employee ID": p.userId || "N/A",
+        "Name": p.name || "N/A",
+        "Email": p.email || "N/A",
+        "Phone": p.phone || "N/A",
+        "Designation": p.designation || "N/A",
+        "Branch": p.branch || "N/A",
+        "Qualification": p.qualification || "N/A",
+        "Registry State": p.activated ? "Activated" : "Non-activated",
+        "Duration Taken": formatDuration(p.timeTakenSeconds),
+        "Integrity Status": p.terminated ? "Disqualified" : (p.tabSwitches > 0 ? `${p.tabSwitches} Tab Switch Warning(s)` : "Verified Secured"),
+        "Tab Switches": p.tabSwitches,
+        "Score": p.score !== null ? p.score : "Evaluating",
+        "Total Questions": totalQuestionsCount,
+        "Score Percentage (%)": `${scorePercentage}%`,
+        "Completed At": p.completedAt ? new Date(p.completedAt).toLocaleString() : "Never Completed"
+      };
+    });
+
+    const worksheet = XLSX.utils.json_to_sheet(data);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Session Results");
+
+    XLSX.writeFile(workbook, `${session.assessment.title.replace(/\s+/g, "_")}_Results.xlsx`);
+  };
+
+  const handleShareReport = async (participant: any) => {
+    if (!token || !sessionId) return;
+    setSharingStudentId(participant.id);
+    setShareSuccessMsg(null);
+    setShareErrorMsg(null);
+    try {
+      const res = await fetch(`/api/director/sessions/${sessionId}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ participantId: participant.id }),
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setShareSuccessMsg(`Assessment report successfully emailed to ${participant.name} (${participant.email})!`);
+        setTimeout(() => setShareSuccessMsg(null), 5000);
+      } else {
+        setShareErrorMsg(data.message || "Failed to share report.");
+        setTimeout(() => setShareErrorMsg(null), 5000);
+      }
+    } catch (err) {
+      console.error("Error sharing report:", err);
+      setShareErrorMsg("Network error trying to share report.");
+      setTimeout(() => setShareErrorMsg(null), 5000);
+    } finally {
+      setSharingStudentId(null);
+    }
+  };
 
   useEffect(() => {
     const t = localStorage.getItem("directorToken");
@@ -106,27 +182,38 @@ export default function DirectorLiveSessionDetailPage({ params }: { params: Prom
   return (
     <div className="p-8 space-y-8 animate-in fade-in slide-in-from-bottom duration-300">
       {/* Back navigation & Header */}
-      <div className="flex items-center gap-4">
-        <Link
-          href="/director/sessions"
-          className="p-3 bg-white border border-gray-200 rounded-none hover:bg-gray-50 text-gray-500 hover:text-gray-900 transition-colors shadow-sm"
-        >
-          <ArrowLeft size={16} />
-        </Link>
-        <div>
-          <div className="flex items-center gap-2">
-            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Conducted Session Report</span>
-            <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded-none border ${
-              session.status === "COMPLETED" ? "bg-emerald-50 text-emerald-600 border-emerald-200" : "bg-blue-50 text-blue-600 border-blue-200 animate-pulse"
-            }`}>
-              {session.status}
-            </span>
+      <div className="flex items-center justify-between gap-4 flex-wrap">
+        <div className="flex items-center gap-4">
+          <Link
+            href="/director/sessions"
+            className="p-3 bg-white border border-gray-200 rounded-none hover:bg-gray-50 text-gray-500 hover:text-gray-900 transition-colors shadow-sm"
+          >
+            <ArrowLeft size={16} />
+          </Link>
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Conducted Session Report</span>
+              <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded-none border ${
+                session.status === "COMPLETED" ? "bg-emerald-50 text-emerald-600 border-emerald-200" : "bg-blue-50 text-blue-600 border-blue-200 animate-pulse"
+              }`}>
+                {session.status}
+              </span>
+            </div>
+            <h2 className="text-2xl font-black mt-1 text-gray-900">{session.assessment.title}</h2>
+            <p className="text-xs text-gray-500 mt-1">
+              Focus: <span className="font-bold text-gray-700">{session.assessment.position}</span> · Institution: <span className="font-bold text-gray-700">{session.assessment.recruitmentFor}</span> · Room key: <span className="font-mono text-blue-600 font-bold">{session.token}</span>
+            </p>
           </div>
-          <h2 className="text-2xl font-black mt-1 text-gray-900">{session.assessment.title}</h2>
-          <p className="text-xs text-gray-500 mt-1">
-            Focus: <span className="font-bold text-gray-700">{session.assessment.position}</span> · Institution: <span className="font-bold text-gray-700">{session.assessment.recruitmentFor}</span> · Room key: <span className="font-mono text-blue-600 font-bold">{session.token}</span>
-          </p>
         </div>
+
+        <button
+          onClick={handleExportExcel}
+          type="button"
+          className="flex items-center gap-1.5 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-none font-bold text-xs shadow-sm hover:shadow transition-all cursor-pointer"
+        >
+          <Download size={13} />
+          Export Results (Excel)
+        </button>
       </div>
 
       {/* Overview Analytics Widgets */}
@@ -178,6 +265,18 @@ export default function DirectorLiveSessionDetailPage({ params }: { params: Prom
             Audit teacher details, registry activation state, anti-cheat focuses, response sheets, and duration logs.
           </p>
         </div>
+        {shareSuccessMsg && (
+          <div className="flex items-center gap-2 bg-emerald-50 border border-emerald-200 text-emerald-800 p-4 text-xs font-bold rounded-none animate-in fade-in duration-200">
+            <Check size={14} className="text-emerald-600 shrink-0" />
+            <span>{shareSuccessMsg}</span>
+          </div>
+        )}
+        {shareErrorMsg && (
+          <div className="flex items-center gap-2 bg-red-50 border border-red-200 text-red-800 p-4 text-xs font-bold rounded-none animate-in fade-in duration-200">
+            <X size={14} className="text-red-600 shrink-0" />
+            <span>{shareErrorMsg}</span>
+          </div>
+        )}
 
         {session.participants.length === 0 ? (
           <div className="bg-white border border-gray-200 rounded-none p-12 text-center text-gray-400 shadow-sm">
@@ -344,13 +443,29 @@ export default function DirectorLiveSessionDetailPage({ params }: { params: Prom
 
                           {/* Actions */}
                           <td className="px-6 py-4 text-center">
-                            <button
-                              onClick={() => toggleStudentExpand(p.id)}
-                              className="p-1.5 bg-white border border-gray-200 hover:border-blue-300 rounded-none hover:bg-blue-50 text-gray-500 hover:text-blue-600 transition-all flex items-center gap-1 font-bold text-[10px] mx-auto cursor-pointer shadow-sm"
-                            >
-                              <span>Inspect</span>
-                              {isExpanded ? <ChevronUp size={11} /> : <ChevronDown size={11} />}
-                            </button>
+                            <div className="flex items-center justify-center gap-2">
+                              <button
+                                onClick={() => toggleStudentExpand(p.id)}
+                                className="p-1.5 bg-white border border-gray-200 hover:border-blue-300 rounded-none hover:bg-blue-50 text-gray-500 hover:text-blue-600 transition-all flex items-center gap-1 font-bold text-[10px] cursor-pointer shadow-sm animate-in duration-200"
+                              >
+                                <span>Inspect</span>
+                                {isExpanded ? <ChevronUp size={11} /> : <ChevronDown size={11} />}
+                              </button>
+                              
+                              <button
+                                onClick={() => handleShareReport(p)}
+                                disabled={sharingStudentId === p.id}
+                                type="button"
+                                className={`p-1.5 border rounded-none transition-all flex items-center justify-center shadow-sm cursor-pointer ${
+                                  sharingStudentId === p.id
+                                    ? "bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed"
+                                    : "bg-white border-gray-200 hover:border-violet-300 hover:bg-violet-50 text-gray-500 hover:text-violet-600"
+                                }`}
+                                title="Share Report via Email"
+                              >
+                                <Mail size={12} className={sharingStudentId === p.id ? "animate-pulse" : ""} />
+                              </button>
+                            </div>
                           </td>
                         </tr>
 

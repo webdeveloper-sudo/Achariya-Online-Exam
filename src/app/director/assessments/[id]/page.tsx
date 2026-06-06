@@ -6,7 +6,8 @@ import Link from "next/link";
 import {
   ArrowLeft, Edit, Save, X, Printer, BookOpen, Clock,
   Trash2, AlertCircle, Loader, CheckCircle, Plus,
-  Play, ChevronDown, ChevronUp, Trophy, Users, Calendar, Award, GripVertical, School, Briefcase
+  Play, ChevronDown, ChevronUp, Trophy, Users, Calendar, Award, GripVertical, School, Briefcase,
+  Image as ImageIcon, UploadCloud, RefreshCw
 } from "lucide-react";
 
 interface Question {
@@ -16,6 +17,8 @@ interface Question {
   options: string[];
   correctAnswer: string;
   explanation?: string;
+  imageUrl?: string;      // Cloudinary URL or base64 preview
+  imagePending?: boolean; // true = base64 not yet uploaded
 }
 
 interface Assessment {
@@ -60,6 +63,7 @@ export default function DirectorAssessmentDetailPage({ params }: { params: Promi
   const [newQuestionForm, setNewQuestionForm] = useState<any | null>(null);
   const [newQuestionError, setNewQuestionError] = useState<string | null>(null);
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+  const [uploadingImages, setUploadingImages] = useState(false);
 
   // Print modal
   const [showPrintModal, setShowPrintModal] = useState(false);
@@ -170,18 +174,67 @@ export default function DirectorAssessmentDetailPage({ params }: { params: Promi
     setNewQuestionError(null);
   };
 
+  const isDiagramType = (type: string) =>
+    type === "diagram_mcq" || type === "diagram_short_answer";
+
+  const uploadPendingImages = async (questions: Question[]): Promise<Question[]> => {
+    return Promise.all(
+      questions.map(async (q) => {
+        if (!q.imagePending || !q.imageUrl) return q;
+        try {
+          const res = await fetch("/api/director/upload-image", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({ base64: q.imageUrl }),
+          });
+          const data = await res.json();
+          if (data.success && data.url) {
+            const { imagePending, ...rest } = q;
+            return { ...rest, imageUrl: data.url };
+          }
+        } catch (err) {
+          console.warn("[Upload pending image] failed:", err);
+        }
+        return q;
+      })
+    );
+  };
+
+  const handleReplaceImage = (idx: number, file: File) => {
+    if (!editForm) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const base64 = e.target?.result as string;
+      const qs = [...editForm.questions];
+      qs[idx] = { ...qs[idx], imageUrl: base64, imagePending: true };
+      setEditForm({ ...editForm, questions: qs });
+    };
+    reader.readAsDataURL(file);
+  };
+
   const handleSave = async () => {
     if (!editForm) return;
     setSaving(true);
     setSaveError(null);
     try {
+      // Upload any pending (base64) images to Cloudinary first
+      setUploadingImages(true);
+      const finalQuestions = await uploadPendingImages(editForm.questions);
+      setUploadingImages(false);
+
+      // Strip runtime-only flags before sending
+      const cleanQuestions = finalQuestions.map(({ imagePending, ...rest }: any) => rest);
+
       const res = await fetch(`/api/director/assessment/${id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`
         },
-        body: JSON.stringify(editForm),
+        body: JSON.stringify({ ...editForm, questions: cleanQuestions }),
       });
       const data = await res.json();
       if (res.ok && data.success) {
@@ -194,6 +247,7 @@ export default function DirectorAssessmentDetailPage({ params }: { params: Promi
         setSaveError(data.message || "Failed to save changes.");
       }
     } catch (err: any) {
+      setUploadingImages(false);
       setSaveError(err.message || "An error occurred while saving.");
     } finally {
       setSaving(false);
@@ -244,8 +298,19 @@ export default function DirectorAssessmentDetailPage({ params }: { params: Promi
       question: "",
       options: ["", "", "", ""],
       correctAnswer: "",
-      explanation: ""
+      explanation: "",
+      imageUrl: undefined,
+      imagePending: false,
     });
+  };
+
+  const handleNewQuestionImageUpload = (file: File) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const base64 = e.target?.result as string;
+      setNewQuestionForm((prev: any) => ({ ...prev, imageUrl: base64, imagePending: true }));
+    };
+    reader.readAsDataURL(file);
   };
 
   const saveNewQuestion = () => {
@@ -269,24 +334,38 @@ export default function DirectorAssessmentDetailPage({ params }: { params: Promi
         setNewQuestionError("Please select the correct option (True or False).");
         return;
       }
-    } else if (newQuestionForm.type === "short_answer") {
+    } else if (newQuestionForm.type === "short_answer" || newQuestionForm.type === "diagram_short_answer") {
       if (!newQuestionForm.correctAnswer.trim()) {
         setNewQuestionError("Please enter the correct answer.");
         return;
       }
+    } else if (newQuestionForm.type === "diagram_mcq") {
+      if (newQuestionForm.options.some((opt: string) => !opt.trim())) {
+        setNewQuestionError("Please fill out all option fields.");
+        return;
+      }
+      if (!newQuestionForm.correctAnswer.trim()) {
+        setNewQuestionError("Please select a correct answer.");
+        return;
+      }
     }
+
+    const isMCQ = newQuestionForm.type === "multiple_choice" || newQuestionForm.type === "diagram_mcq";
+    const isTF = newQuestionForm.type === "true_false";
 
     const newQs = [...editForm.questions, {
       id: Date.now().toString(),
       type: newQuestionForm.type,
       question: newQuestionForm.question.trim(),
-      options: newQuestionForm.type === "multiple_choice"
+      options: isMCQ
         ? newQuestionForm.options.map((o: string) => o.trim())
-        : newQuestionForm.type === "true_false"
+        : isTF
           ? ["True", "False"]
           : [],
       correctAnswer: newQuestionForm.correctAnswer.trim(),
-      explanation: (newQuestionForm.explanation || "").trim()
+      explanation: (newQuestionForm.explanation || "").trim(),
+      imageUrl: newQuestionForm.imageUrl,
+      imagePending: newQuestionForm.imagePending,
     }];
 
     setEditForm({ ...editForm, questions: newQs });
@@ -386,8 +465,9 @@ export default function DirectorAssessmentDetailPage({ params }: { params: Promi
                 <button onClick={cancelEdit} className="flex items-center gap-1.5 px-4 py-2 rounded-none bg-white hover:bg-gray-50 border border-gray-300 text-xs font-bold text-gray-700 transition-all cursor-pointer">
                   <X size={13} /> Cancel
                 </button>
-                <button onClick={handleSave} disabled={saving} className="flex items-center gap-1.5 px-4 py-2 rounded-none bg-[#C72323] hover:bg-[#b01e1e] disabled:opacity-50 text-xs font-bold text-white transition-all cursor-pointer shadow-sm border border-[#C72323]">
-                  {saving ? <Loader size={13} className="animate-spin" /> : <Save size={13} />} {saving ? "Saving..." : "Save Changes"}
+                <button onClick={handleSave} disabled={saving || uploadingImages} className="flex items-center gap-1.5 px-4 py-2 rounded-none bg-[#C72323] hover:bg-[#b01e1e] disabled:opacity-50 text-xs font-bold text-white transition-all cursor-pointer shadow-sm border border-[#C72323]">
+                  {(saving || uploadingImages) ? <Loader size={13} className="animate-spin" /> : <Save size={13} />}
+                  {uploadingImages ? "Uploading Images..." : saving ? "Saving..." : "Save Changes"}
                 </button>
               </>
             )}
@@ -496,23 +576,29 @@ export default function DirectorAssessmentDetailPage({ params }: { params: Promi
                   {[
                     { val: "multiple_choice", label: "Multiple Choice" },
                     { val: "true_false", label: "True / False" },
-                    { val: "short_answer", label: "Short Answer" }
+                    { val: "short_answer", label: "Short Answer" },
+                    { val: "diagram_mcq", label: "Diagram MCQ" },
+                    { val: "diagram_short_answer", label: "Diagram Short Answer" },
                   ].map((t) => (
                     <button
                       key={t.val}
                       type="button"
                       onClick={() => {
+                        const isMCQLike = t.val === "multiple_choice" || t.val === "diagram_mcq";
+                        const isTF = t.val === "true_false";
                         setNewQuestionForm({
                           ...newQuestionForm,
                           type: t.val,
-                          options: t.val === "multiple_choice" ? ["", "", "", ""] : t.val === "true_false" ? ["True", "False"] : [],
-                          correctAnswer: t.val === "true_false" ? "True" : ""
+                          options: isMCQLike ? ["", "", "", ""] : isTF ? ["True", "False"] : [],
+                          correctAnswer: isTF ? "True" : "",
+                          imageUrl: isDiagramType(t.val) ? newQuestionForm.imageUrl : undefined,
+                          imagePending: isDiagramType(t.val) ? newQuestionForm.imagePending : false,
                         });
                         setNewQuestionError(null);
                       }}
                       className={`px-3 py-1.5 rounded-none text-xs font-bold border transition-all cursor-pointer ${
                         newQuestionForm.type === t.val
-                          ? "bg-blue-600 border-blue-600 text-white"
+                          ? isDiagramType(t.val) ? "bg-violet-600 border-violet-600 text-white" : "bg-blue-600 border-blue-600 text-white"
                           : "bg-white border-gray-300 text-gray-600 hover:text-gray-900 hover:border-gray-400"
                       }`}
                     >
@@ -533,7 +619,67 @@ export default function DirectorAssessmentDetailPage({ params }: { params: Promi
                 />
               </div>
 
-              {newQuestionForm.type === "multiple_choice" && (
+              {/* Diagram image upload for manual question */}
+              {isDiagramType(newQuestionForm.type) && (
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black uppercase tracking-wider text-gray-500 flex items-center gap-1.5">
+                    <ImageIcon size={11} className="text-violet-600" /> Diagram Image
+                    <span className="text-gray-400 normal-case font-normal">(optional)</span>
+                  </label>
+
+                  {newQuestionForm.type === "diagram_mcq" && (
+                    <div className="space-y-1.5 border border-gray-150 p-3 bg-gray-50/50">
+                      <label className="text-[9px] font-black uppercase tracking-wider text-gray-500 block">Backup image (optional)</label>
+                      <input
+                        type="text"
+                        placeholder="Paste image link (starts with http/https)..."
+                        value={newQuestionForm.imageUrl && !newQuestionForm.imageUrl.startsWith("data:") ? newQuestionForm.imageUrl : ""}
+                        onChange={(e) => {
+                          const url = e.target.value;
+                          if (url.trim() === "") {
+                            setNewQuestionForm({ ...newQuestionForm, imageUrl: undefined, imagePending: false });
+                          } else if (url.startsWith("http://") || url.startsWith("https://")) {
+                            setNewQuestionForm({ ...newQuestionForm, imageUrl: url.trim(), imagePending: false });
+                          }
+                        }}
+                        className="w-full bg-white border border-gray-300 rounded-none px-3 py-1.5 text-xs text-gray-950 font-bold outline-none focus:border-blue-600"
+                      />
+                    </div>
+                  )}
+
+                  {newQuestionForm.imageUrl ? (
+                    <div className="relative group">
+                      <img
+                        src={newQuestionForm.imageUrl}
+                        alt="Diagram preview"
+                        className="w-full max-h-40 object-contain border border-violet-200 rounded-none bg-violet-50/30"
+                      />
+                      <label className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 bg-white border border-gray-300 text-gray-600 hover:text-blue-600 p-1.5 rounded-none shadow-sm cursor-pointer transition-opacity">
+                        <UploadCloud size={11} />
+                        <input type="file" accept="image/*" className="hidden"
+                          onChange={(e) => {
+                            const f = e.target.files?.[0];
+                            if (f) handleNewQuestionImageUpload(f);
+                          }}
+                        />
+                      </label>
+                    </div>
+                  ) : (
+                    <label className="border-2 border-dashed border-violet-300 hover:border-violet-500 rounded-none p-5 flex flex-col items-center gap-2 bg-violet-50/30 cursor-pointer transition-colors">
+                      <UploadCloud size={20} className="text-violet-400" />
+                      <p className="text-xs text-violet-600 font-bold">Upload diagram image</p>
+                      <input type="file" accept="image/*" className="hidden"
+                        onChange={(e) => {
+                          const f = e.target.files?.[0];
+                          if (f) handleNewQuestionImageUpload(f);
+                        }}
+                      />
+                    </label>
+                  )}
+                </div>
+              )}
+
+              {(newQuestionForm.type === "multiple_choice" || newQuestionForm.type === "diagram_mcq") && (
                 <div className="space-y-3">
                   <label className="text-[10px] font-black uppercase tracking-wider text-gray-500">Options</label>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -596,7 +742,7 @@ export default function DirectorAssessmentDetailPage({ params }: { params: Promi
                 </div>
               )}
 
-              {newQuestionForm.type === "short_answer" && (
+              {(newQuestionForm.type === "short_answer" || newQuestionForm.type === "diagram_short_answer") && (
                 <div className="space-y-1.5">
                   <label className="text-[10px] font-black uppercase tracking-wider text-gray-500">Correct Answer Solution</label>
                   <input
@@ -678,12 +824,102 @@ export default function DirectorAssessmentDetailPage({ params }: { params: Promi
                   </div>
                 )}
                 <span className="h-6 w-6 rounded-none bg-blue-50 border border-blue-100 text-blue-600 flex items-center justify-center font-bold text-[10px] shrink-0">{idx + 1}</span>
-                <span className="text-[9px] font-black uppercase tracking-widest text-gray-500">{q.type.replace("_", " ")}</span>
+                <span className="text-[9px] font-black uppercase tracking-widest text-gray-500">{q.type.replace(/_/g, " ")}</span>
+                {isDiagramType(q.type) && (
+                  <span className="ml-auto text-[9px] font-black uppercase bg-violet-100 text-violet-700 border border-violet-200 px-1.5 py-0.5 rounded-none">Diagram</span>
+                )}
                 {isEditMode && (
                   <button onClick={() => removeEditQuestion(idx)} className="ml-auto p-1 text-gray-400 hover:text-red-650 transition-colors cursor-pointer"><Trash2 size={12} /></button>
                 )}
               </div>
               <p className="text-sm font-bold mb-1 print:hidden text-gray-900">{idx + 1}.</p>
+
+              {/* Diagram image — view mode */}
+              {!isEditMode && isDiagramType(q.type) && q.imageUrl && (
+                <div className="mb-3">
+                  <img
+                    src={q.imageUrl}
+                    alt={`Diagram for Q${idx + 1}`}
+                    className="w-full max-h-56 object-contain border border-violet-100 rounded-none bg-violet-50/20"
+                  />
+                </div>
+              )}
+
+              {/* Diagram image — edit mode */}
+              {isEditMode && isDiagramType(q.type) && (
+                <div className="mb-3 space-y-2">
+                  <label className="text-[9px] font-black uppercase tracking-wider text-violet-600 flex items-center gap-1">
+                    <ImageIcon size={10} /> Diagram Image
+                  </label>
+                  {q.imageUrl ? (
+                    <div className="relative group">
+                      <img
+                        src={q.imageUrl}
+                        alt={`Diagram Q${idx + 1}`}
+                        className="w-full max-h-44 object-contain border border-violet-200 rounded-none bg-violet-50/20"
+                      />
+                      <label className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 bg-white border border-gray-300 text-gray-600 hover:text-blue-600 p-1.5 rounded-none shadow-sm cursor-pointer transition-opacity" title="Replace image">
+                        <UploadCloud size={11} />
+                        <input type="file" accept="image/*" className="hidden"
+                          onChange={(e) => { const f = e.target.files?.[0]; if (f) handleReplaceImage(idx, f); }}
+                        />
+                      </label>
+                      {q.imagePending && (
+                        <div className="absolute bottom-2 left-2 bg-amber-50 border border-amber-200 text-amber-700 text-[9px] font-black px-2 py-1 rounded-none uppercase tracking-wider">
+                          Pending upload
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <label className="border-2 border-dashed border-violet-300 hover:border-violet-500 rounded-none p-4 flex flex-col items-center gap-2 bg-violet-50/20 cursor-pointer">
+                      <UploadCloud size={18} className="text-violet-400" />
+                      <p className="text-xs text-violet-600 font-bold">Upload diagram image</p>
+                      <input type="file" accept="image/*" className="hidden"
+                        onChange={(e) => { const f = e.target.files?.[0]; if (f) handleReplaceImage(idx, f); }}
+                      />
+                    </label>
+                  )}
+                </div>
+              )}
+
+              {isEditMode && q.type === "diagram_mcq" && (
+                <div className="mb-3 space-y-1.5 border border-gray-150 p-3 bg-gray-50/50">
+                  <label className="text-[9px] font-black uppercase tracking-wider text-gray-500 block">Backup image (optional)</label>
+                  <div className="flex flex-col sm:flex-row gap-2">
+                    <input
+                      type="text"
+                      placeholder="Paste image link (starts with http/https)..."
+                      value={q.imageUrl && !q.imageUrl.startsWith("data:") ? q.imageUrl : ""}
+                      onChange={(e) => {
+                        const url = e.target.value;
+                        const qs = [...editForm!.questions];
+                        if (url.trim() === "") {
+                          qs[idx].imageUrl = undefined;
+                          qs[idx].imagePending = false;
+                        } else if (url.startsWith("http://") || url.startsWith("https://")) {
+                          qs[idx].imageUrl = url.trim();
+                          qs[idx].imagePending = false;
+                        }
+                        setEditForm({ ...editForm!, questions: qs });
+                      }}
+                      className="flex-1 bg-white border border-gray-300 rounded-none px-3 py-1.5 text-xs text-gray-955 font-bold outline-none focus:border-blue-600"
+                    />
+                    <label className="bg-white border border-gray-300 text-gray-750 hover:text-blue-600 px-3 py-1.5 rounded-none shadow-sm cursor-pointer text-xs font-bold text-center flex items-center justify-center gap-1">
+                      <UploadCloud size={13} />
+                      <span>Upload File</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) handleReplaceImage(idx, file);
+                        }}
+                      />
+                    </label>
+                  </div>
+                </div>
+              )}
 
               {isEditMode ? (
                 <textarea value={q.question} onChange={(e) => updateEditQuestion(idx, "question", e.target.value)} rows={2}
@@ -692,7 +928,7 @@ export default function DirectorAssessmentDetailPage({ params }: { params: Promi
                 <p className="text-sm font-bold text-gray-900 mb-4">{q.question}</p>
               )}
 
-              {q.type === "multiple_choice" && q.options?.length > 0 && (
+              {(q.type === "multiple_choice" || q.type === "diagram_mcq") && q.options?.length > 0 && (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-4">
                   {q.options.map((opt: string, optIdx: number) => (
                     <div key={optIdx} className="flex items-center gap-2">
