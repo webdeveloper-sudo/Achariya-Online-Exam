@@ -7,6 +7,7 @@ import {
   ArrowLeft, Mail, Phone, Calendar, Award, Shield, ShieldAlert,
   ChevronDown, ChevronUp, AlertCircle, Check, X, Clock, User, School, Briefcase
 } from "lucide-react";
+import Loader from "@/components/Loader";
 
 export default function DirectorTeacherDetailsPage({ params }: { params: Promise<{ email: string }> }) {
   const router = useRouter();
@@ -68,12 +69,7 @@ export default function DirectorTeacherDetailsPage({ params }: { params: Promise
   };
 
   if (loading) {
-    return (
-      <div className="p-8 space-y-6 flex flex-col items-center justify-center min-h-[60vh] text-gray-500">
-        <div className="h-10 w-10 border-4 border-blue-200 border-t-blue-600 animate-spin" />
-        <span className="font-bold">Compiling educator assessment history...</span>
-      </div>
-    );
+    return <Loader variant="card" message="Compiling educator assessment history..." className="min-h-[60vh] m-8" />;
   }
 
   if (error || !profile) {
@@ -95,7 +91,7 @@ export default function DirectorTeacherDetailsPage({ params }: { params: Promise
   }
 
   return (
-    <div className="p-8 space-y-8 animate-in fade-in slide-in-from-bottom duration-300">
+    <div className="p-8 space-y-8 container mx-auto animate-in fade-in slide-in-from-bottom duration-300">
       {/* Back Navigation */}
       <div className="flex items-center gap-4">
         <Link

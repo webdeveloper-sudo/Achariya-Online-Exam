@@ -23,7 +23,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   return (
     <>
     <div className="min-h-screen font-sans flex relative overflow-hidden bg-transparent text-gray-900">
-      <div className="flex-1 h-screen overflow-y-auto relative z-10">
+      <div className="flex-1  h-screen overflow-y-auto relative z-10">
         {children}
       </div>
       

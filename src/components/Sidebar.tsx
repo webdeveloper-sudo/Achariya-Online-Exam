@@ -39,7 +39,7 @@ export default function Sidebar({
   const recruiterAdminMenuItems = [
     { id: "recruiter_candidates", label: "Candidate Registry", icon: Users },
     { id: "recruiter_sessions", label: "Recruiter Conducted Sessions", icon: Activity },
-    { id: "recruiter_assessments", label: "Recruiters Generated All Assessments", icon: ClipboardCheck }
+    { id: "recruiter_assessments", label: "Recruiters Assessments", icon: ClipboardCheck }
   ];
 
   const teacherMenuItems = [
@@ -94,7 +94,7 @@ export default function Sidebar({
       )}
 
       <aside
-        className={`w-64 bg-white/90 backdrop-blur-md border-r border-gray-300 flex flex-col justify-between h-screen shrink-0 select-none transition-transform duration-300 ease-in-out z-50 fixed inset-y-0 left-0 md:sticky md:top-0 ${
+        className={`w-72 bg-white/90 backdrop-blur-md border-r border-gray-300 flex flex-col justify-between h-screen shrink-0 select-none transition-transform duration-300 ease-in-out z-50 fixed inset-y-0 left-0 md:sticky md:top-0 ${
           isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
         }`}
       >

@@ -191,3 +191,24 @@ Goal: Verify that completed test logs are correctly synced and stored.
    * Log back into the Super Admin Console: https://achariya-online-exam.vercel.app/admin/login
    * Go to the Super Admin Dashboard: https://achariya-online-exam.vercel.app/admin/dashboard
    * Verify that global platform metrics (e.g., Total Assessments Created) have increased to reflect the new tests.
+
+---
+
+### Phase 8: UX Polish, Loader, and Toast Verification (v1.1.0)
+Goal: Verify the newly integrated Toast Notification System, circular page/card Loaders, and desktop container spacing.
+
+1. Toast Alerts Verification:
+   * Perform administrative tasks on the Director or Teacher Dashboard (e.g., onboarding a new teacher manually, updating a password, or deleting an assessment).
+   * Verify that notifications appear as animated self-dismissing Toast popups (Success/Error/Warning status) instead of legacy block alerts or persistent message divs.
+   * Trigger a loading operation (such as "Exporting Excel" or "Resetting Password"). Verify that a temporary "Loading..." toast triggers, which updates dynamically to a Success or Error toast when complete.
+
+2. Loader Component Verification:
+   * Trigger any API fetch event (e.g., refreshing lists, loading the dashboard, generating assessments via AI).
+   * Verify that the Loader spinner appears as a true **circular** element (`borderRadius: "50%"` or `style={{ borderRadius: "100%" }}`). Because of global zero-radius styles, the component overrides this rule inline to render circular spinners instead of square boxes.
+   * Check that the loader backdrop is transparent with a soft glassmorphic blur rather than a heavy gray canvas block.
+
+3. Wide-Screen Container Layout Verification:
+   * View the dashboards and layouts on a standard desktop screen.
+   * Verify that page sections are bounded cleanly inside a centralized container with comfortable margins (`container mx-auto`), preventing data grids and panels from sticking to the screen boundaries.
+   * Open the side navigation bar. Verify that item labels (such as "Recruiters Assessments") show clearly with zero text wrapping or icon collisions because of the expanded `w-72` sidebar dimensions.
+

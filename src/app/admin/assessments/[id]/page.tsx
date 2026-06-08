@@ -3,7 +3,8 @@
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Globe, Lock, BookOpen, Clock, Users, Loader, AlertCircle } from "lucide-react";
+import { ArrowLeft, Globe, Lock, BookOpen, Clock, Users, Loader as LoaderIcon, AlertCircle } from "lucide-react";
+import Loader from "@/components/Loader";
 
 export default function AdminAssessmentDetailPage() {
   const router = useRouter();
@@ -40,12 +41,7 @@ export default function AdminAssessmentDetailPage() {
   }, [token, id]);
 
   if (loading) return (
-    <div className="p-8 h-96 flex items-center justify-center text-gray-900">
-      <div className="flex flex-col items-center gap-3 text-gray-500">
-        <Loader size={28} className="animate-spin text-[#20407D]" />
-        <p className="text-sm font-bold">Loading assessment details...</p>
-      </div>
-    </div>
+    <Loader variant="card" message="Loading assessment details..." className="min-h-[400px]" />
   );
 
   if (error || !assessment) return (

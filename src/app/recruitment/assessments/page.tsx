@@ -6,6 +6,7 @@ import Link from "next/link";
 import {
   Globe, Lock, FolderOpen, Search, RefreshCw, Plus, Trash2, Clock, BookOpen, Play, Award, School
 } from "lucide-react";
+import Loader from "@/components/Loader";
 
 export default function RecruiterAssessmentsPage() {
   const router = useRouter();
@@ -160,13 +161,8 @@ export default function RecruiterAssessmentsPage() {
         </div>
       </div>
 
-      {/* Assessment Cards Grid */}
       {loading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-          {[1, 2, 3].map((n) => (
-            <div key={n} className="bg-white/80 border border-gray-200 rounded-none h-52 animate-pulse shadow-sm" />
-          ))}
-        </div>
+        <Loader variant="card" message="Loading recruitment templates..." className="min-h-[250px]" />
       ) : displayList.length === 0 ? (
         <div className="bg-white/40 border border-dashed border-gray-300 rounded-none h-64 flex flex-col items-center justify-center gap-3 text-gray-400 shadow-sm backdrop-blur-sm">
           <FolderOpen size={40} className="text-gray-300" />

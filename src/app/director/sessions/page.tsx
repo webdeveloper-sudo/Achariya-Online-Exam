@@ -6,6 +6,7 @@ import Link from "next/link";
 import {
   Calendar, Search, RefreshCw, Trophy, Users, Activity, ArrowRight
 } from "lucide-react";
+import Loader from "@/components/Loader";
 
 export default function DirectorSessionsPage() {
   const router = useRouter();
@@ -62,7 +63,7 @@ export default function DirectorSessionsPage() {
     : "0";
 
   return (
-    <div className="p-8 space-y-8 animate-in fade-in slide-in-from-bottom duration-300">
+    <div className="p-8 container mx-auto space-y-8 animate-in fade-in slide-in-from-bottom duration-300">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
@@ -122,11 +123,7 @@ export default function DirectorSessionsPage() {
 
       {/* Sessions list */}
       {loading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-          {[1, 2, 3].map((n) => (
-            <div key={n} className="bg-gray-100 border border-gray-200 rounded-none h-60 animate-pulse" />
-          ))}
-        </div>
+        <Loader variant="card" message="Loading evaluation sessions..." className="min-h-[240px]" />
       ) : filtered.length === 0 ? (
         <div className="bg-white border border-dashed border-gray-300 rounded-none h-80 flex flex-col items-center justify-center gap-3 text-gray-400">
           <Calendar size={40} className="text-gray-300" />

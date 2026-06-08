@@ -96,7 +96,7 @@ export default function RecruiterLayout({ children }: { children: React.ReactNod
       />
 
       {/* Page content */}
-      <div className="flex-1 h-screen overflow-y-auto relative z-10">
+      <div className="flex-1 container mx-auto py-8 h-screen overflow-y-auto relative z-10">
         {children}
       </div>
     </div>

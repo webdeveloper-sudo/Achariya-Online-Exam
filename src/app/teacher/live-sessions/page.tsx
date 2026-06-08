@@ -8,6 +8,7 @@ import {
   ArrowRight, Activity, Trash2, HelpCircle, Compass, Globe,
   ChevronDown, ChevronUp, Shield, ShieldAlert, Check, X, AlertCircle
 } from "lucide-react";
+import Loader from "@/components/Loader";
 
 export default function TeacherLiveSessionsPage() {
   const router = useRouter();
@@ -171,11 +172,7 @@ export default function TeacherLiveSessionsPage() {
 
       {/* Roster list */}
       {loading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-          {[1, 2, 3].map((n) => (
-            <div key={n} className="bg-white border border-gray-200 rounded-none h-60 animate-pulse shadow-sm" />
-          ))}
-        </div>
+        <Loader variant="card" message="Loading conducted rooms..." className="min-h-[250px]" />
       ) : filtered.length === 0 ? (
         <div className="bg-white border border-dashed border-gray-300 rounded-none h-80 flex flex-col items-center justify-center gap-3 text-gray-500 shadow-sm">
           <Calendar size={40} className="text-gray-400" />
@@ -275,10 +272,7 @@ export default function TeacherLiveSessionsPage() {
                     </div>
 
                     {detailsLoading[session.id] ? (
-                      <div className="flex items-center justify-center py-6 gap-2 text-gray-550 text-xs">
-                        <RefreshCw size={14} className="animate-spin text-[#20407D]" />
-                        <span>Fetching attendees details...</span>
-                      </div>
+                      <Loader variant="inline" message="Fetching attendees details..." />
                     ) : !sessionDetails[session.id] || sessionDetails[session.id].participants.length === 0 ? (
                       <p className="text-xs text-gray-500 italic py-2 text-center">No students attended this exam.</p>
                     ) : (

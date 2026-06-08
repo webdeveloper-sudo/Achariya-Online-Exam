@@ -7,6 +7,7 @@ import {
   ArrowLeft, Calendar, Clock, Trophy, Users, BarChart2, ShieldAlert,
   ChevronDown, ChevronUp, AlertCircle, HelpCircle, Check, X, Shield
 } from "lucide-react";
+import Loader from "@/components/Loader";
 
 export default function TeacherLiveSessionDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
@@ -58,12 +59,7 @@ export default function TeacherLiveSessionDetailPage({ params }: { params: Promi
   };
 
   if (loading) {
-    return (
-      <div className="p-8 space-y-6 flex flex-col items-center justify-center min-h-[60vh] text-slate-500">
-        <div className="h-10 w-10 border-4 border-emerald-500/20 border-t-emerald-500 rounded-full animate-spin" />
-        <span className="font-bold">Compiling detailed session analytics...</span>
-      </div>
-    );
+    return <Loader variant="card" message="Compiling detailed session analytics..." className="min-h-[60vh]" />;
   }
 
   if (error || !session) {

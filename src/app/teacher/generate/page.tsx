@@ -3,10 +3,11 @@
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import {
-  UploadCloud, FileText, Sliders, Zap, Loader, Plus, Trash2,
+  UploadCloud, FileText, Sliders, Zap, Loader as LoaderIcon, Plus, Trash2,
   CheckCircle, AlertCircle, Save, X, GripVertical, Printer, FileDown,
   Image as ImageIcon, RefreshCw, Edit2, ArrowLeft, Lightbulb, TimerIcon
 } from "lucide-react";
+import Loader from "@/components/Loader";
 import dynamic from "next/dynamic";
 
 const PDFDownloadLink = dynamic(
@@ -1110,7 +1111,7 @@ export default function GeneratePage() {
             >
               {generatorLoading ? (
                 <>
-                  <Loader size={16} className="animate-spin text-white" /> 
+                  <LoaderIcon size={16} className="animate-spin text-white" /> 
                   {generationMode === "text_only" ? "Generating Questions..." : "Processing Documents..."}
                 </>
               ) : (
@@ -1323,9 +1324,7 @@ export default function GeneratePage() {
                   Please Wait, It May Take Few Minutes...
                 </span>
               </h3>
-              <div className="h-32 w-32 flex items-center justify-center text-blue-600 rounded-none animate-spin">
-                <RefreshCw size={64} />
-              </div>
+              <Loader variant="inline" message="Formulating questions..." className="scale-150 py-8" />
               <div className="space-y-2 max-w-md">
                 <p className="text-[10px] font-black uppercase tracking-wider text-blue-600 animate-pulse flex items-end mx-auto justify-center gap-1">
                  <Lightbulb size={18}/> Did you know?
@@ -2076,7 +2075,7 @@ export default function GeneratePage() {
               <button type="submit" disabled={saveLoading}
                 className="w-full bg-brand-red hover:bg-brand-red/90 disabled:opacity-50 py-3.5 rounded-none font-bold text-sm flex items-center justify-center gap-2 transition-all text-white cursor-pointer"
               >
-                {saveLoading ? <><Loader size={14} className="animate-spin" /> Saving...</> : <><Save size={14} /> Save to Database</>}
+                {saveLoading ? <><LoaderIcon size={14} className="animate-spin" /> Saving...</> : <><Save size={14} /> Save to Database</>}
               </button>
             </form>
           </div>
@@ -2279,7 +2278,7 @@ export default function GeneratePage() {
                   {({ loading, error }) => (
                     loading ? (
                       <>
-                        <Loader size={13} className="animate-spin" />
+                        <LoaderIcon size={13} className="animate-spin" />
                         Generating...
                       </>
                     ) : error ? (

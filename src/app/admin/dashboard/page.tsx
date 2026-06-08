@@ -45,6 +45,7 @@ import {
   ArrowRight,
   History
 } from "lucide-react";
+import Loader from "@/components/Loader";
 
 interface Teacher {
   id: string;
@@ -774,7 +775,7 @@ export default function AdminDashboard() {
         onClose={() => setIsSidebarOpen(false)}
       />
 
-      <div className="flex-1 flex flex-col justify-between h-screen overflow-y-auto relative z-10 p-4 sm:p-8">
+      <div className="flex-1 container mx-auto my-8 flex flex-col justify-between h-screen overflow-y-auto relative z-10 p-4 sm:p-8">
         <main className="flex-1 space-y-8 pb-12">
           {/* Toast Alerts */}
           {message && (
@@ -921,10 +922,7 @@ export default function AdminDashboard() {
 
             {/* List Loader / Table */}
             {loading ? (
-              <div className="h-64 flex flex-col items-center justify-center gap-3 text-gray-500">
-                <RefreshCw size={36} className="animate-spin text-[#20407D]" />
-                <span>Loading educator registry...</span>
-              </div>
+              <Loader variant="card" message="Loading educator registry..." className="min-h-[250px]" />
             ) : filteredTeachers.length === 0 ? (
               <div className="h-64 border border-dashed border-gray-300 flex flex-col items-center justify-center gap-2 text-gray-500 bg-white/50">
                 <Users size={40} className="text-gray-400" />
@@ -1435,10 +1433,7 @@ export default function AdminDashboard() {
 
         <div className="bg-white/80 border border-gray-300 rounded-3xl overflow-hidden shadow-md">
           {assessmentsLoading ? (
-            <div className="h-64 flex flex-col items-center justify-center gap-3 text-gray-500">
-              <RefreshCw size={36} className="animate-spin text-[#20407D]" />
-              <span>Loading platform assessments...</span>
-            </div>
+            <Loader variant="card" message="Loading platform assessments..." className="min-h-[250px]" />
           ) : assessments.length === 0 ? (
             <div className="h-64 border border-dashed border-gray-300 rounded-3xl flex flex-col items-center justify-center gap-2 text-gray-500 bg-white/50">
               <Compass size={40} className="text-gray-400" />
@@ -1478,7 +1473,7 @@ export default function AdminDashboard() {
                         </td>
                         <td className="px-6 py-4">
                           <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
-                            a.isPublic ? "bg-indigo-50 text-indigo-800 border border-indigo-150" : "bg-gray-100 text-gray-700 border border-gray-200"
+                            a.isPublic ? "bg-indigo-50 text-indigo-800 border border-indigo-150" : "bg-gray-100 text-gray-700 border-gray-200"
                           }`}>
                             {a.isPublic ? <Globe size={10} /> : <Lock size={10} />}
                             {a.isPublic ? "Public" : "Private"}
@@ -1677,10 +1672,7 @@ export default function AdminDashboard() {
 
         <div className="bg-white/80 border border-gray-300 rounded-none overflow-hidden shadow-sm backdrop-blur-sm">
           {adminSessionsLoading ? (
-            <div className="h-64 flex flex-col items-center justify-center gap-3 text-gray-500">
-              <RefreshCw size={36} className="animate-spin text-[#20407D]" />
-              <span>Loading completed live sessions...</span>
-            </div>
+            <Loader variant="card" message="Loading completed live sessions..." className="min-h-[250px]" />
           ) : adminSessions.length === 0 ? (
             <div className="h-64 border border-dashed border-gray-300 rounded-none flex flex-col items-center justify-center gap-2 text-gray-500 bg-white/50">
               <Calendar size={40} className="text-gray-400" />
@@ -1773,10 +1765,7 @@ export default function AdminDashboard() {
     {activeSidebarTab === "view_live_session" && (
       <div className="space-y-6 animate-in fade-in slide-in-from-bottom duration-300">
         {selectedSessionLoading ? (
-          <div className="h-64 flex flex-col items-center justify-center gap-3 text-gray-500">
-            <RefreshCw size={36} className="animate-spin text-[#20407D]" />
-            <span>Compiling master session analytics...</span>
-          </div>
+          <Loader variant="card" message="Compiling master session analytics..." className="min-h-[250px]" />
         ) : !selectedSession ? (
           <div className="h-64 border border-dashed border-gray-300 rounded-none flex flex-col items-center justify-center gap-2 text-gray-500 bg-white/50">
             <AlertCircle size={40} className="text-gray-400" />
@@ -2120,10 +2109,7 @@ export default function AdminDashboard() {
 
         {/* Candidate registry table */}
         {recruiterCandidatesLoading ? (
-          <div className="h-64 flex flex-col items-center justify-center gap-3 text-gray-500">
-            <RefreshCw size={36} className="animate-spin text-[#20407D]" />
-            <span>Loading recruiter candidates...</span>
-          </div>
+          <Loader variant="card" message="Loading recruiter candidates..." className="min-h-[250px]" />
         ) : recruiterCandidates.length === 0 ? (
           <div className="bg-white/40 border border-dashed border-gray-300 rounded-none h-80 flex flex-col items-center justify-center gap-3 text-gray-400 shadow-sm backdrop-blur-sm">
             <FolderOpen size={44} className="text-gray-300" />
@@ -2334,10 +2320,7 @@ export default function AdminDashboard() {
     {activeSidebarTab === "view_recruiter_candidate" && (
       <div className="space-y-6 animate-in fade-in slide-in-from-bottom duration-300">
         {selectedRecruiterCandidateLoading ? (
-          <div className="h-64 flex flex-col items-center justify-center gap-3 text-gray-550">
-            <RefreshCw size={36} className="animate-spin text-[#20407D]" />
-            <span>Loading candidate profile...</span>
-          </div>
+          <Loader variant="card" message="Loading candidate profile..." className="min-h-[250px]" />
         ) : !selectedRecruiterCandidate ? (
           <div className="h-64 border border-dashed border-gray-300 rounded-none flex flex-col items-center justify-center gap-2 text-gray-500 bg-white/50">
             <AlertCircle size={40} className="text-gray-400" />
@@ -2637,11 +2620,7 @@ export default function AdminDashboard() {
 
         {/* Sessions list */}
         {recruiterSessionsLoading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-            {[1, 2, 3].map((n) => (
-              <div key={n} className="bg-white border border-gray-300 rounded-none h-60 animate-pulse shadow-sm" />
-            ))}
-          </div>
+          <Loader variant="card" message="Loading recruiter sessions..." className="min-h-[250px]" />
         ) : recruiterSessions.length === 0 ? (
           <div className="bg-white border border-dashed border-gray-300 rounded-none h-80 flex flex-col items-center justify-center gap-3 text-gray-400">
             <Calendar size={40} className="text-gray-300" />
@@ -2723,10 +2702,7 @@ export default function AdminDashboard() {
     {activeSidebarTab === "view_recruiter_session" && (
       <div className="space-y-6 animate-in fade-in slide-in-from-bottom duration-300">
         {selectedRecruiterSessionLoading ? (
-          <div className="h-64 flex flex-col items-center justify-center gap-3 text-gray-550">
-            <RefreshCw size={36} className="animate-spin text-[#20407D]" />
-            <span>Compiling session statistics roster...</span>
-          </div>
+          <Loader variant="card" message="Compiling session statistics roster..." className="min-h-[250px]" />
         ) : !selectedRecruiterSession ? (
           <div className="h-64 border border-dashed border-gray-300 rounded-none flex flex-col items-center justify-center gap-2 text-gray-500 bg-white/50">
             <AlertCircle size={40} className="text-gray-400" />
@@ -3003,10 +2979,7 @@ export default function AdminDashboard() {
 
         <div className="bg-white/80 border border-gray-300 rounded-none overflow-hidden shadow-sm">
           {recruiterAssessmentsLoading ? (
-            <div className="h-64 flex flex-col items-center justify-center gap-3 text-gray-500">
-              <RefreshCw size={36} className="animate-spin text-[#20407D]" />
-              <span>Loading recruitment assessments...</span>
-            </div>
+            <Loader variant="card" message="Loading recruitment assessments..." className="min-h-[250px]" />
           ) : recruiterAssessments.length === 0 ? (
             <div className="h-64 border border-dashed border-gray-300 rounded-none flex flex-col items-center justify-center gap-2 text-gray-500 bg-white/50">
               <Compass size={40} className="text-gray-400" />

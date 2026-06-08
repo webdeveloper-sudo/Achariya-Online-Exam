@@ -7,6 +7,7 @@ import {
   Activity, Compass, CheckCircle, Globe, Lock, FolderOpen,
   PlusCircle, ArrowRight
 } from "lucide-react";
+import Loader from "@/components/Loader";
 
 export default function TeacherDashboardPage() {
   const router = useRouter();
@@ -112,7 +113,7 @@ export default function TeacherDashboardPage() {
 
           <div className="bg-white/80 border border-gray-300 rounded-none overflow-hidden shadow-sm backdrop-blur-sm">
             {loading ? (
-              <div className="p-12 text-center text-gray-500 text-sm font-semibold">Loading your assessments...</div>
+              <Loader variant="inline" message="Loading your assessments..." className="py-12" />
             ) : myAssessments.length === 0 ? (
               <div className="p-12 text-center text-gray-500 space-y-2">
                 <FolderOpen size={36} className="mx-auto text-gray-400" />

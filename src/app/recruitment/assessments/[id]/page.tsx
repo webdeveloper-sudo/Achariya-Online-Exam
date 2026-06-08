@@ -5,9 +5,10 @@ import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
 import {
   ArrowLeft, Edit, Save, X, Printer, Globe, Lock, BookOpen, Clock,
-  Trash2, AlertCircle, Loader, CheckCircle, Plus,
+  Trash2, AlertCircle, Loader as LoaderIcon, CheckCircle, Plus,
   Play, ChevronDown, ChevronUp, Trophy, Users, Calendar, Award, GripVertical, School, Briefcase
 } from "lucide-react";
+import Loader from "@/components/Loader";
 
 interface Question {
   id: string;
@@ -312,12 +313,7 @@ export default function RecruitmentAssessmentDetailPage() {
   const isOwner = assessment && assessment.createdById === recruiterId;
 
   if (loading) return (
-    <div className="p-8 flex items-center justify-center h-96">
-      <div className="flex flex-col items-center gap-3 text-gray-500">
-        <Loader size={32} className="animate-spin text-blue-600" />
-        <p className="text-sm">Loading recruitment template...</p>
-      </div>
-    </div>
+    <Loader variant="card" message="Loading recruitment template..." className="min-h-[400px]" />
   );
 
   if (error || !assessment) return (
@@ -376,7 +372,7 @@ export default function RecruitmentAssessmentDetailPage() {
                   disabled={hosting}
                   className="flex items-center gap-1.5 px-4 py-2 rounded-none bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-xs font-bold text-white shadow-sm transition-all cursor-pointer border border-blue-600"
                 >
-                  {hosting ? <Loader size={13} className="animate-spin" /> : <Play size={13} />}
+                  {hosting ? <LoaderIcon size={13} className="animate-spin" /> : <Play size={13} />}
                   Host Live Room
                 </button>
                 {isOwner && (
@@ -396,8 +392,8 @@ export default function RecruitmentAssessmentDetailPage() {
                 <button onClick={cancelEdit} className="flex items-center gap-1.5 px-4 py-2 rounded-none bg-white hover:bg-gray-50 border border-gray-300 text-xs font-bold text-gray-700 transition-all cursor-pointer">
                   <X size={13} /> Cancel
                 </button>
-                <button onClick={handleSave} disabled={saving} className="flex items-center gap-1.5 px-4 py-2 rounded-none bg-red-600 hover:bg-red-700 disabled:opacity-50 text-xs font-bold text-white transition-all cursor-pointer shadow-sm border border-red-650">
-                  {saving ? <Loader size={13} className="animate-spin" /> : <Save size={13} />} {saving ? "Saving..." : "Save Changes"}
+                <button onClick={handleSave} disabled={saving} className="flex items-center gap-1.5 px-4 py-2 rounded-none bg-red-600 hover:bg-red-700 disabled:opacity-50 text-xs font-bold text-white transition-all cursor-pointer shadow-sm border border-red-655">
+                  {saving ? <LoaderIcon size={13} className="animate-spin" /> : <Save size={13} />} {saving ? "Saving..." : "Save Changes"}
                 </button>
               </>
             )}

@@ -7,6 +7,7 @@ import {
   Calendar, Search, RefreshCw, Trophy, Users, BarChart2,
   ArrowRight, Activity, FolderOpen
 } from "lucide-react";
+import Loader from "@/components/Loader";
 
 export default function RecruiterSessionsPage() {
   const router = useRouter();
@@ -121,13 +122,8 @@ export default function RecruiterSessionsPage() {
         </div>
       </div>
 
-      {/* Sessions list */}
       {loading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-          {[1, 2, 3].map((n) => (
-            <div key={n} className="bg-gray-100 border border-gray-200 rounded-none h-60 animate-pulse" />
-          ))}
-        </div>
+        <Loader variant="card" message="Loading candidate sessions..." className="min-h-[250px]" />
       ) : filtered.length === 0 ? (
         <div className="bg-white border border-dashed border-gray-300 rounded-none h-80 flex flex-col items-center justify-center gap-3 text-gray-400">
           <Calendar size={40} className="text-gray-300" />

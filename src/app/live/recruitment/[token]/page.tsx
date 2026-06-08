@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
+import Loader from "@/components/Loader";
 import {
   Clock, AlertTriangle, RefreshCw, CheckCircle2,
   ShieldAlert, FileText, ArrowRight, Maximize, User, Mail, Phone, GraduationCap, Briefcase
@@ -556,12 +557,7 @@ export default function CandidateLivePage() {
 
   // Loading indicator
   if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center text-gray-700">
-        <RefreshCw className="animate-spin text-blue-600 mb-4" size={40} />
-        <p className="text-sm font-medium text-gray-500">Synchronizing recruitment workspace...</p>
-      </div>
-    );
+    return <Loader variant="fullPage" message="Synchronizing recruitment workspace..." />;
   }
 
   // Error screen
@@ -981,7 +977,15 @@ export default function CandidateLivePage() {
             </div>
           </div>
 
-          <p className="text-[10px] text-gray-400 italic">Please stay on this page. Focus switches are strictly monitored.</p>
+          <div className="bg-red-50 border border-red-300 p-4 rounded-none text-left space-y-2 mt-4 animate-pulse">
+            <div className="flex items-center gap-2 text-red-700">
+              <ShieldAlert className="text-red-600 shrink-0" size={18} />
+              <span className="font-black text-xs uppercase tracking-widest">Mandatory Exam Rules</span>
+            </div>
+            <p className="text-xs font-bold text-red-600 leading-relaxed font-sans">
+              Exiting fullscreen, switching browser tabs, minimizing windows, or opening other applications is strictly prohibited. Violating these rules will log security events and will lead to automatic disqualification.
+            </p>
+          </div>
         </div>
       </div>
     );
@@ -1084,9 +1088,14 @@ export default function CandidateLivePage() {
 
         {/* Live take content */}
         <main className="flex-1 max-w-3xl w-full mx-auto p-6 space-y-6">
-          <div className="bg-amber-50 border border-amber-200 rounded-none p-4 flex items-center gap-3 text-xs text-amber-700">
-            <ShieldAlert className="text-amber-500 shrink-0" size={16} />
-            <p>Active proctor lock enabled. Leaving this page is recorded. Exiting fullscreen twice triggers automatic termination.</p>
+          <div className="bg-red-50 border border-red-300 p-4 rounded-none flex items-start gap-3 text-red-800 shadow-sm animate-pulse">
+            <ShieldAlert className="text-red-600 shrink-0 mt-0.5" size={20} />
+            <div className="space-y-1">
+              <p className="font-extrabold text-xs uppercase tracking-widest text-red-800">Anti-Cheat System Active</p>
+              <p className="text-xs font-bold text-red-600 leading-relaxed font-sans">
+                Tab switching, window blurring, or exiting Fullscreen mode will result in immediate proctor logs and automatic disqualification. Exiting fullscreen twice triggers automatic termination.
+              </p>
+            </div>
           </div>
 
           <div className="space-y-6 pb-20">

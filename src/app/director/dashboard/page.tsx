@@ -7,6 +7,7 @@ import {
   Activity, Users, CheckCircle, ShieldAlert, FolderOpen,
   PlusCircle, ArrowRight, HelpCircle, GraduationCap
 } from "lucide-react";
+import Loader from "@/components/Loader";
 
 export default function DirectorDashboardPage() {
   const router = useRouter();
@@ -99,7 +100,7 @@ export default function DirectorDashboardPage() {
   allAttempts.sort((a, b) => new Date(b.joinedAt).getTime() - new Date(a.joinedAt).getTime());
 
   return (
-    <div className="p-8 space-y-8 animate-in fade-in slide-in-from-bottom duration-300">
+    <div className="p-8 container mx-auto space-y-8 animate-in fade-in slide-in-from-bottom duration-300">
       {/* Header banner */}
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 bg-white/80 border border-gray-200 rounded-none p-8 relative overflow-hidden shadow-sm backdrop-blur-sm">
         <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/2 blur-2xl" />
@@ -171,7 +172,7 @@ export default function DirectorDashboardPage() {
 
           <div className="bg-white/80 border border-gray-200 rounded-none overflow-hidden shadow-sm backdrop-blur-sm">
             {loading ? (
-              <div className="p-12 text-center text-gray-500 text-sm">Loading data streams...</div>
+              <Loader variant="inline" message="Loading data streams..." className="py-12" />
             ) : allAttempts.length === 0 ? (
               <div className="p-12 text-center text-gray-500 space-y-2">
                 <FolderOpen size={36} className="mx-auto text-gray-450" />

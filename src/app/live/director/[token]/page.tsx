@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
+import Loader from "@/components/Loader";
 import {
   Clock, AlertTriangle, RefreshCw, CheckCircle2,
   ShieldAlert, FileText, ArrowRight, Maximize, User, Mail, Phone, GraduationCap, Building2, Briefcase
@@ -555,17 +556,12 @@ export default function TeacherLivePage() {
   };
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center text-gray-700">
-        <RefreshCw className="animate-spin text-blue-600 mb-4" size={40} />
-        <p className="text-sm font-medium text-gray-500">Synchronizing evaluation workspace...</p>
-      </div>
-    );
+    return <Loader variant="fullPage" message="Synchronizing evaluation workspace..." />;
   }
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center text-gray-900 p-6">
+      <div className="min-h-screen bg-transparent flex flex-col items-center justify-center text-gray-900 p-6">
         <div className="max-w-md w-full bg-white border border-gray-200 rounded-none p-8 text-center space-y-4 shadow-sm">
           <div className="mx-auto h-12 w-12 rounded-none bg-red-50 border border-red-200 text-red-500 flex items-center justify-center">
             <AlertTriangle size={24} />
@@ -583,7 +579,7 @@ export default function TeacherLivePage() {
   // TERMINATED SCREEN (DISQUALIFIED TEACHER - Tab switches exceed limit)
   if (isTerminated) {
     return (
-      <div className="min-h-screen bg-gray-50 font-sans flex relative overflow-hidden items-center justify-center p-6">
+      <div className="min-h-screen bg-transparent font-sans flex relative overflow-hidden items-center justify-center p-6">
         <div className="max-w-md w-full bg-white border border-red-200 rounded-none p-8 text-center space-y-6 shadow-sm">
           <div className="mx-auto h-16 w-16 rounded-none bg-red-50 border border-red-200 text-red-500 flex items-center justify-center animate-pulse">
             <ShieldAlert size={32} />
@@ -622,8 +618,8 @@ export default function TeacherLivePage() {
   // THANK YOU SCREEN (SUCCESSFULLY SUBMITTED)
   if (submitted) {
     return (
-      <div className="min-h-screen bg-gray-50 font-sans flex relative overflow-hidden items-center justify-center p-6">
-        <div className="max-w-md w-full bg-white border border-gray-200 rounded-none p-8 text-center space-y-6 shadow-sm">
+      <div className="min-h-screen bg-transparent font-sans flex relative overflow-hidden items-center justify-center p-6">
+        <div className="max-w-md w-full bg-white border border-green-200 rounded-none p-8 text-center space-y-6 shadow-sm">
           <div className="mx-auto h-16 w-16 rounded-none bg-emerald-50 border border-emerald-200 text-emerald-600 flex items-center justify-center">
             <CheckCircle2 size={32} />
           </div>
@@ -661,8 +657,8 @@ export default function TeacherLivePage() {
   if (!participantId) {
     if (sessionStatus === "ACTIVE") {
       return (
-        <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center text-gray-900 p-6">
-          <div className="max-w-md w-full bg-white border border-gray-200 rounded-none p-8 text-center space-y-4 shadow-sm">
+        <div className="min-h-screen bg-transparent flex flex-col items-center justify-center text-gray-900 p-6">
+          <div className="max-w-md w-full bg-white border border-blue-200 rounded-none p-8 text-center space-y-4 shadow-sm">
             <div className="mx-auto h-12 w-12 rounded-none bg-amber-50 border border-amber-200 text-amber-600 flex items-center justify-center">
               <ShieldAlert size={24} />
             </div>
@@ -698,8 +694,8 @@ export default function TeacherLivePage() {
     }
 
     return (
-      <div className="min-h-screen bg-gray-50 font-sans flex relative overflow-hidden items-center justify-center p-6">
-        <div className="max-w-md w-full bg-white border border-gray-200 rounded-none p-8 space-y-6 shadow-sm relative z-10">
+      <div className="min-h-screen bg-transparent font-sans flex relative overflow-hidden items-center justify-center p-6">
+        <div className="max-w-2xl w-full bg-white border border-gray-200 rounded-none p-8 space-y-6 shadow-sm relative z-10">
           <div className="text-center space-y-2">
             <div className="inline-flex h-12 w-12 rounded-none bg-blue-50 border border-blue-200 items-center justify-center text-blue-600 mb-2">
               <FileText size={24} />
@@ -936,7 +932,7 @@ export default function TeacherLivePage() {
   // CANDIDATE WAITING ROOM
   if (sessionStatus === "WAITING") {
     return (
-      <div className="min-h-screen bg-gray-50 font-sans flex relative overflow-hidden items-center justify-center p-6">
+      <div className="min-h-screen bg-transparent font-sans flex relative overflow-hidden items-center justify-center p-6">
         {/* Fullscreen warning overlay in waitroom */}
         {showFullscreenWarning && (
           <div className="fixed inset-0 bg-black/70 backdrop-blur-md z-[200] flex items-center justify-center p-6">
@@ -960,7 +956,7 @@ export default function TeacherLivePage() {
           </div>
         )}
 
-        <div className="max-w-md w-full bg-white border border-gray-200 rounded-none p-8 text-center space-y-6 shadow-sm relative z-10">
+        <div className="max-w-md w-full bg-white/80 border border-gray-200 rounded-none p-8 text-center space-y-6 shadow-sm relative z-10">
           {reconnecting && (
             <div className="bg-red-50 border border-red-200 text-red-600 text-xs py-2 px-4 rounded-none inline-flex items-center gap-2 mx-auto animate-pulse">
               <RefreshCw className="animate-spin" size={12} />
@@ -1005,7 +1001,15 @@ export default function TeacherLivePage() {
             </div>
           </div>
 
-          <p className="text-[10px] text-gray-400 italic">Please stay on this page. Focus switches are strictly monitored.</p>
+          <div className="bg-red-50 border border-red-300 p-4 rounded-none text-left space-y-2 mt-4 animate-pulse">
+            <div className="flex items-center gap-2 text-red-700">
+              <ShieldAlert className="text-red-600 shrink-0" size={18} />
+              <span className="font-black text-xs uppercase tracking-widest">Mandatory Exam Rules</span>
+            </div>
+            <p className="text-xs font-bold text-red-600 leading-relaxed font-sans font-bold">
+              Exiting fullscreen, switching browser tabs, minimizing windows, or opening other applications is strictly prohibited. Violating these rules will log security events and will lead to automatic disqualification.
+            </p>
+          </div>
         </div>
       </div>
     );
@@ -1106,9 +1110,14 @@ export default function TeacherLivePage() {
 
         {/* Live take content */}
         <main className="flex-1 max-w-3xl w-full mx-auto p-6 space-y-6">
-          <div className="bg-amber-50 border border-amber-200 rounded-none p-4 flex items-center gap-3 text-xs text-amber-700">
-            <ShieldAlert className="text-amber-500 shrink-0" size={16} />
-            <p>Active proctor lock enabled. Leaving this page is recorded. Exiting fullscreen twice triggers automatic termination.</p>
+          <div className="bg-red-50 border border-red-300 p-4 rounded-none flex items-start gap-3 text-red-800 shadow-sm animate-pulse">
+            <ShieldAlert className="text-red-600 shrink-0 mt-0.5" size={20} />
+            <div className="space-y-1">
+              <p className="font-extrabold text-xs uppercase tracking-widest text-red-800">Anti-Cheat System Active</p>
+              <p className="text-xs font-bold text-red-600 leading-relaxed font-sans">
+                Tab switching, window blurring, or exiting Fullscreen mode will result in immediate proctor logs and automatic disqualification. Exiting fullscreen twice triggers automatic termination.
+              </p>
+            </div>
           </div>
 
           <div className="space-y-6 pb-20">

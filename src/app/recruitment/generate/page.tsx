@@ -3,10 +3,11 @@
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import {
-  UploadCloud, FileText, Sliders, Zap, Loader, Plus, Trash2,
+  UploadCloud, FileText, Sliders, Zap, Loader as LoaderIcon, Plus, Trash2,
   CheckCircle, AlertCircle, Save, X, Eye, FileDown, Printer, Award,
   Image as ImageIcon, RefreshCw, Edit2, ArrowLeft, Lightbulb, TimerIcon
 } from "lucide-react";
+import Loader from "@/components/Loader";
 import dynamic from "next/dynamic";
 
 const PDFDownloadLink = dynamic(
@@ -923,7 +924,7 @@ export default function RecruiterGeneratePage() {
             >
               {generatorLoading ? (
                 <>
-                  <Loader size={16} className="animate-spin" />
+                  <LoaderIcon size={16} className="animate-spin" />
                   Compiling Candidate Assessment...
                 </>
               ) : (
@@ -993,9 +994,7 @@ export default function RecruiterGeneratePage() {
                   Please Wait, It May Take Few Minutes...
                 </span>
               </h3>
-              <div className="h-32 w-32 flex items-center justify-center text-blue-600 rounded-none animate-spin">
-                <RefreshCw size={64} />
-              </div>
+              <Loader variant="inline" message="Compiling candidate assessment..." className="scale-150 py-8" />
               <div className="space-y-2 max-w-md">
                 <p className="text-[10px] font-black uppercase tracking-wider text-blue-600 animate-pulse flex items-end mx-auto justify-center gap-1">
                  <Lightbulb size={18}/> Did you know?
@@ -1789,7 +1788,7 @@ export default function RecruiterGeneratePage() {
                   {({ loading, error }) => (
                     loading ? (
                       <>
-                        <Loader size={13} className="animate-spin" />
+                        <LoaderIcon size={13} className="animate-spin" />
                         Generating...
                       </>
                     ) : error ? (

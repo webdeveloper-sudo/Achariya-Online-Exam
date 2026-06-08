@@ -5,10 +5,12 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
   ArrowLeft, Edit, Save, X, Printer, BookOpen, Clock,
-  Trash2, AlertCircle, Loader, CheckCircle, Plus,
+  Trash2, AlertCircle, Loader2, CheckCircle, Plus,
   Play, ChevronDown, ChevronUp, Trophy, Users, Calendar, Award, GripVertical, School, Briefcase,
   Image as ImageIcon, UploadCloud, RefreshCw
 } from "lucide-react";
+import Loader from "@/components/Loader";
+import { useToast } from "@/components/Toast";
 
 interface Question {
   id: string;
@@ -38,6 +40,7 @@ interface Assessment {
 export default function DirectorAssessmentDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
   const { id } = use(params);
+  const toast = useToast();
 
   const [token, setToken] = useState<string | null>(null);
   const [directorId, setDirectorId] = useState<string | null>(null);
@@ -128,6 +131,7 @@ export default function DirectorAssessmentDetailPage({ params }: { params: Promi
   const handleHostAssessment = async () => {
     if (!token || !id) return;
     setHosting(true);
+    const toastId = toast.loading("Creating live evaluation session...");
     try {
       const res = await fetch("/api/director/live/create", {
         method: "POST",
@@ -139,14 +143,24 @@ export default function DirectorAssessmentDetailPage({ params }: { params: Promi
       });
       const data = await res.json();
       if (res.ok && data.success) {
+        toast.update(toastId, {
+          type: "success",
+          message: "Live evaluation room generated!",
+        });
         // Redirect to director active monitoring room
         router.push(`/live/director/${data.token}/host`);
       } else {
-        alert(data.message || "Failed to create live evaluation room.");
+        toast.update(toastId, {
+          type: "error",
+          message: data.message || "Failed to create live evaluation room.",
+        });
       }
     } catch (err) {
       console.error("Error creating live session:", err);
-      alert("Something went wrong. Please check your internet connection.");
+      toast.update(toastId, {
+        type: "error",
+        message: "Something went wrong. Please check your internet connection.",
+      });
     } finally {
       setHosting(false);
     }
@@ -219,6 +233,7 @@ export default function DirectorAssessmentDetailPage({ params }: { params: Promi
     if (!editForm) return;
     setSaving(true);
     setSaveError(null);
+    const toastId = toast.loading("Saving changes to template...");
     try {
       // Upload any pending (base64) images to Cloudinary first
       setUploadingImages(true);
@@ -238,17 +253,31 @@ export default function DirectorAssessmentDetailPage({ params }: { params: Promi
       });
       const data = await res.json();
       if (res.ok && data.success) {
+        toast.update(toastId, {
+          type: "success",
+          message: "Assessment template saved successfully!",
+        });
         const a = data.assessment;
         const questions = Array.isArray(a.questions) ? a.questions : JSON.parse(a.questions || "[]");
         setAssessment({ ...a, questions });
         setIsEditMode(false);
         setEditForm(null);
       } else {
-        setSaveError(data.message || "Failed to save changes.");
+        const errMsg = data.message || "Failed to save changes.";
+        setSaveError(errMsg);
+        toast.update(toastId, {
+          type: "error",
+          message: errMsg,
+        });
       }
     } catch (err: any) {
       setUploadingImages(false);
-      setSaveError(err.message || "An error occurred while saving.");
+      const errMsg = err.message || "An error occurred while saving.";
+      setSaveError(errMsg);
+      toast.update(toastId, {
+        type: "error",
+        message: errMsg,
+      });
     } finally {
       setSaving(false);
     }
@@ -256,19 +285,30 @@ export default function DirectorAssessmentDetailPage({ params }: { params: Promi
 
   const handleDelete = async () => {
     if (!confirm("Permanently delete this assessment template? This cannot be undone.")) return;
+    const toastId = toast.loading("Deleting assessment template...");
     try {
       const res = await fetch(`/api/director/assessment/${id}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });
       if (res.ok) {
+        toast.update(toastId, {
+          type: "success",
+          message: "Assessment template deleted successfully.",
+        });
         router.push("/director/assessments");
       } else {
         const d = await res.json();
-        alert(d.message || "Failed to delete.");
+        toast.update(toastId, {
+          type: "error",
+          message: d.message || "Failed to delete.",
+        });
       }
     } catch (err: any) {
-      alert("Error: " + err.message);
+      toast.update(toastId, {
+        type: "error",
+        message: "Error: " + err.message,
+      });
     }
   };
 
@@ -386,14 +426,7 @@ export default function DirectorAssessmentDetailPage({ params }: { params: Promi
   const questions = isEditMode ? (editForm?.questions || []) : (assessment?.questions || []);
   const isOwner = assessment && assessment.createdById === directorId;
 
-  if (loading) return (
-    <div className="p-8 flex items-center justify-center h-96">
-      <div className="flex flex-col items-center gap-3 text-gray-500">
-        <Loader size={32} className="animate-spin text-blue-600" />
-        <p className="text-sm">Loading template...</p>
-      </div>
-    </div>
-  );
+  if (loading) return <Loader variant="card" message="Loading template..." className="min-h-[400px] m-8" />;
 
   if (error || !assessment) return (
     <div className="p-8 space-y-4">
@@ -417,7 +450,7 @@ export default function DirectorAssessmentDetailPage({ params }: { params: Promi
         }
       `}</style>
 
-      <div className="p-8 space-y-6 animate-in fade-in slide-in-from-bottom duration-300 print-page text-gray-900">
+      <div className="p-8 container mx-auto space-y-6 animate-in fade-in slide-in-from-bottom duration-300 print-page text-gray-900">
         {/* Header */}
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 no-print border-b border-gray-200 pb-5">
           <div className="flex items-center gap-3">
@@ -445,7 +478,7 @@ export default function DirectorAssessmentDetailPage({ params }: { params: Promi
                   disabled={hosting}
                   className="flex items-center gap-1.5 px-4 py-2 rounded-none bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-xs font-bold text-white shadow-sm transition-all cursor-pointer border border-blue-600"
                 >
-                  {hosting ? <Loader size={13} className="animate-spin" /> : <Play size={13} />}
+                  {hosting ? <Loader2 size={13} className="animate-spin" /> : <Play size={13} />}
                   Host Live Room
                 </button>
                 {isOwner && (
@@ -466,7 +499,7 @@ export default function DirectorAssessmentDetailPage({ params }: { params: Promi
                   <X size={13} /> Cancel
                 </button>
                 <button onClick={handleSave} disabled={saving || uploadingImages} className="flex items-center gap-1.5 px-4 py-2 rounded-none bg-[#C72323] hover:bg-[#b01e1e] disabled:opacity-50 text-xs font-bold text-white transition-all cursor-pointer shadow-sm border border-[#C72323]">
-                  {(saving || uploadingImages) ? <Loader size={13} className="animate-spin" /> : <Save size={13} />}
+                  {(saving || uploadingImages) ? <Loader2 size={13} className="animate-spin" /> : <Save size={13} />}
                   {uploadingImages ? "Uploading Images..." : saving ? "Saving..." : "Save Changes"}
                 </button>
               </>

@@ -8,6 +8,7 @@ import {
   Mail, Phone, Award, Users, BarChart2, ChevronDown, ChevronUp,
   CheckCircle2, Clock, BookOpen
 } from "lucide-react";
+import Loader from "@/components/Loader";
 
 export default function RecruiterCandidatesPage() {
   const router = useRouter();
@@ -131,9 +132,8 @@ export default function RecruiterCandidatesPage() {
         </div>
       </div>
 
-      {/* Candidate registry table */}
       {loading ? (
-        <div className="bg-white border border-gray-200 rounded-none h-96 animate-pulse shadow-sm" />
+        <Loader variant="card" message="Loading candidate registry..." className="min-h-[400px]" />
       ) : filteredCandidates.length === 0 ? (
         <div className="bg-white/40 border border-dashed border-gray-300 rounded-none h-80 flex flex-col items-center justify-center gap-3 text-gray-400 shadow-sm backdrop-blur-sm">
           <FolderOpen size={44} className="text-gray-300" />

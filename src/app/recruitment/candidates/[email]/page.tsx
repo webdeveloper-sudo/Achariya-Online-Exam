@@ -7,6 +7,7 @@ import {
   ArrowLeft, Mail, Phone, Calendar, Award, Shield, ShieldAlert,
   ChevronDown, ChevronUp, AlertCircle, Check, X, Clock, User, Briefcase, GraduationCap
 } from "lucide-react";
+import Loader from "@/components/Loader";
 
 export default function RecruiterCandidateDetailsPage({ params }: { params: Promise<{ email: string }> }) {
   const router = useRouter();
@@ -68,12 +69,7 @@ export default function RecruiterCandidateDetailsPage({ params }: { params: Prom
   };
 
   if (loading) {
-    return (
-      <div className="p-8 space-y-6 flex flex-col items-center justify-center min-h-[60vh] text-gray-500">
-        <div className="h-10 w-10 border-4 border-blue-200 border-t-blue-600 animate-spin" />
-        <span className="font-bold">Compiling candidate assessment history...</span>
-      </div>
-    );
+    return <Loader variant="card" message="Compiling candidate assessment history..." className="min-h-[60vh]" />;
   }
 
   if (error || !profile) {

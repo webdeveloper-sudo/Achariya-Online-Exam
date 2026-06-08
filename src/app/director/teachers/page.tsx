@@ -8,6 +8,7 @@ import {
   Mail, Phone, Award, Users, ChevronDown, ChevronUp,
   CheckCircle2, BookOpen, School
 } from "lucide-react";
+import Loader from "@/components/Loader";
 
 export default function DirectorTeachersPage() {
   const router = useRouter();
@@ -68,7 +69,7 @@ export default function DirectorTeachersPage() {
   const completedCount = teachers.filter((t) => t.latestCompletedAt && !t.hasTerminated).length;
 
   return (
-    <div className="p-8 space-y-8 animate-in fade-in slide-in-from-bottom duration-300">
+    <div className="p-8 container mx-auto space-y-8 animate-in fade-in slide-in-from-bottom duration-300">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
@@ -141,7 +142,7 @@ export default function DirectorTeachersPage() {
 
       {/* Teacher registry table */}
       {loading ? (
-        <div className="bg-white border border-gray-200 rounded-none h-96 animate-pulse shadow-sm" />
+        <Loader variant="card" message="Loading teacher registry..." className="min-h-[384px]" />
       ) : filteredTeachers.length === 0 ? (
         <div className="bg-white/40 border border-dashed border-gray-300 rounded-none h-80 flex flex-col items-center justify-center gap-3 text-gray-400 shadow-sm backdrop-blur-sm">
           <FolderOpen size={44} className="text-gray-300" />

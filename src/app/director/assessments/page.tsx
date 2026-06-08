@@ -7,9 +7,12 @@ import {
   FolderOpen, Search, RefreshCw, Plus, Trash2, Clock, BookOpen, Play, Award, School,
   Edit
 } from "lucide-react";
+import Loader from "@/components/Loader";
+import { useToast } from "@/components/Toast";
 
 export default function DirectorAssessmentsPage() {
   const router = useRouter();
+  const toast = useToast();
   const [token, setToken] = useState<string | null>(null);
   const [myAssessments, setMyAssessments] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -52,19 +55,30 @@ export default function DirectorAssessmentsPage() {
   const handleDelete = async (id: string) => {
     if (!confirm("Permanently delete this assessment template?")) return;
     setDeleting(id);
+    const toastId = toast.loading("Deleting assessment template...");
     try {
       const res = await fetch(`/api/director/assessment/${id}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });
       if (res.ok) {
+        toast.update(toastId, {
+          type: "success",
+          message: "Assessment template deleted successfully.",
+        });
         fetchAssessments();
       } else {
         const d = await res.json();
-        alert(d.message || "Failed to delete assessment.");
+        toast.update(toastId, {
+          type: "error",
+          message: d.message || "Failed to delete assessment.",
+        });
       }
     } catch (err: any) {
-      alert("Network error: " + err.message);
+      toast.update(toastId, {
+        type: "error",
+        message: "Network error: " + err.message,
+      });
     } finally {
       setDeleting(null);
     }
@@ -73,6 +87,7 @@ export default function DirectorAssessmentsPage() {
   const handleHostAssessment = async (id: string) => {
     if (!token || !id) return;
     setHosting(id);
+    const toastId = toast.loading("Creating live evaluation session...");
     try {
       const res = await fetch("/api/director/live/create", {
         method: "POST",
@@ -84,14 +99,24 @@ export default function DirectorAssessmentsPage() {
       });
       const data = await res.json();
       if (res.ok && data.success) {
+        toast.update(toastId, {
+          type: "success",
+          message: "Live evaluation room generated!",
+        });
         // Redirect to director active monitoring room
         router.push(`/live/director/${data.token}/host`);
       } else {
-        alert(data.message || "Failed to launch live evaluation session.");
+        toast.update(toastId, {
+          type: "error",
+          message: data.message || "Failed to launch live evaluation session.",
+        });
       }
     } catch (err) {
       console.error("Error creating live session", err);
-      alert("Something went wrong. Please check your internet connection.");
+      toast.update(toastId, {
+        type: "error",
+        message: "Something went wrong. Please check your internet connection.",
+      });
     } finally {
       setHosting(null);
     }
@@ -104,7 +129,7 @@ export default function DirectorAssessmentsPage() {
   );
 
   return (
-    <div className="p-8 space-y-8 animate-in fade-in slide-in-from-bottom duration-300">
+    <div className="p-8 mx-auto container space-y-8 animate-in fade-in slide-in-from-bottom duration-300">
       {/* Header */}
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div>
@@ -122,7 +147,7 @@ export default function DirectorAssessmentsPage() {
       </div>
 
       {/* Controls */}
-      <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+      <div className="flex flex-col w-full sm:flex-row gap-4 items-start sm:items-center">
         <div className="flex items-center gap-3 flex-1 max-w-sm">
           <div className="flex-1 relative">
             <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
@@ -141,11 +166,7 @@ export default function DirectorAssessmentsPage() {
 
       {/* Grid */}
       {loading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-          {[1, 2, 3].map((n) => (
-            <div key={n} className="bg-white/80 border border-gray-200 rounded-none h-52 animate-pulse shadow-sm" />
-          ))}
-        </div>
+        <Loader variant="card" message="Loading academic templates..." className="min-h-[208px]" />
       ) : displayList.length === 0 ? (
         <div className="bg-white/40 border border-dashed border-gray-300 rounded-none h-64 flex flex-col items-center justify-center gap-3 text-gray-400 shadow-sm backdrop-blur-sm">
           <FolderOpen size={40} className="text-gray-300" />

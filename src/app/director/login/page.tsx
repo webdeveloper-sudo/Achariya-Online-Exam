@@ -3,9 +3,11 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Lock, Mail, Shield, AlertCircle, HelpCircle } from "lucide-react";
+import { useToast } from "@/components/Toast";
 
 export default function DirectorLogin() {
   const router = useRouter();
+  const toast = useToast();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -15,6 +17,7 @@ export default function DirectorLogin() {
     e.preventDefault();
     setError(null);
     setLoading(true);
+    const toastId = toast.loading("Verifying credentials...");
 
     try {
       const res = await fetch("/api/director/auth/login", {
@@ -33,9 +36,17 @@ export default function DirectorLogin() {
       localStorage.setItem("directorToken", data.token);
       localStorage.setItem("directorUser", JSON.stringify(data.user));
 
+      toast.update(toastId, {
+        type: "success",
+        message: "Authentication successful! Redirecting...",
+      });
       router.push("/director/dashboard");
     } catch (err: any) {
       setError(err.message || "Something went wrong.");
+      toast.update(toastId, {
+        type: "error",
+        message: err.message || "Failed to log in",
+      });
     } finally {
       setLoading(false);
     }

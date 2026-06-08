@@ -5,9 +5,10 @@ import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
 import {
   ArrowLeft, Edit, Save, X, Printer, Globe, Lock, BookOpen, Clock,
-  Trash2, AlertCircle, Loader, CheckCircle, FileDown, Plus,
+  Trash2, AlertCircle, Loader as LoaderIcon, CheckCircle, FileDown, Plus,
   Play, ChevronDown, ChevronUp, Trophy, Users, Calendar, Award, GripVertical
 } from "lucide-react";
+import Loader from "@/components/Loader";
 
 interface Question {
   id: string;
@@ -273,12 +274,7 @@ export default function AssessmentDetailPage() {
   const isOwner = assessment && assessment.createdById === teacherId;
 
   if (loading) return (
-    <div className="p-8 flex items-center justify-center h-96">
-      <div className="flex flex-col items-center gap-3 text-gray-500">
-        <Loader size={32} className="animate-spin text-blue-600" />
-        <p className="text-sm">Loading assessment...</p>
-      </div>
-    </div>
+    <Loader variant="card" message="Loading assessment..." className="min-h-[400px]" />
   );
 
   if (error || !assessment) return (
@@ -339,7 +335,7 @@ export default function AssessmentDetailPage() {
                     disabled={hosting}
                     className="flex items-center gap-1.5 px-4 py-2 rounded-none bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-xs font-bold text-white shadow-sm transition-all cursor-pointer border border-blue-600"
                   >
-                    {hosting ? <Loader size={13} className="animate-spin" /> : <Play size={13} />}
+                    {hosting ? <LoaderIcon size={13} className="animate-spin" /> : <Play size={13} />}
                     Host Live Exam
                   </button>
                 )}
@@ -361,7 +357,7 @@ export default function AssessmentDetailPage() {
                   <X size={13} /> Cancel
                 </button>
                 <button onClick={handleSave} disabled={saving} className="flex items-center gap-1.5 px-4 py-2 rounded-none bg-brand-red hover:bg-brand-red/90 disabled:opacity-50 text-xs font-bold text-white transition-all cursor-pointer shadow-sm border border-brand-red">
-                  {saving ? <Loader size={13} className="animate-spin" /> : <Save size={13} />} {saving ? "Saving..." : "Save Changes"}
+                  {saving ? <LoaderIcon size={13} className="animate-spin" /> : <Save size={13} />} {saving ? "Saving..." : "Save Changes"}
                 </button>
               </>
             )}

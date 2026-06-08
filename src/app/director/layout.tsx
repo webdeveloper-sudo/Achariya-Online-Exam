@@ -59,7 +59,7 @@ export default function DirectorLayout({ children }: { children: React.ReactNode
   }
 
   return (
-    <div className="min-h-screen font-sans flex flex-col md:flex-row relative overflow-hidden bg-transparent text-gray-900" data-portal-layout="true">
+    <div className="min-h-screen  font-sans flex flex-col md:flex-row relative overflow-hidden bg-transparent text-gray-900" data-portal-layout="true">
       {/* Soft Ambient Glows (matching recruitment theme but optimized for director blue/red) */}
       <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-[#C72323]/5 blur-[120px] rounded-full z-0 pointer-events-none" />
       <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-[#20407D]/5 blur-[120px] rounded-full z-0 pointer-events-none" />
@@ -96,7 +96,7 @@ export default function DirectorLayout({ children }: { children: React.ReactNode
       />
 
       {/* Page content */}
-      <div className="flex-1 h-screen overflow-y-auto relative z-10">
+      <div className="flex-1 h-screen py-8 overflow-y-auto relative z-10">
         {children}
       </div>
     </div>

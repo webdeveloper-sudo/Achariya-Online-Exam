@@ -27,6 +27,8 @@ import {
   User,
   School
 } from "lucide-react";
+import { useToast } from "@/components/Toast";
+import Loader from "@/components/Loader";
 
 interface Teacher {
   id: string;
@@ -47,6 +49,7 @@ interface Teacher {
 
 export default function DirectorTeachersOnboardPage() {
   const router = useRouter();
+  const toast = useToast();
   const [token, setToken] = useState<string | null>(null);
   const [directorUser, setDirectorUser] = useState<any>(null);
 
@@ -57,7 +60,6 @@ export default function DirectorTeachersOnboardPage() {
   const [statusFilter, setStatusFilter] = useState("all");
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
-  const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
   // Manual Form State
   const [formData, setFormData] = useState({
@@ -125,8 +127,11 @@ export default function DirectorTeachersOnboardPage() {
   };
 
   const showMsg = (type: "success" | "error", text: string) => {
-    setMessage({ type, text });
-    setTimeout(() => setMessage(null), 5000);
+    if (type === "success") {
+      toast.success(text);
+    } else {
+      toast.error(text);
+    }
   };
 
   // Single Teacher Form Sample Loader
@@ -168,6 +173,7 @@ export default function DirectorTeachersOnboardPage() {
     e.preventDefault();
     if (!token) return;
     setActionLoading(true);
+    const toastId = toast.loading("Registering educator profile...");
 
     try {
       const payload = {
@@ -187,7 +193,10 @@ export default function DirectorTeachersOnboardPage() {
 
       const data = await res.json();
       if (res.ok) {
-        showMsg("success", data.message || "Teacher onboarded successfully!");
+        toast.update(toastId, {
+          type: "success",
+          message: data.message || "Teacher onboarded successfully!",
+        });
         setFormData({
           userId: "",
           userName: "",
@@ -204,10 +213,16 @@ export default function DirectorTeachersOnboardPage() {
         setActiveTab("list");
         fetchTeachers();
       } else {
-        showMsg("error", data.message || "Failed to register teacher");
+        toast.update(toastId, {
+          type: "error",
+          message: data.message || "Failed to register teacher",
+        });
       }
     } catch (err) {
-      showMsg("error", "Network error occurred.");
+      toast.update(toastId, {
+        type: "error",
+        message: "Network error occurred.",
+      });
     } finally {
       setActionLoading(false);
     }
@@ -219,6 +234,7 @@ export default function DirectorTeachersOnboardPage() {
     if (!token || !editingTeacher) return;
     setActionLoading(true);
     setModalError(null);
+    const toastId = toast.loading("Saving changes to teacher profile...");
 
     try {
       const payload = {
@@ -242,15 +258,28 @@ export default function DirectorTeachersOnboardPage() {
 
       const data = await res.json();
       if (res.ok) {
-        showMsg("success", "Teacher updated successfully!");
+        toast.update(toastId, {
+          type: "success",
+          message: "Teacher profile updated successfully!",
+        });
         setEditingTeacher(null);
         setModalError(null);
         fetchTeachers();
       } else {
-        setModalError(data.message || "Failed to update teacher");
+        const errMsg = data.message || "Failed to update teacher";
+        setModalError(errMsg);
+        toast.update(toastId, {
+          type: "error",
+          message: errMsg,
+        });
       }
     } catch (err) {
-      setModalError("Network error occurred. Please try again.");
+      const errMsg = "Network error occurred. Please try again.";
+      setModalError(errMsg);
+      toast.update(toastId, {
+        type: "error",
+        message: errMsg,
+      });
     } finally {
       setActionLoading(false);
     }
@@ -262,6 +291,7 @@ export default function DirectorTeachersOnboardPage() {
     if (!confirm("Are you sure you want to delete this teacher account?")) return;
 
     setDeletingTeacherId(id);
+    const toastId = toast.loading("Deleting teacher account...");
     try {
       const res = await fetch(`/api/admin/teachers/${id}`, {
         method: "DELETE",
@@ -272,13 +302,22 @@ export default function DirectorTeachersOnboardPage() {
 
       const data = await res.json();
       if (res.ok) {
-        showMsg("success", "Teacher profile deleted successfully.");
+        toast.update(toastId, {
+          type: "success",
+          message: "Teacher profile deleted successfully.",
+        });
         setTeachers((prev) => prev.filter((t) => t.id !== id));
       } else {
-        showMsg("error", data.message || "Failed to delete teacher");
+        toast.update(toastId, {
+          type: "error",
+          message: data.message || "Failed to delete teacher",
+        });
       }
     } catch (err) {
-      showMsg("error", "Network error occurred.");
+      toast.update(toastId, {
+        type: "error",
+        message: "Network error occurred.",
+      });
     } finally {
       setDeletingTeacherId(null);
     }
@@ -289,6 +328,7 @@ export default function DirectorTeachersOnboardPage() {
     e.preventDefault();
     if (!token || !showPasswordReset) return;
     setActionLoading(true);
+    const toastId = toast.loading("Resetting password...");
 
     try {
       const res = await fetch(`/api/admin/teachers/${showPasswordReset}`, {
@@ -302,14 +342,23 @@ export default function DirectorTeachersOnboardPage() {
 
       const data = await res.json();
       if (res.ok) {
-        showMsg("success", "Password reset successfully!");
+        toast.update(toastId, {
+          type: "success",
+          message: "Password reset successfully!",
+        });
         setShowPasswordReset(null);
         setNewPassword("");
       } else {
-        showMsg("error", data.message || "Failed to reset password");
+        toast.update(toastId, {
+          type: "error",
+          message: data.message || "Failed to reset password",
+        });
       }
     } catch (err) {
-      showMsg("error", "Network error occurred.");
+      toast.update(toastId, {
+        type: "error",
+        message: "Network error occurred.",
+      });
     } finally {
       setActionLoading(false);
     }
@@ -367,7 +416,7 @@ export default function DirectorTeachersOnboardPage() {
       ];
       setParsedTeachers(sampleTeachers);
       setUploadPreviewOpen(true);
-      showMsg("success", "Loaded sample teacher data for preview!");
+      toast.success("Loaded sample teacher data for preview!");
     } else {
       setParsedTeachers([]);
       setUploadPreviewOpen(false);
@@ -384,6 +433,7 @@ export default function DirectorTeachersOnboardPage() {
   const handleParseExcel = async () => {
     if (!uploadFile || !token) return;
     setActionLoading(true);
+    const toastId = toast.loading("Parsing spreadsheet file...");
 
     const fData = new FormData();
     fData.append("file", uploadFile);
@@ -401,12 +451,21 @@ export default function DirectorTeachersOnboardPage() {
       if (res.ok) {
         setParsedTeachers(data.data || []);
         setUploadPreviewOpen(true);
-        showMsg("success", `Parsed ${data.count} teacher records!`);
+        toast.update(toastId, {
+          type: "success",
+          message: `Parsed ${data.count} teacher records!`,
+        });
       } else {
-        showMsg("error", data.message || "Failed to parse spreadsheet file");
+        toast.update(toastId, {
+          type: "error",
+          message: data.message || "Failed to parse spreadsheet file",
+        });
       }
     } catch (err) {
-      showMsg("error", "Error uploading/parsing file");
+      toast.update(toastId, {
+        type: "error",
+        message: "Error uploading/parsing file",
+      });
     } finally {
       setActionLoading(false);
     }
@@ -415,6 +474,7 @@ export default function DirectorTeachersOnboardPage() {
   const handleImportParsed = async () => {
     if (parsedTeachers.length === 0 || !token) return;
     setActionLoading(true);
+    const toastId = toast.loading("Importing teacher datasets...");
 
     try {
       const res = await fetch("/api/admin/teachers/save", {
@@ -428,20 +488,26 @@ export default function DirectorTeachersOnboardPage() {
 
       const data = await res.json();
       if (res.ok) {
-        showMsg(
-          "success",
-          `Import complete! Saved: ${data.saved}, Skipped: ${data.skipped}.`
-        );
+        toast.update(toastId, {
+          type: "success",
+          message: `Import complete! Saved: ${data.saved}, Skipped: ${data.skipped}.`,
+        });
         setUploadPreviewOpen(false);
         setParsedTeachers([]);
         setUploadFile(null);
         setActiveTab("list");
         fetchTeachers();
       } else {
-        showMsg("error", data.message || "Failed to import datasets");
+        toast.update(toastId, {
+          type: "error",
+          message: data.message || "Failed to import datasets",
+        });
       }
     } catch (err) {
-      showMsg("error", "Error during import operation.");
+      toast.update(toastId, {
+        type: "error",
+        message: "Error during import operation.",
+      });
     } finally {
       setActionLoading(false);
     }
@@ -483,20 +549,7 @@ export default function DirectorTeachersOnboardPage() {
   const pendingCount = totalCount - activatedCount;
 
   return (
-    <div className="p-8 space-y-8 animate-in fade-in slide-in-from-bottom duration-300">
-      {/* Toast Alerts */}
-      {message && (
-        <div
-          className={`fixed bottom-6 right-6 z-50 p-4 border rounded-none backdrop-blur-xl shadow-2xl flex items-center gap-3 text-sm font-medium animate-in slide-in-from-bottom-5 duration-300 max-w-md ${
-            message.type === "success"
-              ? "bg-emerald-50 border-emerald-200 text-emerald-800"
-              : "bg-red-50 border-red-200 text-red-800"
-          }`}
-        >
-          <CheckCircle size={20} className="shrink-0 text-emerald-600" />
-          <span>{message.text}</span>
-        </div>
-      )}
+    <div className="p-8 container mx-auto space-y-8 animate-in fade-in slide-in-from-bottom duration-300">
 
       {/* Header */}
       <div className="flex items-center gap-3 border-b border-gray-200 pb-5">
@@ -633,10 +686,7 @@ export default function DirectorTeachersOnboardPage() {
 
           {/* List Table */}
           {loading ? (
-            <div className="h-64 flex flex-col items-center justify-center gap-3 text-gray-500 bg-white border border-gray-200 rounded-none">
-              <RefreshCw size={36} className="animate-spin text-blue-600" />
-              <span className="text-xs font-bold text-gray-400">Loading educator registry...</span>
-            </div>
+            <Loader variant="card" message="Loading educator registry..." className="min-h-[256px]" />
           ) : filteredTeachers.length === 0 ? (
             <div className="h-64 border border-dashed border-gray-300 rounded-none flex flex-col items-center justify-center gap-2 text-gray-500 bg-white">
               <Users size={40} className="text-gray-300" />

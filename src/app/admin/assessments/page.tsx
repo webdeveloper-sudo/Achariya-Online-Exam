@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Globe, Lock, RefreshCw, Search, FolderOpen } from "lucide-react";
+import Loader from "@/components/Loader";
 
 export default function AdminAssessmentsPage() {
   const router = useRouter();
@@ -88,9 +89,7 @@ export default function AdminAssessmentsPage() {
       {/* Table Card */}
       <div className="bg-white/80 border border-gray-300 rounded-none overflow-hidden shadow-sm backdrop-blur-sm">
         {loading ? (
-          <div className="h-64 flex items-center justify-center">
-            <RefreshCw size={28} className="animate-spin text-[#20407D]" />
-          </div>
+          <Loader variant="card" message="Loading assessments..." className="min-h-[250px]" />
         ) : filtered.length === 0 ? (
           <div className="h-64 flex flex-col items-center justify-center gap-2 text-gray-500">
             <FolderOpen size={36} className="text-gray-400" />

@@ -3,9 +3,10 @@
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import {
-  Users, Trophy, Copy, Check, Play, Square, Loader, ArrowLeft,
+  Users, Trophy, Copy, Check, Play, Square, Loader as LoaderIcon, ArrowLeft,
   Calendar, RefreshCw, AlertTriangle, ShieldCheck, HelpCircle, UserCheck, Eye
 } from "lucide-react";
+import Loader from "@/components/Loader";
 
 interface SSEParticipant {
   id: string;
@@ -249,12 +250,7 @@ export default function TeacherHostPage() {
   };
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center text-gray-700">
-        <Loader className="animate-spin text-blue-600 mb-4" size={40} />
-        <p className="text-sm text-gray-500">Loading educator hosting panel...</p>
-      </div>
-    );
+    return <Loader variant="fullPage" message="Loading educator hosting panel..." />;
   }
 
   if (error) {
@@ -307,7 +303,7 @@ export default function TeacherHostPage() {
                 onClick={startAssessment}
                 className="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 disabled:opacity-40 disabled:cursor-not-allowed border border-emerald-600 px-5 py-3 rounded-none font-bold text-sm text-white flex items-center justify-center gap-2 shadow-sm transition-all"
               >
-                {actionLoading ? <Loader size={16} className="animate-spin" /> : <Play size={16} />}
+                {actionLoading ? <LoaderIcon size={16} className="animate-spin" /> : <Play size={16} />}
                 Start Assessment
               </button>
             )}
@@ -318,7 +314,7 @@ export default function TeacherHostPage() {
                 onClick={endAssessment}
                 className="w-full sm:w-auto bg-red-600 hover:bg-red-700 disabled:opacity-50 border border-red-600 px-5 py-3 rounded-none font-bold text-sm text-white flex items-center justify-center gap-2 shadow-sm transition-all"
               >
-                {actionLoading ? <Loader size={16} className="animate-spin" /> : <Square size={16} />}
+                {actionLoading ? <LoaderIcon size={16} className="animate-spin" /> : <Square size={16} />}
                 End Assessment
               </button>
             )}

@@ -7,7 +7,7 @@ import {
   FileText,
   Sliders,
   Zap,
-  Loader,
+  Loader2,
   Plus,
   Trash2,
   CheckCircle,
@@ -25,6 +25,8 @@ import {
   Lightbulb,
   TimerIcon,
 } from "lucide-react";
+import Loader from "@/components/Loader";
+import { useToast } from "@/components/Toast";
 import dynamic from "next/dynamic";
 
 const PDFDownloadLink = dynamic(
@@ -50,6 +52,7 @@ interface Question {
 
 export default function DirectorGeneratePage() {
   const router = useRouter();
+  const toast = useToast();
   const [isMounted, setIsMounted] = useState(false);
   const [token, setToken] = useState<string | null>(null);
   const [director, setDirector] = useState<any>(null);
@@ -319,6 +322,7 @@ export default function DirectorGeneratePage() {
     formData.append("department", department || "General");
     formData.append("teachingType", teachingType);
 
+    const toastId = toast.loading("Generating academic assessment questions...");
     try {
       const res = await fetch("/api/director/assessment/generate", {
         method: "POST",
@@ -326,6 +330,10 @@ export default function DirectorGeneratePage() {
       });
       const data = await res.json();
       if (res.ok && data.success) {
+        toast.update(toastId, {
+          type: "success",
+          message: "Assessment generated successfully!",
+        });
         const questions: Question[] = data.questions;
         setAssessmentTitle(
           `${position} Assessment - ${new Date().toLocaleDateString("en-IN")}`,
@@ -370,10 +378,20 @@ export default function DirectorGeneratePage() {
         });
         await Promise.allSettled(imagePromises);
       } else {
-        setGeneratorError(data.message || "Failed to generate assessment.");
+        const errMsg = data.message || "Failed to generate assessment.";
+        setGeneratorError(errMsg);
+        toast.update(toastId, {
+          type: "error",
+          message: errMsg,
+        });
       }
     } catch (err: any) {
-      setGeneratorError("Network error: " + err.message);
+      const errMsg = "Network error: " + err.message;
+      setGeneratorError(errMsg);
+      toast.update(toastId, {
+        type: "error",
+        message: errMsg,
+      });
     } finally {
       setGeneratorLoading(false);
     }
@@ -390,6 +408,7 @@ export default function DirectorGeneratePage() {
     }
     setSaveLoading(true);
     setSaveError(null);
+    const toastId = toast.loading("Uploading images and saving assessment...");
 
     try {
       // 1. Upload any pending (base64) images to Cloudinary
@@ -426,6 +445,10 @@ export default function DirectorGeneratePage() {
       });
       const data = await res.json();
       if (res.ok && data.success) {
+        toast.update(toastId, {
+          type: "success",
+          message: "Assessment template saved successfully!",
+        });
         localStorage.removeItem("gen_generatedQuestions");
         localStorage.removeItem("gen_generationMode");
         localStorage.removeItem("gen_contextText");
@@ -439,10 +462,20 @@ export default function DirectorGeneratePage() {
 
         router.push("/director/assessments");
       } else {
-        setSaveError(data.message || "Failed to save assessment template.");
+        const errMsg = data.message || "Failed to save assessment template.";
+        setSaveError(errMsg);
+        toast.update(toastId, {
+          type: "error",
+          message: errMsg,
+        });
       }
     } catch (err: any) {
-      setSaveError("Network error: " + err.message);
+      const errMsg = "Network error: " + err.message;
+      setSaveError(errMsg);
+      toast.update(toastId, {
+        type: "error",
+        message: errMsg,
+      });
     } finally {
       setSaveLoading(false);
     }
@@ -708,7 +741,7 @@ export default function DirectorGeneratePage() {
   // Render
   // ---------------------------------------------------------------------------
   return (
-    <div className="p-8 space-y-8 animate-in fade-in duration-300">
+    <div className="p-8 container mx-auto space-y-8 animate-in fade-in duration-300">
       <div className="no-print max-w-5xl flex items-start justify-center gap-4">
         <div className="p-2 bg-white/80 border border-gray-200 shadow-sm backdrop-blur-sm">
           <ArrowLeft />
@@ -1037,8 +1070,8 @@ export default function DirectorGeneratePage() {
             >
               {generatorLoading ? (
                 <>
-                  <Loader size={16} className="animate-spin" />
-                  Compiling Evaluation Assessment...
+                  <Loader2 size={16} className="animate-spin" />
+                  <span>Formulating Exam Paper...</span>
                 </>
               ) : (
                 <>
@@ -1101,9 +1134,7 @@ export default function DirectorGeneratePage() {
                   Please Wait, It May Take Few Minutes...
                 </span>
               </h3>
-              <div className="h-32 w-32 flex items-center justify-center text-blue-600 rounded-none animate-spin">
-                <RefreshCw size={64} />
-              </div>
+              <Loader variant="inline" message="Formulating questions..." className="scale-150 py-8" />
               <div className="space-y-2 max-w-md">
                 <p className="text-[10px] font-black uppercase tracking-wider text-blue-600 animate-pulse flex items-end mx-auto justify-center gap-1">
                  <Lightbulb size={18}/> Did you know?
@@ -1802,7 +1833,7 @@ export default function DirectorGeneratePage() {
                   disabled={saveLoading}
                   className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-4 py-2 text-xs cursor-pointer disabled:opacity-50 flex items-center gap-2"
                 >
-                  {saveLoading && <Loader size={12} className="animate-spin" />}
+                  {saveLoading && <Loader2 size={12} className="animate-spin" />}
                   {saveLoading ? "Uploading & Saving..." : "Save Assessment"}
                 </button>
               </div>
