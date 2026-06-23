@@ -90,7 +90,7 @@ export default function AdminLogin() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="input-field pl-12 pr-4 py-3 bg-white text-gray-900 placeholder-gray-400"
-                  placeholder="admin@achariya.org"
+                  placeholder="admin email"
                 />
               </div>
             </div>

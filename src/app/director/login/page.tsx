@@ -90,7 +90,7 @@ export default function DirectorLogin() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="w-full bg-white border border-gray-300 rounded-none pl-12 pr-4 py-3 text-sm focus:border-blue-600 outline-none text-gray-900 placeholder-gray-400 font-semibold"
-                  placeholder="e.g. director.la@achariya.org"
+                  placeholder="director's email"
                 />
               </div>
             </div>
@@ -124,14 +124,14 @@ export default function DirectorLogin() {
           </form>
 
           {/* Seed accounts notice */}
-          <div className="p-4 bg-blue-50 border border-blue-100 rounded-none flex items-start gap-3">
+          {/* <div className="p-4 bg-blue-50 border border-blue-100 rounded-none flex items-start gap-3">
             <HelpCircle size={18} className="text-blue-600 shrink-0 mt-0.5" />
             <div className="text-xs text-gray-600 space-y-1">
               <p className="font-bold text-gray-900">Seeded Director Profile</p>
               <p>Email: <code className="text-blue-700 font-bold">director.la@achariya.org</code></p>
               <p>Password: <code className="text-blue-700 font-bold">password123</code></p>
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
     </div>
