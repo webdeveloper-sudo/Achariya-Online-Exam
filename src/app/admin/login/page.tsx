@@ -67,7 +67,6 @@ export default function AdminLogin() {
           </p>
         </div>
 
-        {/* Login Card - flat no-radius style */}
         <div className="bg-white/80 backdrop-blur-md border border-gray-300 p-8 shadow-xl">
           {error && (
             <div className="mb-6 p-4 bg-red-50 border border-red-200 flex items-center gap-3 text-[#C72323] text-sm">
@@ -75,6 +74,7 @@ export default function AdminLogin() {
               <span>{error}</span>
             </div>
           )}
+
 
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Email Field */}
@@ -90,7 +90,7 @@ export default function AdminLogin() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="input-field pl-12 pr-4 py-3 bg-white text-gray-900 placeholder-gray-400"
-                  placeholder="admin email"
+                  placeholder="admin email address"
                 />
               </div>
             </div>
