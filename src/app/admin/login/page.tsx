@@ -45,7 +45,7 @@ export default function AdminLogin() {
     <div className="min-h-screen text-gray-900 flex flex-col items-center justify-center p-4 relative overflow-hidden bg-transparent">
       <div className="w-full max-w-md relative z-10">
         
-        {/* Back Link */}
+       
         {/* <div className="mb-6">
           <Link
             href="/"
