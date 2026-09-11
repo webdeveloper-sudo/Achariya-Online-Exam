@@ -1,0 +1,220 @@
+import { NextResponse } from "next/server";
+import { prisma } from "@/lib/db";
+import { broadcast } from "@/lib/sse-store";
+import { GoogleGenerativeAI } from "@google/generative-ai";
+
+async function evaluateShortAnswerWithAI(
+  question: string,
+  correctAnswer: string,
+  studentAnswer: string
+): Promise<boolean> {
+  const apiKey = process.env.GOOGLE_AI_API_KEY;
+  if (!apiKey) {
+    return studentAnswer.trim().toLowerCase() === correctAnswer.trim().toLowerCase();
+  }
+
+  try {
+    const genAI = new GoogleGenerativeAI(apiKey);
+    const modelsToTry = [
+      "gemini-1.5-flash",
+      "gemini-2.5-flash",
+      "gemini-2.5-flash-lite",
+      "gemini-flash-latest"
+    ];
+
+    const prompt = `
+You are an expert exam evaluator. You are grading a short answer question.
+Compare the student's answer to the expected correct answer/context.
+The student's answer does NOT need to match the correct answer word-for-word, but it must be conceptually correct, accurate, and answer the question properly.
+
+Question: "${question}"
+Expected Correct Answer/Context: "${correctAnswer}"
+Student's Answer: "${studentAnswer}"
+
+Respond ONLY with a JSON object:
+{
+  "isCorrect": true or false
+}
+`;
+
+    let textResponse = "";
+    for (const modelName of modelsToTry) {
+      try {
+        const model = genAI.getGenerativeModel({ model: modelName });
+        const result = await model.generateContent(prompt);
+        const response = await result.response;
+        const text = response.text();
+        if (text && text.trim().length > 0) {
+          textResponse = text;
+          break;
+        }
+      } catch (err) {
+        // Fallback to next model
+      }
+    }
+
+    if (!textResponse) {
+      return studentAnswer.trim().toLowerCase() === correctAnswer.trim().toLowerCase();
+    }
+
+    const cleanJson = textResponse.replace(/```json/g, "").replace(/```/g, "").trim();
+    const parsed = JSON.parse(cleanJson);
+    return !!parsed.isCorrect;
+  } catch (err) {
+    console.error("Gemini short answer evaluation error:", err);
+    return studentAnswer.trim().toLowerCase() === correctAnswer.trim().toLowerCase();
+  }
+}
+
+function evaluateObjectiveAnswer(
+  pAnswer: string,
+  correctAnswer: string,
+  options?: string[]
+): boolean {
+  if (!pAnswer || !correctAnswer) return false;
+  const pNorm = String(pAnswer).trim().toLowerCase();
+  const cNorm = String(correctAnswer).trim().toLowerCase();
+
+  if (pNorm === cNorm) return true;
+
+  if (options && Array.isArray(options) && options.length > 0) {
+    if (/^[a-f]$/i.test(cNorm)) {
+      const idx = cNorm.charCodeAt(0) - 97;
+      if (idx >= 0 && idx < options.length && pNorm === options[idx].trim().toLowerCase()) {
+        return true;
+      }
+    }
+
+    if (/^[1-6]$/.test(cNorm)) {
+      const idx = parseInt(cNorm, 10) - 1;
+      if (idx >= 0 && idx < options.length && pNorm === options[idx].trim().toLowerCase()) {
+        return true;
+      }
+    }
+
+    if (/^[a-f]$/i.test(pNorm)) {
+      const idx = pNorm.charCodeAt(0) - 97;
+      if (idx >= 0 && idx < options.length && options[idx].trim().toLowerCase() === cNorm) {
+        return true;
+      }
+    }
+
+    const cleanP = pNorm.replace(/^(\([a-d1-4]\)|[a-d1-4][\)\.\:\-–—\s])\s*/i, "").trim();
+    const cleanC = cNorm.replace(/^(\([a-d1-4]\)|[a-d1-4][\)\.\:\-–—\s])\s*/i, "").trim();
+    if (cleanP && cleanC && cleanP === cleanC) return true;
+    if (cleanP && cleanP === cNorm) return true;
+    if (cleanC && cleanC === pNorm) return true;
+  }
+
+  return false;
+}
+
+export async function POST(
+  request: Request,
+  { params }: { params: Promise<{ token: string }> }
+) {
+  try {
+    const { token } = await params;
+    const body = await request.json();
+    const { participantId, answers = {}, tabSwitches = 0 } = body;
+
+    if (!participantId) {
+      return NextResponse.json({ message: "participantId is required." }, { status: 400 });
+    }
+
+    const session = await prisma.recruitmentLiveSession.findUnique({
+      where: { token },
+      include: {
+        assessment: { select: { questions: true } },
+        participants: true,
+      },
+    });
+
+    if (!session) {
+      return NextResponse.json({ message: "Session not found." }, { status: 404 });
+    }
+
+    if (session.status !== "ACTIVE") {
+      return NextResponse.json({ message: "Session is not active." }, { status: 409 });
+    }
+
+    const participant = session.participants.find((p) => p.id === participantId);
+    if (!participant) {
+      return NextResponse.json({ message: "Participant not found in this session." }, { status: 404 });
+    }
+
+    if (participant.completedAt) {
+      return NextResponse.json({ message: "Already submitted." }, { status: 409 });
+    }
+
+    // Score calculation
+    const questions = (Array.isArray(session.assessment.questions)
+      ? session.assessment.questions
+      : JSON.parse(session.assessment.questions as string)
+    ) as Array<{ id: string; correctAnswer: string; question: string; options?: string[]; type?: string }>;
+
+    const evaluationPromises = questions.map(async (q, idx) => {
+      const pAnswer =
+        answers[q.id] ||
+        answers[String(idx + 1)] ||
+        answers[String(idx)] ||
+        answers[`q-${idx + 1}`] ||
+        answers[`q_${idx + 1}`];
+      const cAnswer = q.correctAnswer;
+      if (!pAnswer || !cAnswer) return false;
+
+      const isShortAnswer = q.type === "short_answer" || q.type === "long_answer" || (!q.options && q.type !== "true_false");
+      if (isShortAnswer) {
+        return await evaluateShortAnswerWithAI(
+          q.question || `Short answer prompt for question ${q.id}`,
+          cAnswer,
+          String(pAnswer)
+        );
+      } else {
+        return evaluateObjectiveAnswer(String(pAnswer), String(cAnswer), q.options);
+      }
+    });
+
+    const results = await Promise.all(evaluationPromises);
+    const score = results.filter(Boolean).length;
+
+    const completedAt = new Date();
+    const timeTakenSeconds = session.startedAt
+      ? Math.floor((completedAt.getTime() - session.startedAt.getTime()) / 1000)
+      : null;
+
+    // Is the user disqualified at submission time?
+    const finalTabSwitches = Math.max(participant.tabSwitches, tabSwitches);
+    const terminated = finalTabSwitches > 2 || participant.terminated;
+
+    await prisma.recruitmentLiveSessionParticipant.update({
+      where: { id: participantId },
+      data: {
+        completedAt,
+        timeTakenSeconds,
+        score,
+        totalQuestions: questions.length,
+        answers: answers as object,
+        tabSwitches: finalTabSwitches,
+        terminated,
+      },
+    });
+
+    // Notify recruitment host that a candidate has submitted
+    broadcast(token, { type: "student:submitted", participantId });
+
+    return NextResponse.json({
+      success: true,
+      score,
+      totalQuestions: questions.length,
+      timeTakenSeconds,
+      terminated,
+    });
+  } catch (error: any) {
+    console.error("Error submitting recruitment session:", error);
+    return NextResponse.json(
+      { message: "Internal server error: " + error.message },
+      { status: 500 }
+    );
+  }
+}
